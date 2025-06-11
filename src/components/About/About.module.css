@@ -1,0 +1,199 @@
+
+.mainContainer {
+  margin: 0 auto;
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 30px;
+}
+
+.heroImage {
+  margin: 0 auto;
+  width: 1290px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.heroImage img {
+  height: 500px;
+  width: 100%;
+  object-fit: cover;
+}
+
+.contentSection {
+  margin: 0 auto;
+  width: 1290px;
+  display: flex;
+  padding: 60px 40px;
+  gap: 40px;
+}
+
+.column {
+  flex: 1;
+  padding: 0 20px;
+}
+
+.columnTitle {
+  font-size: 32px;
+  font-weight: bold;
+  color: #d4a574;
+  margin-bottom: 20px;
+  text-align: center;
+  border-bottom: 2px solid #d4a574;
+  padding-bottom: 10px;
+}
+
+.column p {
+  font-size: 18px;
+  line-height: 1.7;
+  color: #555;
+  text-align: justify;
+  margin-bottom: 15px;
+}
+
+.divider {
+  width: 1px;
+  background: linear-gradient(to bottom, transparent, #ddd, transparent);
+  margin: 0 20px;
+}
+
+.testimonialContainer {
+  margin: 0 auto;
+  display: flex;
+}
+
+.testimonialContent {
+  align-items: center;
+  flex: 1;
+  background: linear-gradient(135deg, #f8f8f8 0%, #e8e8e8 100%);
+  padding: 80px 60px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: relative;
+}
+
+.quoteText {
+  font-size: 24px;
+  line-height: 1.8;
+  color: #333;
+  font-style: italic;
+  margin-bottom: 40px;
+  text-align: justify;
+  max-width: 520px;
+}
+
+.authorSection {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.authorAvatar {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: linear-gradient(45deg, #8B4513, #D2691E);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: bold;
+  font-size: 18px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+.authorInfo h4 {
+  font-size: 18px;
+  color: #333;
+  font-weight: bold;
+  margin-bottom: 2px;
+}
+
+.authorInfo p {
+  font-size: 14px;
+  color: #888;
+  font-style: italic;
+}
+
+.restaurantImage {
+  flex: 1;
+  position: relative;
+  background: linear-gradient(rgba(0,0,0,0.1), rgba(0,0,0,0.1)), url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 645 500"><rect width="645" height="500" fill="%23654321"/><rect x="50" y="50" width="545" height="400" fill="%238B4513"/><rect x="100" y="100" width="200" height="150" fill="%23A0522D"/><rect x="350" y="80" width="180" height="200" fill="%23654321"/><rect x="80" y="300" width="180" height="120" fill="%238B0000"/><rect x="300" y="320" width="150" height="100" fill="%232F4F2F"/><circle cx="150" cy="50" r="15" fill="%23FFE4B5"/><circle cx="200" cy="40" r="12" fill="%23FFE4B5"/><circle cx="120" cy="70" r="10" fill="%23FFE4B5"/><circle cx="180" cy="80" r="8" fill="%23FFE4B5"/><circle cx="520" cy="180" r="40" fill="%23F5F5DC"/><circle cx="580" cy="200" r="25" fill="%232F4F2F"/><circle cx="460" cy="220" r="30" fill="%238B0000"/><rect x="200" y="350" width="100" height="80" fill="%234A4A4A"/><rect x="320" y="360" width="80" height="60" fill="%23696969"/></svg>');
+  background-size: cover;
+  background-position: center;
+}
+
+.restaurantImage img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.restaurantImage::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(45deg, rgba(139, 69, 19, 0.1), rgba(160, 82, 45, 0.1));
+}
+
+.lantern {
+  position: absolute;
+  width: 20px;
+  height: 30px;
+  background: #FFE4B5;
+  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  top: 60px;
+  left: 150px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+}
+
+.lantern2 {
+  left: 200px;
+  top: 50px;
+  width: 18px;
+  height: 25px;
+}
+
+.lantern3 {
+  left: 120px;
+  top: 80px;
+  width: 15px;
+  height: 20px;
+}
+
+.newWrapper {
+  text-align: center;
+  padding: 50px 0;
+  background-color: #f9f9f9;
+}
+
+.title {
+  color: #8B0000;
+  font-size: 2em;
+  margin-bottom: 10px;
+}
+
+.subtitle {
+  font-size: 1.5em;
+  margin-bottom: 20px;
+}
+
+.content {
+  font-size: 24px;
+  max-width: 1290px;
+  margin: 0 auto;
+  line-height: 1.5;
+  padding: 20px;
+}
+
+.border {
+  border-bottom: 5px solid #8B0000;
+  width: 100%;
+  position: fixed;
+  bottom: 0;
+}

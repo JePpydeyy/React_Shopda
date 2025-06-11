@@ -1,0 +1,565 @@
+
+.indexContainer {
+  width: 100%;
+}
+
+/* Banner Section */
+.banner {
+  width: 100%;
+}
+
+.bannerImage {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Collections Section */
+.collectionsSection {
+  padding: 50px 0;
+}
+
+.collectionsTitle {
+  text-align: center;
+  font-size: 2.5rem;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 50px;
+  letter-spacing: -0.5px;
+}
+
+.collectionsGrid {
+  margin: 0 auto;
+  display: flex;
+  flex-direction: row;
+  width: 1290px;
+  gap: 30px;
+  padding: 0 20px;
+}
+
+.collectionCard {
+  width: 400px;
+  position: relative;
+  height: 250px;
+  border-radius: 15px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.4s ease;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+.collectionCard:hover {
+  transform: translateY(-8px) scale(1.05);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+}
+
+.necklaces .cardBackground {
+  background-image: url('/public/images/vongdaphongthuy.png');
+}
+
+.rings .cardBackground {
+  background-image: url('/public/images/vongtaythoitrang.jpg');
+}
+
+.bracelets .cardBackground {
+  background-image: url('/public/images/newproduct.png');
+}
+
+.cardBackground {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  transition: all 0.4s ease;
+}
+
+.cardOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.3);
+  transition: all 0.4s ease;
+}
+
+.collectionCard:hover .cardOverlay {
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.cardContent {
+  position: relative;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 30px;
+  z-index: 2;
+}
+
+.collectionTitle {
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: white;
+  text-align: center;
+  margin-bottom: 20px;
+  letter-spacing: 0.5px;
+  margin-top: 30px;
+}
+
+.shopNowBtn {
+  background: white;
+  color: #2c3e50;
+  border: none;
+  padding: 12px 30px;
+  border-radius: 25px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  opacity: 0;
+  transform: translateY(20px);
+  text-decoration: none;
+  display: inline-block;
+}
+
+.collectionCard:hover .shopNowBtn {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.shopNowBtn:hover {
+  background: #f8f9fa;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* New Product Section */
+.newProduct {
+  background: url('/public/images/Banner.png');
+  padding: 50px 0;
+}
+
+.newProductSection {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 30px;
+  align-items: center;
+  min-height: 400px;
+  padding: 0 20px;
+}
+
+.productTextColumn {
+  position: relative;
+  color: white;
+  padding: 60px 40px;
+  border-radius: 15px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 350px;
+}
+
+.productTextColumn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #B91C1C 0%, #DC2626 100%);
+  border-radius: 15px;
+  z-index: -1;
+  box-shadow: 0 10px 30px rgba(185, 28, 28, 0.3);
+}
+
+.newProductTitle {
+  font-size: 2.2rem;
+  font-weight: 700;
+  line-height: 1.3;
+  margin-bottom: 15px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.imageColumn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.productImageContainer {
+  position: relative;
+  width: 400px;
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+  transition: transform 0.3s ease;
+}
+
+.productImageContainer:hover {
+  transform: scale(1.05);
+}
+
+.productImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 15px;
+}
+
+.newProductDesc {
+  padding: 30px;
+  background: white;
+  border-radius: 15px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+}
+
+.productCategory {
+  color: #6B7280;
+  font-size: 0.9rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 10px;
+}
+
+.productName {
+  color: #F4C430;
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 20px;
+  line-height: 1.3;
+}
+
+.productDescription {
+  color: #4B5563;
+  font-size: 1rem;
+  line-height: 1.7;
+  margin-bottom: 30px;
+  text-align: justify;
+}
+
+.ctaButton {
+  background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
+  color: white;
+  border: none;
+  padding: 15px 30px;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 15px rgba(139, 69, 19, 0.3);
+}
+
+.ctaButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(139, 69, 19, 0.4);
+  background: linear-gradient(135deg, #A0522D 0%, #8B4513 100%);
+}
+
+/* Ngũ Hành Section */
+.nguHanhSection {
+  width: 1290px;
+  margin: 0 auto;
+  padding: 50px 20px;
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  grid-template-areas: 'ngu-hanh-desc ngu-hanh-grid';
+  gap: 40px;
+  align-items: center;
+}
+
+.nguHanhGrid {
+  grid-area: ngu-hanh-grid;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+  gap: 15px;
+  height: auto;
+}
+
+.elementCard {
+  position: relative;
+  border-radius: 15px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  aspect-ratio: 1 / 1;
+}
+
+.elementCard:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
+}
+
+.elementImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.elementCard:hover .elementImage {
+  transform: scale(1.05);
+}
+
+.elementOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.elementCard:hover .elementOverlay {
+  background: linear-gradient(45deg, rgba(0, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0.2) 100%);
+}
+
+.mongTho {
+  background: linear-gradient(135deg, #8B4513 0%, #D2691E 100%);
+}
+
+.mongKim {
+  background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+}
+
+.mongThuy {
+  background: linear-gradient(135deg, #1E90FF 0%, #00CED1 100%);
+}
+
+.mongMoc {
+  background: linear-gradient(135deg, #228B22 0%, #32CD32 100%);
+}
+
+.mongHoa {
+  background: linear-gradient(135deg, #DC143C 0%, #FF6347 100%);
+}
+
+.thoiThuong {
+  background: linear-gradient(135deg, #CD853F 0%, #DEB887 100%);
+}
+
+.nguHanhDesc {
+  grid-area: ngu-hanh-desc;
+  padding: 30px;
+  background: white;
+  border-radius: 15px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+  height: fit-content;
+}
+
+.nguHanhTitle {
+  color: #2c3e50;
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 25px;
+  line-height: 1.2;
+}
+
+.nguHanhText {
+  color: #4B5563;
+  font-size: 1rem;
+  line-height: 1.8;
+  text-align: left;
+  margin-bottom: 25px;
+}
+
+.nguHanhHighlight {
+  color: #8B4513;
+  font-weight: 600;
+}
+
+/* Product Slider Section */
+.containerProduct {
+  position: relative;
+  width: 100%;
+  width: 1290px;
+  margin: 0 auto;
+  overflow: hidden;
+}
+
+.scrollWrapper {
+  display: flex;
+  gap: 10px;
+  padding: 20px 0;
+  overflow-x: hidden;
+  
+}
+
+.product {
+  min-width: 277.5px;
+  height: 300px;
+  background: #f9e4d4;
+  border: 5px solid #a31f34;
+  border-radius: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-shrink: 0;
+  position: relative;
+}
+
+.productImage {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(163, 31, 52, 0.8);
+  color: white;
+  border: none;
+  padding: 15px;
+  cursor: pointer;
+  font-size: 18px;
+  z-index: 20;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.3s;
+}
+
+.btn:hover {
+  background: rgba(163, 31, 52, 1);
+}
+
+.btnLeft {
+  left: 10px;
+}
+
+.btnRight {
+  right: 10px;
+}
+
+/* News Section */
+.news {
+  gap: 42px;
+  margin: 0 auto;
+  width: 1290px;
+  display: flex;
+  flex-direction: row;
+}
+
+.newsPost {
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
+  overflow: hidden;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  position: relative;
+  background-color: transparent;
+  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+}
+
+.postImage {
+  width: 100%;
+  height: 250px;
+  position: relative;
+  background-size: contain, contain, cover;
+  background-position: bottom left, top right, center;
+}
+
+.postImageImg {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  z-index: 1;
+}
+
+.postContent {
+  position: relative;
+  top: -40px;
+  width: 300px;
+  margin: 0 auto;
+  padding: 1.25rem;
+  background-color: #ffffff;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  display: grid;
+  grid-template-rows: auto auto 1fr;
+  z-index: 10;
+}
+
+.postDate {
+  display: flex;
+  align-items: center;
+  color: #6b7280;
+  font-size: 0.9rem;
+  margin-bottom: 0.625rem;
+}
+
+.postDateIcon {
+  width: 16px;
+  height: 16px;
+  margin-right: 0.5rem;
+  color: #6b7280;
+}
+
+.postTitle {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 0.9375rem;
+  line-height: 1.3;
+}
+
+.postLink {
+  display: grid;
+  grid-template-columns: 1fr;
+  align-content: end;
+}
+
+.postLinkA {
+  color: #1f2937;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 1rem;
+  padding-bottom: 2px;
+  position: relative;
+  transition: color 0.3s ease-in-out;
+}
+
+.postLinkA::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 50%;
+  height: 2px;
+  background-color: #1f2937;
+  transition: width 0.3s ease-in-out, background-color 0.3s ease-in-out;
+}
+
+.postLinkA:hover {
+  color: #2C7DA0;
+}
+
+.postLinkA:hover::after {
+  width: 100%;
+  background-color: #2C7DA0;
+}
+

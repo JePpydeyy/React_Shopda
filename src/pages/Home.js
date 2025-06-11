@@ -1,17 +1,17 @@
 // src/pages/Home.js
 import React from 'react';
 import Header from '../components/Header/Header';
-import ProductSite from '../components/Product/Product';
+import Index from '../components/index/index';
 import Footer from '../components/Footer/Footer';
 
-const DetailJob = () => {
+const Home = () => {
   return (
     <div>
       <Header />
-      <ProductSite />
+      <Index />
       <Footer />
     </div>
   );
 };
 
-export default DetailJob;
+export default Home;

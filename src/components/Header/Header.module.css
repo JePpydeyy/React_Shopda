@@ -1,0 +1,138 @@
+.header {
+  background: linear-gradient(135deg, #F4C430 0%, #E6B800 100%);
+  padding: 15px 0;
+}
+
+.container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1290px;
+  margin: 0 auto;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  color: #8B4513;
+  text-decoration: none;
+}
+
+.logoIcon {
+  width: 40px;
+  height: 40px;
+  background: #8B4513;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #F4C430;
+  font-weight: bold;
+  font-size: 18px;
+  margin-right: 10px;
+}
+
+.logoText {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.logoSubtitle {
+  font-size: 12px;
+  color: #8B4513;
+  opacity: 0.8;
+}
+
+.headerRight {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.searchCart {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.searchIcon,
+.cartIcon {
+  font-size: 24px;
+  cursor: pointer;
+  color: #8B4513;
+}
+
+.cartContainer {
+  position: relative;
+}
+
+.cartBadge {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: #dc3545;
+  color: white;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  font-size: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.languageSelector {
+  color: #8B4513;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.navbar {
+  background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
+  padding: 12px 0;
+}
+
+.navContainer {
+  width: 1290px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 30px;
+}
+
+.navHighlight {
+  color: #F4C430;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.navDivider {
+  color: #F4C430;
+  font-size: 18px;
+}
+
+.navMenu {
+  display: flex;
+  list-style: none;
+  gap: 30px;
+}
+
+.navMenu a {
+  color: white;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.navMenu a:hover {
+  color: #F4C430;
+}
+
+.dropdownArrow {
+  margin-left: 5px;
+  font-size: 10px;
+}
