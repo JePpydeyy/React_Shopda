@@ -3,6 +3,8 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Home from './pages/Home';
 import About from './pages/About'
 import ProductSite from './pages/product';
+import Cart from './pages/Cart';
+
 import './App.css';
 // import { AuthProvider } from './Admin/components/AuthContext/AuthContext';
 
@@ -16,6 +18,7 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/product" element={<ProductSite />} />
             <Route path="/About" element={<About />} />
+            <Route path="/cart" element={<Cart />} />
             
           </Routes>
         </div>
