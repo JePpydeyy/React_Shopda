@@ -1,24 +1,24 @@
-import logo from './logo.svg';
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+// import Home from './pages/Home';np
+import ProductSite from './pages/product';
 import './App.css';
+// import { AuthProvider } from './Admin/components/AuthContext/AuthContext';
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    // <AuthProvider>
+      <Router>  
+        <div className="App">
+          <Routes>
+            {/* Public routes */}
+            {/* <Route path="/" element={<Home />} /> */}
+            <Route path="/product" element={<ProductSite />} />
+            
+          </Routes>
+        </div>
+      </Router>
+    // </AuthProvider>
   );
 }
 
