@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faStar } from '@fortawesome/free-regular-svg-icons';
 
-import styles from './Product.module.css';
+import styles from './product.module.css';
 
 const initialProducts = [
   {

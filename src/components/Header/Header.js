@@ -48,7 +48,7 @@ const Navbar = () => {
             </a>
           </li>
           <li><a href="#">BÀI VIẾT</a></li>
-          <li><a href="#">LIÊN HỆ</a></li>
+          <li><a href="/contact">LIÊN HỆ</a></li>
         </ul>
       </div>
     </nav>
