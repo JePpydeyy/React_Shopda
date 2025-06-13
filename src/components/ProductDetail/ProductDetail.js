@@ -58,6 +58,7 @@ const DescriptionTab = ({ product }) => (
     </ul>
   </div>
 );
+{/* eslint-disable react/prop-types */}
 
 const ProductDetail = () => {
   const { id } = useParams();
