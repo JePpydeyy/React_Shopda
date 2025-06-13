@@ -117,15 +117,6 @@
   font-weight: bold;
 }
 
-textarea,
-input {
-  width: 100%;
-  padding: 10px;
-  margin-bottom: 15px;
-  border-radius: 4px;
-  border: 1px solid #ddd;
-}
-
 button {
   background-color: #ff5e00;
   color: #fff;
