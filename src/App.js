@@ -4,6 +4,8 @@ import Home from './pages/Home';
 import About from './pages/About'
 import ProductSite from './pages/product';
 import Cart from './pages/Cart';
+import News from './pages/New';
+import Newdetails from './pages/Newdetail';
 
 import './App.css';
 // import { AuthProvider } from './Admin/components/AuthContext/AuthContext';
@@ -19,6 +21,9 @@ function App() {
             <Route path="/product" element={<ProductSite />} />
             <Route path="/About" element={<About />} />
             <Route path="/cart" element={<Cart />} />
+            <Route path="/new" element={<News />}/>
+            <Route path="/newdetail" element={<Newdetails />}/>
+            
             
           </Routes>
         </div>
