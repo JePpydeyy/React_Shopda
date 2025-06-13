@@ -10,7 +10,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 2px solid #f0c14b;
+  border-bottom: 2px solid #d4a373;
   padding-bottom: 10px;
   margin-bottom: 20px;
 }
@@ -59,11 +59,15 @@
   background: #fff;
   padding: 20px;
   border-radius: 8px;
-  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
-.nav-tabs .nav-link {
-  color: #000; /* Chữ đen khi không active */
+.navTabs {
+  border-bottom: 1px solid #e0c4a0;
+}
+
+.navLink {
+  color: #6b3900;
   border: none;
   border-bottom: 2px solid transparent;
   padding: 10px 20px;
