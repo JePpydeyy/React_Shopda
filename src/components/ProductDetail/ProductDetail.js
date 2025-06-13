@@ -113,7 +113,7 @@ const ProductDetail = () => {
   };
 
   const handleAddToCart = () => {
-    const cart = JSON.parse(localStorage.getItem('cart')) || [];
+    const cart = JSON.parse(localStorage.getItem('cart_da')) || [];
     const cartItem = {
       _id: product._id,
       name: product.name,
@@ -142,7 +142,7 @@ const ProductDetail = () => {
     } else {
       cart.push(cartItem);
     }
-    localStorage.setItem('cart', JSON.stringify(cart));
+    localStorage.setItem('cart_da', JSON.stringify(cart));
     alert('Đã thêm vào giỏ hàng!');
   };
 

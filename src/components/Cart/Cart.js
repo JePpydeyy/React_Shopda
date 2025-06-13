@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
@@ -9,7 +9,7 @@ const Cart = () => {
   const [couponCode, setCouponCode] = useState('');
 
   useEffect(() => {
-    const cart = JSON.parse(localStorage.getItem('cart')) || [];
+    const cart = JSON.parse(localStorage.getItem('cart_da')) || [];
     setCartItems(cart);
   }, []);
 
@@ -26,14 +26,14 @@ const Cart = () => {
       item.quantity = newQuantity;
     }
     setCartItems(newCart);
-    localStorage.setItem('cart', JSON.stringify(newCart));
+    localStorage.setItem('cart_da', JSON.stringify(newCart));
   };
 
   const removeItem = (index) => {
     if (window.confirm('Bạn có chắc chắn muốn xóa sản phẩm này khỏi giỏ hàng?')) {
       const newCart = cartItems.filter((_, i) => i !== index);
       setCartItems(newCart);
-      localStorage.setItem('cart', JSON.stringify(newCart));
+      localStorage.setItem('cart_da', JSON.stringify(newCart));
     }
   };
 
