@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import styles from './Product.module.css';
 
+const API_URL = process.env.REACT_APP_API_URL;
 const PRODUCTS_PER_PAGE = 9;
 
 const Product = () => {
@@ -15,7 +16,7 @@ const Product = () => {
 
   // Fetch products from API
   useEffect(() => {
-    fetch('https://api-tuyendung-cty.onrender.com/api/product')
+    fetch(`${API_URL}/product`)
       .then(res => res.json())
       .then(data => {
         setProducts(data);
@@ -254,7 +255,7 @@ const Product = () => {
                       <img
                         src={
                           product.images && product.images.length > 0
-                            ? `https://api-tuyendung-cty.onrender.com/${product.images[0]}`
+                            ? `${process.env.REACT_APP_API_BASE}/${product.images[0]}`
                             : 'https://via.placeholder.com/300'
                         }
                         alt={product.name}
