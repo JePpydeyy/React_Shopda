@@ -4,6 +4,8 @@ import Home from './pages/Home';
 import About from './pages/About'
 import ProductSite from './pages/product';
 import Cart from './pages/Cart';
+import News from './pages/New';
+import Newdetails from './pages/Newdetail';
 import ProductDetail from './pages/ProductDetail';
 
 import './App.css';
@@ -18,9 +20,13 @@ function App() {
             {/* Public routes */}
             <Route path="/" element={<Home />} />
             <Route path="/product" element={<ProductSite />} />
+            <Route path="/detail/:id" element={<ProductDetail />} />
             <Route path="/About" element={<About />} />
             <Route path="/cart" element={<Cart />} />
-            <Route path="/detail/:id" element={<ProductDetail />} />
+            <Route path="/new" element={<News />}/>
+            <Route path="/newdetail" element={<Newdetails />}/>
+            
+            
           </Routes>
         </div>
       </Router>
