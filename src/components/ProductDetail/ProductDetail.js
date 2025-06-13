@@ -99,6 +99,40 @@ const ProductDetail = () => {
     console.log('Form submitted');
   };
 
+  const handleAddToCart = () => {
+    const cart = JSON.parse(localStorage.getItem('cart')) || [];
+    const cartItem = {
+      _id: product._id,
+      name: product.name,
+      price: product.price,
+      quantity,
+      charm: product.Collection,
+      stoneSize: product.size ? product.size.join(', ') : '',
+      wristSize,
+      image: product.images && product.images.length > 0
+        ? `https://api-tuyendung-cty.onrender.com/${product.images[0]}`
+        : 'https://via.placeholder.com/300',
+      stock: product.stock // Lưu stock vào cart
+    };
+    // Kiểm tra trùng sản phẩm và size tay
+    const existIndex = cart.findIndex(item => item._id === cartItem._id && item.wristSize === cartItem.wristSize);
+    let totalQuantity = quantity;
+    if (existIndex !== -1) {
+      totalQuantity += cart[existIndex].quantity;
+    }
+    if (totalQuantity > product.stock) {
+      alert(`Số lượng vượt quá tồn kho (${product.stock})!`);
+      return;
+    }
+    if (existIndex !== -1) {
+      cart[existIndex].quantity += quantity;
+    } else {
+      cart.push(cartItem);
+    }
+    localStorage.setItem('cart', JSON.stringify(cart));
+    alert('Đã thêm vào giỏ hàng!');
+  };
+
   return (
     <div className={styles.container}>
       <div className={styles.header}>
@@ -131,6 +165,10 @@ const ProductDetail = () => {
             onIncreaseWristSize={handleIncreaseWristSize}
             onDecreaseWristSize={handleDecreaseWristSize}
           />
+          {/* Chỉ còn 1 nút thêm vào giỏ hàng: */}
+          <button className={styles.addToCart} onClick={handleAddToCart}>
+            Thêm vào giỏ hàng
+          </button>
         </div>
       </div>
       <div className="product-content">

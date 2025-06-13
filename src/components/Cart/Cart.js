@@ -1,36 +1,39 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import styles from './Cart.module.css';
 
 const Cart = () => {
-  const [cartItems, setCartItems] = useState([
-    {
-      name: 'VÒNG APATITE BIỂN XANH',
-      price: 2740000,
-      quantity: 1,
-      charm: 'Charm Kim Thọ',
-      stoneSize: '10 Li (Phù Hợp Size Tay: 15cm-18cm)',
-      wristSize: '12 cm',
-    },
-  ]);
+  const [cartItems, setCartItems] = useState([]);
   const [couponCode, setCouponCode] = useState('');
+
+  useEffect(() => {
+    const cart = JSON.parse(localStorage.getItem('cart')) || [];
+    setCartItems(cart);
+  }, []);
 
   const formatPrice = (price) => new Intl.NumberFormat('vi-VN').format(price) + ' VND';
 
-  const updateQuantity = (quantity) => {
-    setCartItems([
-      {
-        ...cartItems[0],
-        quantity: Math.max(1, parseInt(quantity)),
-      },
-    ]);
+  const updateQuantity = (quantity, index) => {
+    const newCart = [...cartItems];
+    const item = newCart[index];
+    const newQuantity = Math.max(1, parseInt(quantity));
+    if (newQuantity > item.stock) {
+      alert(`Chỉ còn tối đa ${item.stock} sản phẩm trong kho!`);
+      item.quantity = item.stock;
+    } else {
+      item.quantity = newQuantity;
+    }
+    setCartItems(newCart);
+    localStorage.setItem('cart', JSON.stringify(newCart));
   };
 
-  const removeItem = () => {
+  const removeItem = (index) => {
     if (window.confirm('Bạn có chắc chắn muốn xóa sản phẩm này khỏi giỏ hàng?')) {
-      setCartItems([]);
+      const newCart = cartItems.filter((_, i) => i !== index);
+      setCartItems(newCart);
+      localStorage.setItem('cart', JSON.stringify(newCart));
     }
   };
 
@@ -47,9 +50,6 @@ const Cart = () => {
     if (cartItems.length > 0) {
       const { quantity, price, name } = cartItems[0];
       const total = quantity * price;
-      alert(
-        `Tiến hành thanh toán:\n- Sản phẩm: ${name}\n- Số lượng: ${quantity}\n- Tổng tiền: ${formatPrice(total)}`
-      );
     } else {
       alert('Giỏ hàng trống!');
     }
@@ -91,11 +91,7 @@ const Cart = () => {
                     <td>
                       <div className={styles.productInfo}>
                         <div className={styles.productImage}>
-                          <div className={styles.braceletVisual}>
-                            {[...Array(8)].map((_, i) => (
-                              <div key={i} className={styles.bead}></div>
-                            ))}
-                          </div>
+                          <img src={item.image} alt={item.name} style={{ width: 60, borderRadius: 8 }} />
                         </div>
                         <div className={styles.productDetails}>
                           <h3>{item.name}</h3>
@@ -112,14 +108,14 @@ const Cart = () => {
                         className={styles.quantityInput}
                         value={item.quantity}
                         min="1"
-                        onChange={(e) => updateQuantity(e.target.value)}
+                        onChange={(e) => updateQuantity(e.target.value, index)}
                       />
                     </td>
                     <td className={styles.totalCell}>{formatPrice(item.price * item.quantity)}</td>
                     <td>
                       <button
                         className={styles.removeBtn}
-                        onClick={removeItem}
+                        onClick={() => removeItem(index)}
                         title="Xóa sản phẩm"
                       >
                         <FontAwesomeIcon icon={faTimes} />
