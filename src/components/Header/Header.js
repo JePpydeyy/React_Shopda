@@ -7,7 +7,7 @@ const Header = () => {
   return (
     <header className={styles.header}>
       <div className={styles.container}>
-        <a href="#" className={styles.logo}>
+        <a href="/" className={styles.logo}>
           <div className={styles.logoIcon}>TL</div>
           <div>
             <div className={styles.logoText}>TINH LÂM</div>
@@ -39,10 +39,10 @@ const Navbar = () => {
         <span className={styles.navHighlight}>CAM KẾT SẢN PHẨM HOÀN TOÀN LÀ ĐÁ TỰ NHIÊN</span>
         <span className={styles.navDivider}>|</span>
         <ul className={styles.navMenu}>
-          <li><a href="#">TRANG CHỦ</a></li>
-          <li><a href="#">GIỚI THIỆU</a></li>
+          <li><a href="/">TRANG CHỦ</a></li>
+          <li><a href="/about">GIỚI THIỆU</a></li>
           <li>
-            <a href="#">
+            <a href="/product">
               SẢN PHẨM
               <FontAwesomeIcon icon={faCaretDown} className={styles.dropdownArrow} />
             </a>
