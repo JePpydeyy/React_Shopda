@@ -1,0 +1,107 @@
+.container {
+  max-width: 800px;
+  margin: 20px auto;
+  padding: 0 20px;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.socialShare {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.socialShare a {
+  display: inline-block;
+  width: 40px;
+  height: 40px;
+  line-height: 40px;
+  text-align: center;
+  color: white;
+  border-radius: 50%;
+  text-decoration: none;
+  transition: background-color 0.3s;
+}
+.facebook { background-color: #3b5998; }
+.twitter { background-color: #1da1f2; }
+.pinterest { background-color: #bd081c; }
+.linkedin { background-color: #0077b5; }
+.socialShare a:hover { opacity: 0.8; }
+
+.postTitle {
+  font-size: 2rem;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+.postContent {
+  text-align: left;
+  font-size: 1rem;
+  line-height: 1.7;
+  color: #333;
+}
+
+.postContent p {
+  margin-bottom: 15px;
+}
+
+.postContent h2 {
+  font-size: 1.5rem;
+  margin-top: 30px;
+  margin-bottom: 15px;
+  font-weight: bold;
+}
+
+.postContent h4 {
+  font-size: 1.25rem;
+  margin-top: 20px;
+  margin-bottom: 10px;
+  font-weight: bold;
+}
+
+.postContent ul {
+  list-style: disc;
+  padding-left: 20px;
+  margin-bottom: 15px;
+}
+
+.postContent ul li {
+  margin-bottom: 8px;
+}
+
+.postContent img {
+  display: block;
+  margin: 0 auto;
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+}
+
+.postContent a {
+  color: #1e90ff;
+  text-decoration: none;
+}
+
+.postContent a:hover {
+  text-decoration: underline;
+}
+
+.navigation {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.navigation button {
+  background-color: #1e90ff;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.navigation button:hover {
+  background-color: #0d6efd;
+}

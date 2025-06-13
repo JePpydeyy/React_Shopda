@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import styles from './Product.module.css';
 
 const API_URL = process.env.REACT_APP_API_URL;
@@ -251,7 +252,7 @@ const Product = () => {
                     {product.status === 'Sale' && (
                       <span className={styles.newLabel}>SALE</span>
                     )}
-                    <a href="#" className={styles.productImgLink}>
+                    <Link to={`/detail/${product._id}`} className={styles.productImgLink}>
                       <img
                         src={
                           product.images && product.images.length > 0
@@ -260,7 +261,7 @@ const Product = () => {
                         }
                         alt={product.name}
                       />
-                    </a>
+                    </Link>
                   </div>
                   <div className={styles.productItemText}>
                     <h6>{product.name}</h6>
