@@ -1,0 +1,54 @@
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px solid #f0c14b;
+  padding-bottom: 10px;
+  margin-bottom: 20px;
+}
+
+.nameProduct {
+  font-size: 24px;
+  margin-left: 5px;
+}
+
+.content {
+  display: flex;
+  gap: 20px;
+}
+
+.rightColumn {
+  flex: 2;
+}
+
+.rightColumn p {
+  line-height: 1.6;
+  margin: 10px 0;
+}
+
+.sale {
+  color: #9b6013;
+}
+
+.sale strong {
+  color: black;
+}
+
+.contact {
+  background-color: #d3a5a5;
+  padding: 10px 20px;
+  border-radius: 20px;
+  color: white;
+  text-align: center;
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+}

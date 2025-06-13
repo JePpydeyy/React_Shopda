@@ -4,6 +4,7 @@ import Home from './pages/Home';
 import About from './pages/About'
 import ProductSite from './pages/product';
 import Cart from './pages/Cart';
+import ProductDetail from './pages/ProductDetail';
 
 import './App.css';
 // import { AuthProvider } from './Admin/components/AuthContext/AuthContext';
@@ -19,7 +20,7 @@ function App() {
             <Route path="/product" element={<ProductSite />} />
             <Route path="/About" element={<About />} />
             <Route path="/cart" element={<Cart />} />
-            
+            <Route path="/product/:id" element={<ProductDetail />} />
           </Routes>
         </div>
       </Router>
