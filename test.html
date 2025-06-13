@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thông Tin Sản Phẩm Ngọc</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            padding: 20px;
+        }
+        .product-content {
+            max-width: 900px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .nav-tabs .nav-link {
+            color: #333;
+            border: none;
+            border-bottom: 2px solid transparent;
+            padding: 10px 20px;
+        }
+        .nav-tabs .nav-link.active {
+            color: #ff5e00;
+            border-bottom: 2px solid #ff5e00;
+            background: none;
+        }
+        .tab-content {
+            padding-top: 20px;
+        }
+        .tab-pane h5 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+        .tab-pane p {
+            line-height: 1.6;
+            color: #666;
+        }
+        .tab-pane strong {
+            color: #000;
+        }
+        .review-section {
+            margin-top: 20px;
+        }
+        .review-item {
+            border-bottom: 1px solid #eee;
+            padding-bottom: 15px;
+            margin-bottom: 15px;
+        }
+        .rating {
+            color: #ffca08;
+        }
+        .form-label {
+            font-weight: bold;
+        }
+        textarea, input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+        button {
+            background-color: #ff5e00;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #ff5e00;
+        }
+    </style>
+</head>
+<body>
+    <div class="product-content">
+        <div class="tab01">
+            <ul class="nav nav-tabs" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link" data-bs-toggle="tab" href="#delivery" role="tab" aria-selected="false">Thông tin giao hàng</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" data-bs-toggle="tab" href="#description" role="tab" aria-selected="true">Chi tiết sản phẩm</a>
+                </li>
+            </ul>
+            <div class="tab-content p-t-43">
+                <div class="tab-pane fade" id="delivery" role="tabpanel">
+                    <div class="row">
+                        <div class="col-12">
+                            <h5><strong>THÔNG TIN VẬN CHUYỂN VÀ HOÀN TRẢ</strong></h5>
+                            <div class="row">
+                                <div class="col-md-6" style="border-right: 1px solid #7c6455;">
+                                    <p><strong>Giao hàng</strong><br>
+                                    – Nội thành: Giao từ 1 – 3 ngày; Miễn phí giao hàng trong bán kính 10km<br>
+                                    – Tỉnh khác: Giao từ 5 – 7 ngày; 30.000 VNĐ / đơn<br>
+                                    ** Lưu ý: Thời gian nhận hàng có thể thay đổi sớm hoặc muộn hơn tùy theo địa chỉ cụ thể của khách hàng.<br>
+                                    *** Trong trường hợp sản phẩm tạm hết hàng, nhân viên CSKH sẽ liên hệ trực tiếp với quý khách để thông báo về thời gian giao hàng.<br>
+                                    Nếu khách hàng có yêu cầu về Giấy Kiểm Định Đá, đơn hàng sẽ cộng thêm 20 ngày để hoàn thành thủ tục.</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p><strong>Chính sách hoàn trả</strong><br>
+                                    – Chúng tôi chấp nhận đổi / trả sản phẩm ngay lúc khách kiểm tra và xác nhận hàng hóa. Chúng tôi cam kết sẽ hỗ trợ và áp dụng chính sách bảo hành tốt nhất tới Quý khách, đảm bảo mọi quyền lợi Quý khách được đầy đủ.<br>
+                                    – Những trình trạng bể, vỡ do quá trình quý khách sử dụng chúng tôi xin từ chối đổi hàng.<br>
+                                    – Tùy vào tình hình thực tế của sản phẩm, chúng tôi sẽ cân nhắc hỗ trợ đổi / trả nếu sản phẩm lỗi hoặc các vấn đề liên quan khác.<br>
+                                    – Chúng tôi nhận bảo hành dây đeo vĩnh viễn dành cho khách hàng nếu tình trạng dây lâu ngày bị giãn nở, cọ xát với đá gây đứt dây trong quá trình sử dụng, chi phí vận chuyển xin quý khách vui lòng tự thanh toán.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane fade show active" id="description" role="tabpanel">
+                    <div class="row">
+                        <div class="col-12">
+                            <p><b>ĐÁ CẨM THẠCH XANH</b></p>
+                            <p><b>(JADEITE)</b></p>
+                            <p><b>Sơ lược:</b> Đá cẩm thạch là loại đá quý rất được ưa chuộng ở khu vực châu Á, được hình thành từ trong lòng đất, những phiến đá tự nhiên nằm sâu trong lớp vỏ trái đất được tôi luyện dưới sức ép và nhiệt độ. Được chắt lọc từ những gì tinh túy nhất của tự nhiên, chính vì thế đá cẩm thạch mới có được độ bền cao.</p>
+                            <p>Từ thời xa xưa, cẩm thạch (hay còn được gọi là đá Trời) đã là loại đá quý vốn chỉ dành cho giới vua chúa, quý tộc trong văn hóa Á Đông.</p>
+                            <p><b>Khu vực được khai thác:</b> Myanmar (Miến Điện), Trung Quốc, Ý, Nhật, Nga, Mỹ, Guatemala,… Việt Nam (Sơn La)</p>
+                            <p><b>Thành phần:</b> NaAlSi2O6 – Jadeite, Ca2(Mg,Fe)5(Si4O11)2(OH)2 – Nephrite</p>
+                            <p><b>Độ cứng thang Mohs:</b> 6.0 – 7.0 /10</p>
+                            <p><b>Mạng phù hợp: Mộc – Hỏa</b></p>
+                            <p><b>Tác dụng tinh thần:</b>
+                            – Tiếp thêm nguồn động lực, mạnh mẽ, lạc quan trong cuộc sống.<br>
+                            – Giúp xua tan sự phiền muộn.<br>
+                            – Thúc đẩy khả năng sinh sản.<br>
+                            – Mang đến cho bạn một cuộc sống hạnh phúc, may mắn trong công việc, học tập, thăng quan, phát tài.<br>
+                            – Có thể xóa đi sự hiểu lầm, xua tan bế tắc trong những mối quan hệ tình cảm, tăng khả năng tập trung cho người đeo.</p>
+                            <p><b>Tác dụng sức khỏe:</b>
+                            – Đá cẩm thạch có tác dụng trải rộng toàn thân con người. Hỗ trợ gan, thận loại bỏ độc tố, chất dư thừa, cân bằng lượng nước, muối và nồng độ pH của cơ thể.<br>
+                            – Các vấn đề liên quan tới xương khớp cũng được cải thiện, giảm tỷ lệ các bệnh đau hông và co cơ, chuột rút.<br>
+                            – Giúp cân bằng năng lượng, rất có lợi cho những người gặp vấn đề về sinh sản.</p>
+                            <p><b>Cách bảo quản đá Cẩm Thạch:</b>
+                            – Tránh xịt nước hoa hoặc keo cứng tóc lên vòng tay.<br>
+                            – Luôn cởi vòng tay khi tập thể thao hoặc làm việc nặng nhọc.<br>
+                            – Bảo quản riêng, không chung đụng với các loại trang sức đá quý khác.<br>
+                            – Bọc bằng vải mềm, và cho vào hộp.<br>
+                            – Khi làm sạch đá cẩm thạch, bạn chỉ cần ngâm trong nước ấm, rồi lau khô bằng vải mềm sạch.</p>
+                        </div>
+                    </div>
+                </div>
+               
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

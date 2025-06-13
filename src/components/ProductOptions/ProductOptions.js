@@ -4,8 +4,6 @@ import styles from './ProductOptions.module.css';
 const ProductOptions = ({ quantity, wristSize, onIncreaseQuantity, onDecreaseQuantity, onIncreaseWristSize, onDecreaseWristSize }) => {
   return (
     <div className={styles.options}>
-      <label>Chọn Charm và Size viên đá để thể hiện giá sản phẩm</label>
-      <p><strong>4,010,000 VND</strong></p>
       <select id="charm" className={styles.select}>
         <option>Charm</option>
         <option>Charm 1</option>
