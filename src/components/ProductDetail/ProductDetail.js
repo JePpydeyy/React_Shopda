@@ -30,35 +30,32 @@ const DeliveryTab = () => (
   </div>
 );
 
-const DescriptionTab = () => (
+const DescriptionTab = ({ product }) => (
   <div className="tab-pane">
-    <p><b>ĐÁ CẨM THẠCH XANH</b></p>
-    <p><b>(JADEITE)</b></p>
-    <p><b>Sơ lược:</b> Đá cẩm thạch là loại đá quý rất được ưa chuộng ở khu vực châu Á, được hình thành từ trong lòng đất, những phiến đá tự nhiên nằm sâu trong lớp vỏ trái đất được tôi luyện dưới sức ép và nhiệt độ. Được chắt lọc từ những gì tinh túy nhất của tự nhiên, chính vì thế đá cẩm thạch mới có được độ bền cao.</p>
-    <p>Từ thời xa xưa, cẩm thạch (hay còn được gọi là đá Trời) đã là loại đá quý vốn chỉ dành cho giới vua chúa, quý tộc trong văn hóa Á Đông.</p>
-    <p><b>Khu vực được khai thác:</b> Myanmar (Miến Điện), Trung Quốc, Ý, Nhật, Nga, Mỹ, Guatemala,… Việt Nam (Sơn La)</p>
-    <p><b>Thành phần:</b> NaAlSi2O6 – Jadeite, Ca2(Mg,Fe)5(Si4O11)2(OH)2 – Nephrite</p>
-    <p><b>Độ cứng thang Mohs:</b> 6.0 – 7.0 /10</p>
-    <p><b>Mạng phù hợp: Mộc – Hỏa</b></p>
-    <p><b>Tác dụng tinh thần:</b>
-      – Tiếp thêm nguồn động lực, mạnh mẽ, lạc quan trong cuộc sống.<br />
-      – Giúp xua tan sự phiền muộn.<br />
-      – Thúc đẩy khả năng sinh sản.<br />
-      – Mang đến cho bạn một cuộc sống hạnh phúc, may mắn trong công việc, học tập, thăng quan, phát tài.<br />
-      – Có thể xóa đi sự hiểu lầm, xua tan bế tắc trong những mối quan hệ tình cảm, tăng khả năng tập trung cho người đeo.
-    </p>
-    <p><b>Tác dụng sức khỏe:</b>
-      – Đá cẩm thạch có tác dụng trải rộng toàn thân con người. Hỗ trợ gan, thận loại bỏ độc tố, chất dư thừa, cân bằng lượng nước, muối và nồng độ pH của cơ thể.<br />
-      – Các vấn đề liên quan tới xương khớp cũng được cải thiện, giảm tỷ lệ các bệnh đau hông và co cơ, chuột rút.<br />
-      – Giúp cân bằng năng lượng, rất có lợi cho những người gặp vấn đề về sinh sản.
-    </p>
-    <p><b>Cách bảo quản đá Cẩm Thạch:</b>
-      – Tránh xịt nước hoa hoặc keo cứng tóc lên vòng tay.<br />
-      – Luôn cởi vòng tay khi tập thể thao hoặc làm việc nặng nhọc.<br />
-      – Bảo quản riêng, không chung đụng với các loại trang sức đá quý khác.<br />
-      – Bọc bằng vải mềm, và cho vào hộp.<br />
-      – Khi làm sạch đá cẩm thạch, bạn chỉ cần ngâm trong nước ấm, rồi lau khô bằng vải mềm sạch.
-    </p>
+    <p><b>{product.material}</b></p>
+    <p><b>Sơ lược:</b> {product.short_description}</p>
+    <p><b>Khu vực được khai thác:</b> {product.origin}</p>
+    <p><b>Thành phần:</b> {product.material}</p>
+    <p><b>Độ cứng thang Mohs:</b> {product.hardness}</p>
+    <p><b>Mạng phù hợp:</b> {product.element}</p>
+    <p><b>Tác dụng tinh thần:</b></p>
+    <ul>
+      {product.spiritual_benefits.map((benefit, index) => (
+        <li key={index}>{benefit}</li>
+      ))}
+    </ul>
+    <p><b>Tác dụng sức khỏe:</b></p>
+    <ul>
+      {product.health_benefits.map((benefit, index) => (
+        <li key={index}>{benefit}</li>
+      ))}
+    </ul>
+    <p><b>Cách bảo quản:</b></p>
+    <ul>
+      {product.care_instructions.map((instruction, index) => (
+        <li key={index}>{instruction}</li>
+      ))}
+    </ul>
   </div>
 );
 
@@ -69,20 +66,35 @@ const ProductDetail = () => {
   const [wristSize, setWristSize] = useState(15);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [activeTab, setActiveTab] = useState('delivery');
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetch(`https://api-tuyendung-cty.onrender.com/api/product/${id}`)
-      .then(res => res.json())
-      .then(data => setProduct(data))
-      .catch(() => setProduct(null));
+    const fetchProduct = async () => {
+      try {
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/product/${id}`);
+        if (!response.ok) {
+          throw new Error('Không thể lấy dữ liệu sản phẩm');
+        }
+        const data = await response.json();
+        setProduct(data);
+      } catch (err) {
+        setError(err.message);
+        setProduct(null);
+      }
+    };
+    fetchProduct();
   }, [id]);
+
+  if (error) {
+    return <div className={styles.error}>Lỗi: {error}</div>;
+  }
 
   if (!product) {
     return <div className={styles.loading}>Đang tải...</div>;
   }
 
   const images = product.images && product.images.length > 0
-    ? product.images.map(img => `https://api-tuyendung-cty.onrender.com/${img}`)
+    ? product.images.map(img => `${process.env.REACT_APP_API_BASE}/${img}`)
     : ["https://via.placeholder.com/300"];
 
   const handleIncreaseQuantity = () => setQuantity(quantity + 1);
@@ -93,11 +105,6 @@ const ProductDetail = () => {
   const handlePrevImage = () => setCurrentImageIndex((currentImageIndex - 1 + images.length) % images.length);
   const handleThumbnailClick = (index) => setCurrentImageIndex(index);
   const formatPrice = (price) => new Intl.NumberFormat('vi-VN').format(price);
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log('Form submitted');
-  };
 
   return (
     <div className={styles.container}>
@@ -120,7 +127,7 @@ const ProductDetail = () => {
           )}
           <p><strong>NỘI DUNG SẢN PHẨM:</strong></p>
           <p>{product.description || 'Không có mô tả'}</p>
-          <p><strong>MẠNG PHÙ HỢP: {product.suitableNetwork || 'Hỏa - Thổ'}</strong></p>
+          <p><strong>MẠNG PHÙ HỢP: {product.element || 'Hỏa - Thổ'}</strong></p>
           <hr />
           <p><strong>Giá: {formatPrice(product.price)} VND</strong></p>
           <ProductOptions
@@ -137,8 +144,8 @@ const ProductDetail = () => {
         <ul className="nav nav-tabs" role="tablist">
           <li className="nav-item" role="presentation">
             <button
-              className={`nav-link ${activeTab === 'delivery' ? 'active' : ''}`}
-              onClick={() => { setActiveTab('delivery'); console.log('Switched to delivery'); }}
+              className={`nav-link tab1 ${activeTab === 'delivery' ? 'active' : ''}`}
+              onClick={() => setActiveTab('delivery')}
               role="tab"
               aria-selected={activeTab === 'delivery'}
             >
@@ -147,8 +154,8 @@ const ProductDetail = () => {
           </li>
           <li className="nav-item" role="presentation">
             <button
-              className={`nav-link ${activeTab === 'description' ? 'active' : ''}`}
-              onClick={() => { setActiveTab('description'); console.log('Switched to description'); }}
+              className={`nav-link tab1 ${activeTab === 'description' ? 'active' : ''}`}
+              onClick={() => setActiveTab('description')}
               role="tab"
               aria-selected={activeTab === 'description'}
             >
@@ -161,7 +168,7 @@ const ProductDetail = () => {
             <DeliveryTab />
           </div>
           <div className={`tab-pane ${activeTab === 'description' ? 'active' : ''}`} role="tabpanel">
-            <DescriptionTab />
+            <DescriptionTab product={product} />
           </div>
         </div>
       </div>
