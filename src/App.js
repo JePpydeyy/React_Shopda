@@ -8,6 +8,9 @@ import Newsite from './pages/New';
 import PostDetail from './pages/Newdetail'; 
 
 import Cart from './pages/Cart';
+import News from './pages/New';
+import Newdetails from './pages/Newdetail';
+import ProductDetail from './pages/ProductDetail';
 
 import './App.css';
 
@@ -23,6 +26,7 @@ function App() {
             {/* Public routes */}
             <Route path="/" element={<Home />} />
             <Route path="/product" element={<ProductSite />} />
+            <Route path="/detail/:id" element={<ProductDetail />} />
             <Route path="/About" element={<About />} />
 <<<<<<< HEAD
             <Route path="/Contact" element={<Contactus />} />
@@ -30,6 +34,9 @@ function App() {
             <Route path="/Newdetail" element={<PostDetail />} />
 =======
             <Route path="/cart" element={<Cart />} />
+            <Route path="/new" element={<News />}/>
+            <Route path="/newdetail" element={<Newdetails />}/>
+            
             
 >>>>>>> 5816c20f9a80065b1135f8699734a501ede6dfc5
           </Routes>

@@ -1,86 +1,67 @@
 import React, { useState, useEffect } from 'react';
+<<<<<<< HEAD
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faStar } from '@fortawesome/free-regular-svg-icons';
 
 import styles from './product.module.css';
+=======
+import { Link } from 'react-router-dom';
+import styles from './Product.module.css';
+>>>>>>> 3738fcc2fbe77d009c2a69f827d0d584a3316972
 
-const initialProducts = [
-  {
-    name: 'VÒNG GARNET LỰU ĐỎ',
-    price: 4010000,
-    image: 'https://public.youware.com/users-website-assets/prod/9ad90c6e-7bcc-4cf9-98b3-9b23c289f60f/GARNET-LUU-DO-CHARM-PHUC.png',
-  },
-  {
-    name: 'VÒNG CẨM THẠCH XANH',
-    price: 2340000,
-    image: 'https://public.youware.com/users-website-assets/prod/9ad90c6e-7bcc-4cf9-98b3-9b23c289f60f/CAM-THACH-XANH-CHARM-LOC.png',
-  },
-  {
-    name: 'VÒNG APATITE BIỂN XANH',
-    price: 2740000,
-    image: 'https://public.youware.com/users-website-assets/prod/9ad90c6e-7bcc-4cf9-98b3-9b23c289f60f/APATITE-CHARM-THO.png',
-  },
-  {
-    name: 'VÒNG MOONSTONE',
-    price: 2240000,
-    image: 'https://public.youware.com/users-website-assets/prod/9ad90c6e-7bcc-4cf9-98b3-9b23c289f60f/MOONSTONE-VUONG-MAY-BAC-WEB-TIKTOK.png',
-  },
-  {
-    name: 'VÒNG MẮT HỔ VÀNG NÂU - PHỐI ƯU LINH',
-    price: 1254000,
-    image: 'https://public.youware.com/users-website-assets/prod/9ad90c6e-7bcc-4cf9-98b3-9b23c289f60f/MH-VANG-VUONG-MAY-BAC-WEB-TIKTOK.png',
-  },
-  {
-    name: 'VÒNG MẮT HỔ ĐỎ - PHỐI DIOPSIDE',
-    price: 1540000,
-    image: 'https://public.youware.com/users-website-assets/prod/9ad90c6e-7bcc-4cf9-98b3-9b23c289f60f/MH-DO-VUONG-MAY-DIOPSIDE-WEB-TIKTOK.png',
-  },
-];
-
-const initialCartItems = [
-  {
-    name: 'VÒNG APATITE BIỂN XANH',
-    price: 2740000,
-    quantity: 6,
-    image: 'https://public.youware.com/users-website-assets/prod/9ad90c6e-7bcc-4cf9-98b3-9b23c289f60f/APATITE-CHARM-THO.png',
-    charm: 'Charm Kim Thọ',
-    stoneSize: '10 Li (Phù Hợp Size Tay: 15cm-20cm)',
-    wristSize: '12 cm',
-  },
-  {
-    name: 'VÒNG MẮT HỔ ĐỎ',
-    price: 1540000,
-    quantity: 2,
-    image: 'https://public.youware.com/users-website-assets/prod/9ad90c6e-7bcc-4cf9-98b3-9b23c289f60f/MH-DO-VUONG-MAY-DIOPSIDE.png',
-    charm: 'Charm Diopside',
-    stoneSize: '10 Li (Phù Hợp Size Tay: 15cm-18cm)',
-    wristSize: '13 cm',
-  },
-  {
-    name: 'VÒNG MẮT DIỀU HÀU',
-    price: 3000000,
-    quantity: 1,
-    image: 'https://public.youware.com/users-website-assets/prod/9ad90c6e-7bcd-4cf9-98b3-9b23c289f60f/MAT-DIEU-HAU.png',
-    charm: 'Charm Bạc 925',
-    stoneSize: '10 Li (Phù Hợp Size Tay: 15cm-18cm)',
-    wristSize: '14 cm',
-  },
-];
+const API_URL = process.env.REACT_APP_API_URL;
+const PRODUCTS_PER_PAGE = 9;
 
 const Product = () => {
+  const [products, setProducts] = useState([]);
   const [search, setSearch] = useState('');
   const [minPrice, setMinPrice] = useState(0);
-  const [maxPrice, setMaxPrice] = useState(6000000);
-  const [cartItems, setCartItems] = useState(initialCartItems);
-  const [isCartOpen, setIsCartOpen] = useState(false);
+  const [maxPrice, setMaxPrice] = useState(10000000);
+  const [maxPriceLimit, setMaxPriceLimit] = useState(10000000); // Giá trị max thực tế
+  const [currentPage, setCurrentPage] = useState(1);
+  const [selectedLevel, setSelectedLevel] = useState('');
+  const [sortType, setSortType] = useState('newest');
 
-  const filteredProducts = initialProducts.filter((p) => {
+  // Fetch products from API
+  useEffect(() => {
+    fetch(`${API_URL}/product`)
+      .then(res => res.json())
+      .then(data => {
+        setProducts(data);
+        // Tìm giá lớn nhất và làm tròn lên hàng triệu
+        const max = data.reduce((acc, cur) => cur.price > acc ? cur.price : acc, 0);
+        const roundedMax = Math.ceil(max / 1000000) * 1000000;
+        setMaxPriceLimit(roundedMax);
+        setMaxPrice(roundedMax);
+      })
+      .catch(() => setProducts([]));
+  }, []);
+
+  // Filtered products
+  let filteredProducts = products.filter((p) => {
     return (
       p.name.toLowerCase().includes(search.toLowerCase()) &&
       p.price >= minPrice &&
-      p.price <= maxPrice
+      p.price <= maxPrice &&
+      (selectedLevel === '' || p.level === selectedLevel)
     );
   });
+
+  // Sort products
+  if (sortType === 'price-asc') {
+    filteredProducts = filteredProducts.slice().sort((a, b) => a.price - b.price);
+  } else if (sortType === 'price-desc') {
+    filteredProducts = filteredProducts.slice().sort((a, b) => b.price - a.price);
+  } else if (sortType === 'newest') {
+    filteredProducts = filteredProducts.slice().sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  }
+
+  // Pagination logic
+  const totalPages = Math.ceil(filteredProducts.length / PRODUCTS_PER_PAGE);
+  const paginatedProducts = filteredProducts.slice(
+    (currentPage - 1) * PRODUCTS_PER_PAGE,
+    currentPage * PRODUCTS_PER_PAGE
+  );
 
   const formatPrice = (price) => new Intl.NumberFormat('vi-VN').format(price);
 
@@ -91,12 +72,12 @@ const Product = () => {
     if (minPriceValue) minPriceValue.textContent = formatPrice(minPrice);
     if (maxPriceValue) maxPriceValue.textContent = formatPrice(maxPrice);
     if (priceTrack) {
-      const minPercent = (minPrice / 6000000) * 100;
-      const maxPercent = (maxPrice / 6000000) * 100;
+      const minPercent = (minPrice / maxPriceLimit) * 100;
+      const maxPercent = (maxPrice / maxPriceLimit) * 100;
       priceTrack.style.left = `${minPercent}%`;
       priceTrack.style.width = `${maxPercent - minPercent}%`;
     }
-  }, [minPrice, maxPrice]);
+  }, [minPrice, maxPrice, maxPriceLimit]);
 
   const handlePriceChange = (e, type) => {
     const value = parseInt(e.target.value);
@@ -115,315 +96,205 @@ const Product = () => {
     }
   };
 
-  const updateQuantity = (index, delta) => {
-    setCartItems((prevItems) =>
-      prevItems.map((item, i) =>
-        i === index
-          ? { ...item, quantity: Math.max(1, item.quantity + delta) }
-          : item
-      )
-    );
-  };
-
-  const removeItem = (index) => {
-    setCartItems((prevItems) => prevItems.filter((_, i) => i !== index));
-  };
-
-  const totalPrice = cartItems.reduce(
-    (sum, item) => sum + item.price * item.quantity,
-    0
+  // Pagination controls
+  const renderPagination = () => (
+    <div className={styles.productPagination}>
+      {Array.from({ length: totalPages }, (_, i) => (
+        <a
+          href="#"
+          key={i + 1}
+          className={currentPage === i + 1 ? styles.active : ''}
+          onClick={(e) => {
+            e.preventDefault();
+            setCurrentPage(i + 1);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }}
+        >
+          {i + 1}
+        </a>
+      ))}
+    </div>
   );
 
-  const openCartPopup = () => setIsCartOpen(true);
-  const closeCartPopup = () => setIsCartOpen(false);
-
   return (
-    <>
-      {/* Shop Section */}
-      <section className={styles.shop}>
-        <div className={styles.container}>
-          <div className={styles.row}>
-            <div className={styles.colLg3}>
-              <div className={styles.shopSidebar}>
-                <div className={styles.shopSidebarSearch}>
-                  <form onSubmit={(e) => e.preventDefault()}>
+    <section className={`${styles.productPage} ${styles.shop}`}>
+      <div className={styles.container}>
+        <div className={styles.row}>
+          <div className={styles.colLg3}>
+            <div className={styles.shopSidebar}>
+              <div className={styles.shopSidebarSearch}>
+                <form onSubmit={(e) => e.preventDefault()}>
+                  <input
+                    type="text"
+                    placeholder="Tìm kiếm..."
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                  />
+                  <button type="submit">
+                    <i className="fa fa-search"></i>
+                  </button>
+                </form>
+              </div>
+              <div className={styles.filterSection}>
+                <h6>
+                  GIÁ SẢN PHẨM <span style={{ float: 'right' }}>–</span>
+                </h6>
+                <div className={styles['price-filter']}>
+                  <div className={styles['price-slider-container']}>
+                    <div
+                      className={styles['price-slider-track']}
+                      id="priceTrack"
+                    ></div>
+                  </div>
+                  <input
+                    type="range"
+                    id="minPrice"
+                    min="0"
+                    max={maxPriceLimit}
+                    step="100000"
+                    value={minPrice}
+                    onChange={e => handlePriceChange(e, 'min')}
+                  />
+                  <input
+                    type="range"
+                    id="maxPrice"
+                    min="0"
+                    max={maxPriceLimit}
+                    step="100000"
+                    value={maxPrice}
+                    onChange={e => handlePriceChange(e, 'max')}
+                  />
+                </div>
+                <div className={styles['price-values']}>
+                  Giá: <span id="minPriceValue">{formatPrice(minPrice)}</span> VND — <span id="maxPriceValue">{formatPrice(maxPrice)}</span> VND
+                </div>
+              </div>
+              <div className={styles.filterSection}>
+                <h6>LOẠI SẢN PHẨM</h6>
+                <div>
+                  <label>
+                    <input type="radio" name="productType" /> Phong thủy
+                  </label>
+                  <br />
+                  <label>
+                    <input type="radio" name="productType" /> Thời trang
+                  </label>
+                </div>
+              </div>
+              <div className={styles.filterSection}>
+                <h6>DÒNG SẢN PHẨM</h6>
+                <div>
+                  <label>
                     <input
-                      type="text"
-                      placeholder="Tìm kiếm..."
-                      value={search}
-                      onChange={(e) => setSearch(e.target.value)}
-                    />
-                    <button type="submit">
-                      <i className="fa fa-search"></i>
-                    </button>
-                  </form>
-                </div>
-                <div className={styles.filterSection}>
-                  <h6>
-                    GIÁ SẢN PHẨM <span style={{ float: 'right' }}>–</span>
-                  </h6>
-                  <div className={styles['price-filter']}>
-                    <div className={styles['price-slider-container']}>
-                      <div
-                        className={styles['price-slider-track']}
-                        id="priceTrack"
-                      ></div>
-                    </div>
+                      type="radio"
+                      name="productLine"
+                      value=""
+                      checked={selectedLevel === ''}
+                      onChange={() => setSelectedLevel('')}
+                    /> Tất cả
+                  </label>
+                  <br />
+                  <label>
                     <input
-                      type="range"
-                      id="minPrice"
-                      min="0"
-                      max="6000000"
-                      step="100000"
-                      value={minPrice}
-                      onChange={(e) => handlePriceChange(e, 'min')}
-                    />
+                      type="radio"
+                      name="productLine"
+                      value="Cao cấp"
+                      checked={selectedLevel === 'Cao cấp'}
+                      onChange={() => setSelectedLevel('Cao cấp')}
+                    /> Cao cấp
+                  </label>
+                  <br />
+                  <label>
                     <input
-                      type="range"
-                      id="maxPrice"
-                      min="0"
-                      max="6000000"
-                      step="100000"
-                      value={maxPrice}
-                      onChange={(e) => handlePriceChange(e, 'max')}
-                    />
-                  </div>
-                  <div className={styles['price-values']}>
-                    Giá: <span id="minPriceValue">{formatPrice(minPrice)}</span>{' '}
-                    VND — <span id="maxPriceValue">{formatPrice(maxPrice)}</span>{' '}
-                    VND
-                  </div>
-                </div>
-                <div className={styles.filterSection}>
-                  <h6>LOẠI SẢN PHẨM</h6>
-                  <div>
-                    <label>
-                      <input type="radio" name="productType" /> Phong thủy
-                    </label>
-                    <br />
-                    <label>
-                      <input type="radio" name="productType" /> Thời trang
-                    </label>
-                  </div>
-                </div>
-                <div className={styles.filterSection}>
-                  <h6>DÒNG SẢN PHẨM</h6>
-                  <div>
-                    <label>
-                      <input type="radio" name="productLine" /> Cao cấp
-                    </label>
-                    <br />
-                    <label>
-                      <input type="radio" name="productLine" /> Trung cấp
-                    </label>
-                    <br />
-                    <label>
-                      <input type="radio" name="productLine" /> Phổ thông
-                    </label>
-                  </div>
-                </div>
-                <div className={styles.filterSection}>
-                  <h6>BỘ SƯU TẬP</h6>
-                  <div>
-                    <label>
-                      <input type="checkbox" name="collection" /> BST Charm Phúc - Lộc - Thọ
-                    </label>
-                    <br />
-                    <label>
-                      <input type="checkbox" name="collection" /> BST Charm Vân Mây
-                    </label>
-                    <br />
-                    <label>
-                      <input type="checkbox" name="collection" /> BST Charm Nơ
-                    </label>
-                    <br />
-                    <label>
-                      <input type="checkbox" name="collection" /> BST Charm Kim Long Phát Lộc
-                    </label>
-                    <br />
-                    <label>
-                      <input type="checkbox" name="collection" /> BST Charm Cá Chép Hóa Rồng
-                    </label>
-                    <br />
-                    <label>
-                      <input type="checkbox" name="collection" /> BST Charm Tỳ Hưu
-                    </label>
-                    <br />
-                    <label>
-                      <input type="checkbox" name="collection" /> Pride Month
-                    </label>
-                    <br />
-                    <label>
-                      <input type="checkbox" name="collection" /> BST Charm Lồng Đèn
-                    </label>
-                    <br />
-                    <label>
-                      <input type="checkbox" name="collection" /> BST Charm Bọc Vàng
-                    </label>
-                    <br />
-                    <label>
-                      <input type="checkbox" name="collection" /> BST Charm Yêu Trẻ
-                    </label>
-                    <br />
-                    <label>
-                      <input type="checkbox" name="collection" /> BST Vòng Cổ Đá Phong Thủy
-                    </label>
-                    <br />
-                    <label>
-                      <input type="checkbox" name="collection" /> BST Vòng Hổ Phách
-                    </label>
-                    <br />
-                    <label>
-                      <input type="checkbox" name="collection" /> BST Charm Ống Hồ
-                    </label>
-                    <br />
-                    <label>
-                      <input type="checkbox" name="collection" /> BST Charm Sen Việt
-                    </label>
-                  </div>
+                      type="radio"
+                      name="productLine"
+                      value="Trung Cấp"
+                      checked={selectedLevel === 'Trung Cấp'}
+                      onChange={() => setSelectedLevel('Trung Cấp')}
+                    /> Trung Cấp
+                  </label>
+                  <br />
+                  <label>
+                    <input
+                      type="radio"
+                      name="productLine"
+                      value="Phổ thông"
+                      checked={selectedLevel === 'Phổ thông'}
+                      onChange={() => setSelectedLevel('Phổ thông')}
+                    /> Phổ thông
+                  </label>
                 </div>
               </div>
             </div>
-            <div className={styles.colLg9}>
-              <div className={styles.shopProductOption}>
-                <div className={styles.shopProductOptionLeft}>
-                  <p>
-                    Hiển thị 1–{filteredProducts.length} trong{' '}
-                    {initialProducts.length} kết quả
-                  </p>
-                </div>
-                <div className={styles.shopProductOptionRight}>
-                  <select>
-                    <option value="">Sắp xếp theo sự phổ biến</option>
-                    <option value="">Sắp xếp theo mới nhất</option>
-                    <option value="">Sắp xếp theo giá: thấp đến cao</option>
-                    <option value="">Sắp xếp theo giá: cao đến thấp</option>
-                  </select>
-                </div>
+          </div>
+          <div className={styles.colLg9}>
+            <div className={styles.shopProductOption}>
+              <div className={styles.shopProductOptionLeft}>
+                <p>
+                  Hiển thị {paginatedProducts.length} trong{' '}
+                  {filteredProducts.length} kết quả
+                </p>
               </div>
-              <div className={styles.products}>
-                {filteredProducts.length === 0 && (
-                  <p>Không tìm thấy sản phẩm.</p>
-                )}
-                {filteredProducts.map((product, idx) => (
-                  <div className={styles.productItem} key={idx}>
-                    <div className={styles.productItemPic}>
-                      <span className={styles.newLabel}>NEW</span>
-                      <a href="#" className={styles.productImgLink}>
-                        <img src={product.image} alt={product.name} />
+              <div className={styles.shopProductOptionRight}>
+                <select
+                  value={sortType}
+                  onChange={e => {
+                    setSortType(e.target.value);
+                    setCurrentPage(1);
+                  }}
+                >
+                  <option value="newest">Sắp xếp theo mới nhất</option>
+                  <option value="price-asc">Sắp xếp theo giá: thấp đến cao</option>
+                  <option value="price-desc">Sắp xếp theo giá: cao đến thấp</option>
+                </select>
+              </div>
+            </div>
+            <div className={styles.products}>
+              {paginatedProducts.length === 0 && (
+                <p>Không tìm thấy sản phẩm.</p>
+              )}
+              {paginatedProducts.map((product, idx) => (
+                <div className={styles.productItem} key={product._id || idx}>
+                  <div className={styles.productItemPic}>
+                    {product.status === 'Sale' && (
+                      <span className={styles.newLabel}>SALE</span>
+                    )}
+                    <Link to={`/detail/${product._id}`} className={styles.productImgLink}>
+                      <img
+                        src={
+                          product.images && product.images.length > 0
+                            ? `${process.env.REACT_APP_API_BASE}/${product.images[0]}`
+                            : 'https://via.placeholder.com/300'
+                        }
+                        alt={product.name}
+                      />
+                    </Link>
+                  </div>
+                  <div className={styles.productItemText}>
+                    <h6>{product.name}</h6>
+                    <h5>{formatPrice(product.price)} VND</h5>
+                    {/* <div className={styles.hoverContent}>
+                      <a href="#" className={styles.viewDetailsBtn}>
+                        Xem chi tiết
                       </a>
-                    </div>
-                    <div className={styles.productItemText}>
-                      <h6>{product.name}</h6>
-                      <h5>{formatPrice(product.price)} VND</h5>
-                      <div className={styles.hoverContent}>
-                        <a href="#" className={styles.viewDetailsBtn}>
-                          Xem chi tiết
-                        </a>
-                        <div className={styles.productRating}>
-                          <div className={styles.stars}>
-                            {[...Array(5)].map((_, i) => (
-                              <FontAwesomeIcon icon={faStar} key={i} />
-                            ))}
-                          </div>
+                      <div className={styles.productRating}>
+                        <div className={styles.stars}>
+                          {[...Array(5)].map((_, i) => (
+                            <FontAwesomeIcon icon={faStar} key={i} />
+                          ))}
                         </div>
                       </div>
-                    </div>
+                    </div> */}
                   </div>
-                ))}
-              </div>
-              <div className={styles.productPagination}>
-                <a href="#" className={styles.active}>
-                  1
-                </a>
-                <a href="#">2</a>
-                <a href="#">3</a>
-                <a href="#">4</a>
-                <span>...</span>
-                <a href="#">21</a>
-                <a href="#">22</a>
-                <a href="#">23</a>
-                <a href="#">→</a>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Cart Popup Overlay */}
-      <div
-        id="cartPopupOverlay"
-        style={{ display: isCartOpen ? 'block' : 'none' }}
-      ></div>
-
-      {/* Cart Popup */}
-      <div
-        id="cartPopup"
-        className={styles['cart-popup']}
-        style={{ display: isCartOpen ? 'block' : 'none' }}
-      >
-        <div className={styles['cart-popup-header']}>
-          <span>GIỎ HÀNG CỦA BẠN</span>
-          <button className={styles['close-btn']} onClick={closeCartPopup}>
-            ×
-          </button>
-        </div>
-        <div className={styles['cart-popup-body']}>
-          {cartItems.map((item, index) => (
-            <div className={styles['cart-popup-product']} key={index}>
-              <img src={item.image} alt={item.name} />
-              <div className={styles['cart-popup-info']}>
-                <div className={styles['cart-popup-title']}>{item.name}</div>
-                <div className={styles['cart-popup-desc']}>
-                  <b>Charm:</b> {item.charm}
-                  <br />
-                  <b>Size Viên Đá:</b> {item.stoneSize}
-                  <br />
-                  <b>Size Tay:</b> {item.wristSize}
                 </div>
-                <div className={styles['cart-popup-price']}>
-                  Price: {formatPrice(item.price)} VND
-                </div>
-                <div className={styles['cart-popup-qty']}>
-                  <button onClick={() => updateQuantity(index, -1)}>-</button>
-                  <input type="text" value={item.quantity} readOnly />
-                  <button onClick={() => updateQuantity(index, 1)}>+</button>
-                  <span className={styles['cart-popup-total']}>
-                    {formatPrice(item.price * item.quantity)} VND
-                  </span>
-                </div>
-              </div>
-              <button
-                className={styles['cart-popup-remove']}
-                onClick={() => removeItem(index)}
-              >
-                <i className="fa fa-trash"></i>
-              </button>
+              ))}
             </div>
-          ))}
-        </div>
-        <div className={styles['cart-popup-footer']}>
-          <div className={styles['cart-popup-summary']}>
-            <div>
-              <b>Tổng Cộng:</b> {formatPrice(totalPrice)} VND
-            </div>
-            <div>Total: {formatPrice(totalPrice)} VND</div>
+            {/* Pagination luôn ở dưới */}
+            {renderPagination()}
           </div>
-          <div className={styles['cart-popup-actions']}>
-            <button className={styles.outline}>
-              <a href="./cart.html">Xem Giỏ Hàng</a>
-            </button>
-            <button className={styles.primary}>Thanh Toán</button>
-          </div>
-          <button
-            className={`${styles.outline} ${styles.full}`}
-            onClick={closeCartPopup}
-          >
-            Tiếp tục Mua Sắm
-          </button>
         </div>
       </div>
-    </>
+    </section>
   );
 };
 

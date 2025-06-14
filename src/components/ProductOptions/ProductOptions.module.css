@@ -1,0 +1,93 @@
+.options {
+  margin: 20px 0;
+}
+
+.options label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.select {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin-right: 10px;
+}
+
+.wristSize {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 10px 0;
+}
+
+.wristSize label {
+  font-weight: bold;
+  margin-right: 10px;
+  white-space: nowrap;
+}
+
+.wristSize button {
+  padding: 5px 10px;
+  background-color: #9b6013;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  width: 30px;
+  height: 25px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.wristSizeSpan {
+  display: flex;
+  align-items: center;
+  height: 30px;
+  padding: 0 5px;
+}
+
+.link {
+  color: #9b6013;
+  text-decoration: none;
+}
+
+.quantity {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 20px 0;
+}
+
+.quantity button {
+  padding: 5px 10px;
+  width: 30px;
+  height: 25px;
+  background-color: #9b6013;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  
+}
+
+.quantitySpan {
+  display: flex;
+  align-items: center;
+  height: 30px;
+  padding: 0 5px;
+}
+
+.addToCart {
+  background-color: #9b6013;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 20px;
+  font-size: 16px;
+  cursor: pointer;
+}
