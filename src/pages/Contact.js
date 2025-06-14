@@ -1,4 +1,4 @@
-// src/pages/Home.js
+// src/pages/contact.js
 import React from 'react';
 import Header from '../components/Header/Header';
 import Contact from '../components/Contact/Contact';

@@ -67,7 +67,7 @@ const initialCartItems = [
   },
 ];
 
-const ProductSite = () => {
+const Product = () => {
   const [search, setSearch] = useState('');
   const [minPrice, setMinPrice] = useState(0);
   const [maxPrice, setMaxPrice] = useState(6000000);
@@ -139,31 +139,6 @@ const ProductSite = () => {
 
   return (
     <>
-      {/* Header */}
-      <header className={styles.header}>
-        <div className={styles.container}>
-          <a href="#" className={styles.logo}>
-            <div className={styles['logo-icon']}>TL</div>
-            <div>
-              <div className={styles['logo-text']}>TINH LÂM</div>
-              <div className={styles['logo-subtitle']}>TRANG SỨC PHONG THỦY</div>
-            </div>
-          </a>
-          <div className={styles['header-right']}>
-            <div className={styles['search-cart']}>
-              <i className="fa-solid fa-magnifying-glass"></i>
-              <div className={styles['cart-container']} onClick={openCartPopup}>
-                <i className="fa-solid fa-cart-shopping"></i>
-              </div>
-            </div>
-            <div className={styles['language-selector']}>
-              <span>Tiếng Việt</span>
-              <i className="fa-solid fa-caret-down"></i>
-            </div>
-          </div>
-        </div>
-      </header>
-
       {/* Shop Section */}
       <section className={styles.shop}>
         <div className={styles.container}>
@@ -452,4 +427,4 @@ const ProductSite = () => {
   );
 };
 
-export default ProductSite;
+export default Product;
