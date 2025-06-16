@@ -115,7 +115,7 @@ const ProductDetail = () => {
   };
 
   const handleAddToCart = () => {
-    const cart = JSON.parse(localStorage.getItem('cart')) || [];
+    const cart = JSON.parse(localStorage.getItem('cart_da')) || [];
     const cartItem = {
       _id: product._id,
       name: product.name,

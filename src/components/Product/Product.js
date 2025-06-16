@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Link } from 'react-router-dom';
+import { faStar } from '@fortawesome/free-regular-svg-icons';
+
 import styles from './Product.module.css';
 
 const API_URL = process.env.REACT_APP_API_URL;

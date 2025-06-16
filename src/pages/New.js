@@ -1,14 +1,14 @@
-// src/pages/Newdetail.js
+// src/pages/new.js
 import React from 'react';
 import Header from '../components/Header/Header';
-import New from '../components/New/New'; // Đã sửa chỗ này
+import Newsite from '../components/New/New';
 import Footer from '../components/Footer/Footer';
-
+  
 const News = () => {
   return (
     <div>
       <Header />
-      <New />
+      <Newsite />
       <Footer />
     </div>
   );

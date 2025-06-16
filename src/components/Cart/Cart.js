@@ -9,7 +9,7 @@ const Cart = () => {
   const [couponCode, setCouponCode] = useState('');
 
   useEffect(() => {
-    const cart = JSON.parse(localStorage.getItem('cart')) || [];
+    const cart = JSON.parse(localStorage.getItem('cart_da')) || [];
     setCartItems(cart);
   }, []);
 
@@ -26,14 +26,14 @@ const Cart = () => {
       item.quantity = newQuantity;
     }
     setCartItems(newCart);
-    localStorage.setItem('cart', JSON.stringify(newCart));
+    localStorage.setItem('cart_da', JSON.stringify(newCart));
   };
 
   const removeItem = (index) => {
     if (window.confirm('Bạn có chắc chắn muốn xóa sản phẩm này khỏi giỏ hàng?')) {
       const newCart = cartItems.filter((_, i) => i !== index);
       setCartItems(newCart);
-      localStorage.setItem('cart', JSON.stringify(newCart));
+      localStorage.setItem('cart_da', JSON.stringify(newCart));
     }
   };
 
@@ -160,7 +160,7 @@ const Cart = () => {
                 <td className={styles.labelCell}>Thành tiền</td>
                 <td className={styles.valueCell}>{formatPrice(subtotal)}</td>
               </tr>
-              <tr>
+              {/* <tr>
                 <td className={styles.labelCell}>Giao Hàng</td>
                 <td className={styles.valueCell}>
                   <div className={styles.shippingDetails}>
@@ -169,7 +169,7 @@ const Cart = () => {
                     <div className={styles.calcShipping}>Tính phí giao hàng</div>
                   </div>
                 </td>
-              </tr>
+              </tr> */}
               <tr className={styles.totalRow}>
                 <td className={styles.labelCell}>Tổng tiền</td>
                 <td className={styles.valueCell}>{formatPrice(grandTotal)}</td>
