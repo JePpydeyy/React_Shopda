@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom'; // <-- thêm dòng này
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { Link } from 'react-router-dom';
 import { faStar } from '@fortawesome/free-regular-svg-icons';
 
 import styles from './Product.module.css';
