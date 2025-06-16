@@ -143,7 +143,7 @@ const ProductDetail = () => {
     } else {
       cart.push(cartItem);
     }
-    localStorage.setItem('cart', JSON.stringify(cart));
+    localStorage.setItem('cart_da', JSON.stringify(cart));
     showToast('Đã thêm vào giỏ hàng!', 'success');
   };
 

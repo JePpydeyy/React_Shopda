@@ -429,26 +429,67 @@
 .productPagination {
     padding-top: 25px;
     text-align: center;
+    font-family: inherit;
 }
 
 .productPagination a {
     text-decoration: none;
     display: inline-block;
-    font-size: 16px;
-    font-weight: 700;
-    color: #111111;
-    height: 30px;
-    width: 30px;
-    border: 1px solid transparent;
+    font-size: 18px;
+    font-weight: 500;
+    color: #111;
+    height: 32px;
+    width: 32px;
+    border: 1.5px solid transparent;
     border-radius: 50%;
-    line-height: 30px;
+    line-height: 32px;
     text-align: center;
-    margin: 0 5px;
+    margin: 0 4px;
+    transition: border-color 0.2s, color 0.2s;
+    background: none;
+    cursor: pointer;
 }
 
 .productPagination a.active,
-.productPagination a:hover { 
-    border-color: #111111; 
+.productPagination a:focus {
+    border-color: #bfa16b;
+    color: #bfa16b;
+    background: #fff;
+    font-weight: 700;
+}
+
+.productPagination a:hover:not(.active) {
+    border-color: #bfa16b;
+    color: #bfa16b;
+    background: #fff;
+}
+
+.productPagination span {
+    display: inline-block;
+    width: 32px;
+    text-align: center;
+    color: #888;
+    font-size: 18px;
+    vertical-align: middle;
+}
+
+.productPagination a[aria-label] {
+    border: none;
+    background: none;
+    font-size: 22px;
+    color: #111;
+    width: 32px;
+    height: 32px;
+    line-height: 32px;
+    vertical-align: middle;
+    padding: 0;
+}
+
+.productPagination a.disabled {
+    pointer-events: none;
+    color: #ccc;
+    border: none;
+    background: none;
 }
 
 /* === CART POPUP === */
@@ -796,4 +837,136 @@
 .price-values span {
     font-weight: 500;
     color: #333;
+}
+/* === CHECKBOX FILTER STYLES === */
+/* Styling cho LOẠI SẢN PHẨM - Simple minimal style */
+.categoryCheckboxGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.categoryCheckboxGroup label {
+  display: flex;
+  align-items: center;
+  font-size: 15px;
+  color: #3d3d3d;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+}
+
+.categoryCheckboxGroup label:hover {
+  color: #111111;
+  background: #f8f8f8;
+  border-color: #e5e5e5;
+}
+
+.categoryCheckboxGroup label input[type="checkbox"] {
+  margin-right: 12px;
+  width: 18px;
+  height: 18px;
+  position: relative;
+  appearance: none;
+  -webkit-appearance: none;
+  border: 2px solid #8B6F47;
+  border-radius: 4px;
+  background: #fff;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.categoryCheckboxGroup label input[type="checkbox"]:checked {
+  background: #fff;
+  border-color: #8B6F47;
+}
+
+.categoryCheckboxGroup label input[type="checkbox"]:checked::after {
+  content: '●';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #8B6F47;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.categoryCheckboxGroup label input[type="checkbox"]:hover {
+  border-color: #8B6F47;
+  box-shadow: 0 0 0 2px rgba(139, 111, 71, 0.1);
+}
+
+.categoryCheckboxGroup label input[type="checkbox"]:focus {
+  outline: none;
+  border-color: #8B6F47;
+  box-shadow: 0 0 0 3px rgba(139, 111, 71, 0.2);
+}
+
+/* Styling cho DÒNG SẢN PHẨM - Checkbox vuông với style khác */
+.levelCheckboxGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.levelCheckboxGroup label {
+  display: flex;
+  align-items: center;
+  font-size: 15px;
+  color: #3d3d3d;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+}
+
+.levelCheckboxGroup label:hover {
+  color: #111111;
+  background: #f8f8f8;
+  border-color: #e5e5e5;
+}
+
+.levelCheckboxGroup label input[type="checkbox"] {
+  margin-right: 12px;
+  width: 18px;
+  height: 18px;
+  position: relative;
+  appearance: none;
+  -webkit-appearance: none;
+  border: 2px solid #8B6F47;
+  border-radius: 4px;
+  background: #fff;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.levelCheckboxGroup label input[type="checkbox"]:checked {
+  background: #fff;
+  border-color: #8B6F47;
+}
+
+.levelCheckboxGroup label input[type="checkbox"]:checked::after {
+  content: '●';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #8B6F47;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.levelCheckboxGroup label input[type="checkbox"]:hover {
+  border-color: #8B6F47;
+  box-shadow: 0 0 0 2px rgba(139, 111, 71, 0.1);
+}
+
+.levelCheckboxGroup label input[type="checkbox"]:focus {
+  outline: none;
+  border-color: #8B6F47;
+  box-shadow: 0 0 0 3px rgba(139, 111, 71, 0.2);
 }

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Link } from 'react-router-dom';
-import { faStar } from '@fortawesome/free-regular-svg-icons';
+// import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+// import { faStar } from '@fortawesome/free-regular-svg-icons';
 
 import styles from './Product.module.css';
 
@@ -10,13 +10,16 @@ const PRODUCTS_PER_PAGE = 9;
 
 const Product = () => {
   const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState('');
   const [search, setSearch] = useState('');
   const [minPrice, setMinPrice] = useState(0);
   const [maxPrice, setMaxPrice] = useState(10000000);
   const [maxPriceLimit, setMaxPriceLimit] = useState(10000000); // Giá trị max thực tế
   const [currentPage, setCurrentPage] = useState(1);
-  const [selectedLevel, setSelectedLevel] = useState('');
+  const [selectedLevels, setSelectedLevels] = useState([]);
   const [sortType, setSortType] = useState('newest');
+  const [selectedCategories, setSelectedCategories] = useState([]);
 
   // Fetch products from API
   useEffect(() => {
@@ -24,6 +27,9 @@ const Product = () => {
       .then(res => res.json())
       .then(data => {
         setProducts(data);
+        // Lấy danh sách category duy nhất
+        const uniqueCategories = Array.from(new Set(data.map(item => item.category).filter(Boolean)));
+        setCategories(uniqueCategories);
         // Tìm giá lớn nhất và làm tròn lên hàng triệu
         const max = data.reduce((acc, cur) => cur.price > acc ? cur.price : acc, 0);
         const roundedMax = Math.ceil(max / 1000000) * 1000000;
@@ -39,7 +45,8 @@ const Product = () => {
       p.name.toLowerCase().includes(search.toLowerCase()) &&
       p.price >= minPrice &&
       p.price <= maxPrice &&
-      (selectedLevel === '' || p.level === selectedLevel)
+      (selectedLevels.length === 0 || selectedLevels.includes(p.level)) &&
+      (selectedCategories.length === 0 || selectedCategories.includes(p.category))
     );
   });
 
@@ -89,28 +96,80 @@ const Product = () => {
       } else {
         setMaxPrice(value);
       }
+      
     }
   };
 
   // Pagination controls
-  const renderPagination = () => (
-    <div className={styles.productPagination}>
-      {Array.from({ length: totalPages }, (_, i) => (
+  const renderPagination = () => {
+    if (totalPages <= 1) return null;
+
+    let start = Math.max(1, currentPage - 1);
+    let end = Math.min(totalPages, start + 2);
+    if (end - start < 2) start = Math.max(1, end - 2);
+
+    const pageNumbers = [];
+    for (let i = start; i <= end; i++) {
+      pageNumbers.push(i);
+    }
+
+    return (
+      <div className={styles.productPagination}>
         <a
           href="#"
-          key={i + 1}
-          className={currentPage === i + 1 ? styles.active : ''}
-          onClick={(e) => {
+          onClick={e => {
             e.preventDefault();
-            setCurrentPage(i + 1);
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            if (currentPage > 1) setCurrentPage(currentPage - 1);
           }}
+          className={currentPage === 1 ? styles.disabled : ''}
+          aria-label="Trang trước"
         >
-          {i + 1}
+          &lt;
         </a>
-      ))}
-    </div>
-  );
+        {pageNumbers.map(num => (
+          <a
+            href="#"
+            key={num}
+            className={currentPage === num ? styles.active : ''}
+            onClick={e => {
+              e.preventDefault();
+              setCurrentPage(num);
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+          >
+            {num}
+          </a>
+        ))}
+        <a
+          href="#"
+          onClick={e => {
+            e.preventDefault();
+            if (currentPage < totalPages) setCurrentPage(currentPage + 1);
+          }}
+          className={currentPage === totalPages ? styles.disabled : ''}
+          aria-label="Trang sau"
+        >
+          &gt;
+        </a>
+      </div>
+    );
+  };
+
+  const handleLevelChange = (level) => {
+    setSelectedLevels(prev =>
+      prev.includes(level)
+        ? prev.filter(l => l !== level)
+        : [...prev, level]
+    );
+  };
+
+  const handleCategoryChange = (cat) => {
+    setSelectedCategories(prev =>
+      prev.includes(cat)
+        ? prev.filter(c => c !== cat)
+        : [...prev, cat]
+    );
+  };
 
   return (
     <section className={`${styles.productPage} ${styles.shop}`}>
@@ -167,56 +226,54 @@ const Product = () => {
               </div>
               <div className={styles.filterSection}>
                 <h6>LOẠI SẢN PHẨM</h6>
-                <div>
-                  <label>
-                    <input type="radio" name="productType" /> Phong thủy
+                <div className={styles.categoryCheckboxGroup}>
+                  <label className={styles.categoryCheckboxLabel}>
+                    <input
+                      type="checkbox"
+                      checked={selectedCategories.length === 0}
+                      onChange={() => setSelectedCategories([])}
+                    /> Tất cả
                   </label>
-                  <br />
-                  <label>
-                    <input type="radio" name="productType" /> Thời trang
-                  </label>
+                  {categories.map((cat) => (
+                    <label className={styles.categoryCheckboxLabel} key={cat}>
+                      <input
+                        type="checkbox"
+                        checked={selectedCategories.includes(cat)}
+                        onChange={() => handleCategoryChange(cat)}
+                      /> {cat}
+                    </label>
+                  ))}
                 </div>
               </div>
               <div className={styles.filterSection}>
                 <h6>DÒNG SẢN PHẨM</h6>
-                <div>
+                <div className={styles.levelCheckboxGroup}>
                   <label>
                     <input
-                      type="radio"
-                      name="productLine"
-                      value=""
-                      checked={selectedLevel === ''}
-                      onChange={() => setSelectedLevel('')}
+                      type="checkbox"
+                      checked={selectedLevels.length === 0}
+                      onChange={() => setSelectedLevels([])}
                     /> Tất cả
                   </label>
-                  <br />
                   <label>
                     <input
-                      type="radio"
-                      name="productLine"
-                      value="Cao cấp"
-                      checked={selectedLevel === 'Cao cấp'}
-                      onChange={() => setSelectedLevel('Cao cấp')}
+                      type="checkbox"
+                      checked={selectedLevels.includes('Cao cấp')}
+                      onChange={() => handleLevelChange('Cao cấp')}
                     /> Cao cấp
                   </label>
-                  <br />
                   <label>
                     <input
-                      type="radio"
-                      name="productLine"
-                      value="Trung Cấp"
-                      checked={selectedLevel === 'Trung Cấp'}
-                      onChange={() => setSelectedLevel('Trung Cấp')}
+                      type="checkbox"
+                      checked={selectedLevels.includes('Trung Cấp')}
+                      onChange={() => handleLevelChange('Trung Cấp')}
                     /> Trung Cấp
                   </label>
-                  <br />
                   <label>
                     <input
-                      type="radio"
-                      name="productLine"
-                      value="Phổ thông"
-                      checked={selectedLevel === 'Phổ thông'}
-                      onChange={() => setSelectedLevel('Phổ thông')}
+                      type="checkbox"
+                      checked={selectedLevels.includes('Phổ thông')}
+                      onChange={() => handleLevelChange('Phổ thông')}
                     /> Phổ thông
                   </label>
                 </div>
@@ -253,7 +310,7 @@ const Product = () => {
                 <div className={styles.productItem} key={product._id || idx}>
                   <div className={styles.productItemPic}>
                     {product.status === 'Sale' && (
-                      <span className={styles.newLabel}>SALE</span>
+                      <span className={styles.newLabel}>NEW</span>
                     )}
                     <Link to={`/detail/${product._id}`} className={styles.productImgLink}>
                       <img
