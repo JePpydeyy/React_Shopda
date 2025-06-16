@@ -6,9 +6,8 @@ import Contactus from './pages/Contact';
 import ProductSite from './pages/product';
 import Newsite from './pages/New';
 import PostDetail from './pages/Newdetail'; 
-
+import Checkout from './pages/Checkout';
 import Cart from './pages/Cart';
-import News from './pages/New';
 import Newdetails from './pages/Newdetail';
 import ProductDetail from './pages/ProductDetail';
 
@@ -32,6 +31,7 @@ function App() {
             <Route path="/New" element={<Newsite />} />
             <Route path="/Newdetail" element={<PostDetail />} />
             <Route path="/Cart" element={<Cart />} />
+            <Route path="/Checkout" element={<Checkout />} />
           </Routes>
         </div>
       </Router>

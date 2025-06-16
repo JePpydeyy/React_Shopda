@@ -1,0 +1,248 @@
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+.container h1 {
+  font-size: 24px;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.formContainer {
+  display: flex;
+  gap: 20px;
+}
+
+.customerInfo, .orderInfo {
+  flex: 1;
+  width: 300px;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+}
+
+.orderInfo {
+  width: 100%;
+  margin: 0 auto;
+}
+
+.orderInfo .order {
+  border: 2px solid #cacaca;
+  border-radius: 10px;
+}
+
+.customerInfo h2, .orderInfo h2 {
+  font-size: 18px;
+  margin-bottom: 15px;
+  color: #555;
+  text-align: center;
+}
+
+.formGroup {
+  margin-bottom: 10px;
+}
+
+.mergeForms {
+  display: flex;
+  justify-content: space-between;
+}
+
+.mergeForms .sdt,
+.mergeForms .email,
+.mergeForms .districtWard,
+.mergeForms .ward,
+.mergeForms .country,
+.mergeForms .province {
+  width: 48%;
+}
+
+.formGroup label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+  color: #6d6d6d;
+}
+
+.formGroup input,
+.formGroup select,
+.formGroup textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+.datePicker {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.datePicker input#selectedDate {
+  flex: 1;
+  padding: 13px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: white;
+  cursor: pointer;
+}
+
+.calendarBtn {
+  padding: 12px 15px;
+  margin-left: 10px;
+  background-color: #dfdfdf;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.calendarBtn:hover {
+  background-color: #bbbbbb;
+}
+
+.calendarPopup {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+  width: 330px;
+  padding: 10px;
+}
+
+.calendarHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.calendarHeader select {
+  padding: 5px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.calendarHeader button {
+  padding: 5px 10px;
+  background-color: #8b4513;
+  color: white;
+  border: none;
+  width: 120px;
+  height: 40px;
+  margin-left: 10px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.calendarHeader button:hover {
+  background-color: #7a3a0f;
+}
+
+.calendarDays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  text-align: center;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.calendarDays div {
+  padding: 5px;
+}
+
+.calendarDates {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  text-align: center;
+}
+
+.calendarDates div {
+  padding: 5px;
+  cursor: pointer;
+}
+
+.calendarDates div:hover {
+  background-color: #f0f0f0;
+}
+
+.selectedDate {
+  background-color: #8b4513;
+  color: white;
+  border-radius: 50%;
+}
+
+.formGroup textarea {
+  height: 80px;
+  resize: vertical;
+}
+
+.error {
+  color: red;
+  font-size: 14px;
+  margin-bottom: 10px;
+  display: none;
+}
+
+.order {
+  margin: 0 auto;
+  width: 450px;
+}
+
+.orderItem {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  font-size: 14px;
+  color: #666;
+  margin: 0px 50px 0px 50px;
+}
+
+.orderItem p:first-child {
+  width: 70%; /* Left side takes 70% */
+  text-align: left;
+}
+
+.orderItem p:last-child {
+  width: 30%; /* Right side takes 30% */
+  text-align: right;
+}
+
+.orderItem.total {
+  font-weight: bold;
+  color: #333;
+}
+
+.orderBtn {
+  width: 100%;
+  margin-top: 30px;
+  text-align: center;
+}
+
+.orderBtn button {
+  padding: 10px;
+  background-color: #8a3e00;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  width: 350px;
+  height: 50px;
+  font-size: 16px;
+  cursor: pointer;
+  margin: 0 auto;
+  display: inline-block;
+}
+
+.orderBtn button:hover {
+  background-color: #552600;
+}
