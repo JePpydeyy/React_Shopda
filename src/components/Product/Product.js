@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import styles from './Product.module.css';
+import styles from './product.module.css';
 
 const PRODUCTS_PER_PAGE = 9;
 
