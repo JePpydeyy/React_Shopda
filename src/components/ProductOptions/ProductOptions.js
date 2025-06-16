@@ -1,11 +1,11 @@
 import React from 'react';
 import styles from './ProductOptions.module.css';
 
+
+
 const ProductOptions = ({ quantity, wristSize, onIncreaseQuantity, onDecreaseQuantity, onIncreaseWristSize, onDecreaseWristSize }) => {
   return (
     <div className={styles.options}>
-      <label>Chọn Charm và Size viên đá để thể hiện giá sản phẩm</label>
-      <p><strong>4,010,000 VND</strong></p>
       <select id="charm" className={styles.select}>
         <option>Charm</option>
         <option>Charm 1</option>
@@ -29,7 +29,7 @@ const ProductOptions = ({ quantity, wristSize, onIncreaseQuantity, onDecreaseQua
         <span id="quantity" className={styles.quantitySpan}>{quantity}</span>
         <button onClick={onIncreaseQuantity}>+</button>
       </div>
-      <button className={styles.addToCart}>THÊM VÀO GIỎ HÀNG</button>
+      {/* <button className={styles.addToCart} onClick={handleAddToCart}>THÊM VÀO GIỎ HÀNG</button> */}
     </div>
   );
 };

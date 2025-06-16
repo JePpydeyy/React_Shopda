@@ -355,6 +355,7 @@
 }
 
 .productItemText {
+    text-align: center;
     position: relative;
     transition: all 0.3s ease;
     margin-top: -15px,; /* Hoặc -15px, -20px tùy theo mức độ bạn muốn */

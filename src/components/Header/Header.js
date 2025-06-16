@@ -1,9 +1,29 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react'; // Added useState and useEffect
+import { Link } from 'react-router-dom'; // Added Link import
 import styles from './Header.module.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMagnifyingGlass, faCartShopping, faCaretDown } from '@fortawesome/free-solid-svg-icons';
 
 const Header = () => {
+  // const [cartCount, setCartCount] = useState(0); // Added state for cartCount
+
+  // useEffect(() => {
+  //   // Lấy số lượng sản phẩm trong localStorage
+  //   const cart = JSON.parse(localStorage.getItem('cart')) || [];
+  //   // Đếm tổng số lượng sản phẩm (tổng quantity)
+  //   const total = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
+  //   setCartCount(total);
+
+  //   // Nếu muốn cập nhật realtime khi có thay đổi cart:
+  //   const handleStorage = () => {
+  //     const cart = JSON.parse(localStorage.getItem('cart')) || [];
+  //     const total = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
+  //     setCartCount(total);
+  //   };
+  //   window.addEventListener('storage', handleStorage);
+  //   return () => window.removeEventListener('storage', handleStorage);
+  // }, []);
+
   return (
     <header className={styles.header}>
       <div className={styles.container}>
@@ -17,10 +37,10 @@ const Header = () => {
         <div className={styles.headerRight}>
           <div className={styles.searchCart}>
             <FontAwesomeIcon icon={faMagnifyingGlass} className={styles.searchIcon} />
-            <div className={styles.cartContainer}>
+            <Link to="/cart" className={styles.cartContainer}>
               <FontAwesomeIcon icon={faCartShopping} className={styles.cartIcon} />
-              <span className={styles.cartBadge}>0</span>
-            </div>
+              {/* <span className={styles.cartBadge}>{cartCount}</span> */}
+            </Link>
           </div>
           <div className={styles.languageSelector}>
             <span>Tiếng Việt</span>
@@ -48,7 +68,7 @@ const Navbar = () => {
             </a>
           </li>
           <li><a href="#">BÀI VIẾT</a></li>
-          <li><a href="#">LIÊN HỆ</a></li>
+          <li><a href="/contact">LIÊN HỆ</a></li>
         </ul>
       </div>
     </nav>
