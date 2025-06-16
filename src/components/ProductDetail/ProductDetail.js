@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import ImageGallery from '../ImageGallery/ImageGallery';
 import ProductOptions from '../ProductOptions/ProductOptions';
+import ToastNotification from '../ToastNotification/ToastNotification';
 import styles from './ProductDetail.module.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
@@ -58,29 +59,31 @@ const DescriptionTab = ({ product }) => (
     </ul>
   </div>
 );
-{/* eslint-disable react/prop-types */}
 
 const ProductDetail = () => {
   const { id } = useParams();
   const [product, setProduct] = useState(null);
   const [quantity, setQuantity] = useState(1);
-  const [wristSize, setWristSize] = useState(15);
+  const [wristSize, setWristSize] = useState(12);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [activeTab, setActiveTab] = useState('delivery');
   const [error, setError] = useState(null);
+  const [toast, setToast] = useState(null);
 
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const response = await fetch(`${process.env.REACT_APP_API_URL}/product/${id}`);
+        const response = await fetch(`https://api-tuyendung-cty.onrender.com/api/product/${id}`);
         if (!response.ok) {
           throw new Error('Không thể lấy dữ liệu sản phẩm');
         }
         const data = await response.json();
         setProduct(data);
+        setWristSize(data.size?.[0] || 12);
       } catch (err) {
         setError(err.message);
         setProduct(null);
+        setToast({ message: 'Lỗi khi tải dữ liệu sản phẩm!', type: 'error' });
       }
     };
     fetchProduct();
@@ -95,21 +98,20 @@ const ProductDetail = () => {
   }
 
   const images = product.images && product.images.length > 0
-    ? product.images.map(img => `${process.env.REACT_APP_API_BASE}/${img}`)
+    ? product.images.map(img => `https://api-tuyendung-cty.onrender.com/${img}`)
     : ["https://via.placeholder.com/300"];
 
   const handleIncreaseQuantity = () => setQuantity(quantity + 1);
   const handleDecreaseQuantity = () => quantity > 1 && setQuantity(quantity - 1);
-  const handleIncreaseWristSize = () => setWristSize(wristSize + 1);
-  const handleDecreaseWristSize = () => wristSize > 1 && setWristSize(wristSize - 1);
+  const handleIncreaseWristSize = () => setWristSize(prev => Math.min(prev + 0.5, product.size[1]));
+  const handleDecreaseWristSize = () => wristSize > product.size[0] && setWristSize(prev => prev - 0.5);
   const handleNextImage = () => setCurrentImageIndex((currentImageIndex + 1) % images.length);
   const handlePrevImage = () => setCurrentImageIndex((currentImageIndex - 1 + images.length) % images.length);
   const handleThumbnailClick = (index) => setCurrentImageIndex(index);
   const formatPrice = (price) => new Intl.NumberFormat('vi-VN').format(price);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log('Form submitted');
+  const showToast = (message, type) => {
+    setToast({ message, type });
   };
 
   const handleAddToCart = () => {
@@ -120,21 +122,20 @@ const ProductDetail = () => {
       price: product.price,
       quantity,
       charm: product.Collection,
-      stoneSize: product.size ? product.size.join(', ') : '',
-      wristSize,
+      stoneSize: product.weight || '10,5 Li',
+      wristSize: wristSize.toFixed(1),
       image: product.images && product.images.length > 0
         ? `https://api-tuyendung-cty.onrender.com/${product.images[0]}`
         : 'https://via.placeholder.com/300',
-      stock: product.stock // Lưu stock vào cart
+      stock: product.stock
     };
-    // Kiểm tra trùng sản phẩm và size tay
     const existIndex = cart.findIndex(item => item._id === cartItem._id && item.wristSize === cartItem.wristSize);
     let totalQuantity = quantity;
     if (existIndex !== -1) {
       totalQuantity += cart[existIndex].quantity;
     }
     if (totalQuantity > product.stock) {
-      alert(`Số lượng vượt quá tồn kho (${product.stock})!`);
+      showToast(`Số lượng vượt quá tồn kho (${product.stock})!`, 'error');
       return;
     }
     if (existIndex !== -1) {
@@ -143,11 +144,18 @@ const ProductDetail = () => {
       cart.push(cartItem);
     }
     localStorage.setItem('cart', JSON.stringify(cart));
-    alert('Đã thêm vào giỏ hàng!');
+    showToast('Đã thêm vào giỏ hàng!', 'success');
   };
 
   return (
     <div className={styles.container}>
+      {toast && (
+        <ToastNotification
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      )}
       <div className={styles.header}>
         <h1 className={styles.nameProduct}>{product.name}</h1>
         <div className={styles.contact}>Liên hệ: 0909 123 456</div>
@@ -180,8 +188,9 @@ const ProductDetail = () => {
             onDecreaseQuantity={handleDecreaseQuantity}
             onIncreaseWristSize={handleIncreaseWristSize}
             onDecreaseWristSize={handleDecreaseWristSize}
+            weight={product.weight}
+            size={product.size}
           />
-          {/* Chỉ còn 1 nút thêm vào giỏ hàng: */}
           <button className={styles.addToCart} onClick={handleAddToCart}>
             Thêm vào giỏ hàng
           </button>

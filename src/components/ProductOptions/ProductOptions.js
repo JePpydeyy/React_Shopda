@@ -1,35 +1,64 @@
 import React from 'react';
 import styles from './ProductOptions.module.css';
 
+const ProductOptions = ({ 
+  quantity,
+  wristSize,
+  onIncreaseQuantity,
+  onDecreaseQuantity,
+  onIncreaseWristSize,
+  onDecreaseWristSize,
+  weight,
+  size
+}) => {
+  // Lấy kích thước viên đá
+  const stoneSize = weight ? `${weight}` : '10,5 Li';
 
+  // Lấy khoảng kích thước từ size, mặc định [12, 16] nếu không có
+  const sizeRange = size && size.length === 2 ? [size[0], size[1]] : [12, 22];
 
-const ProductOptions = ({ quantity, wristSize, onIncreaseQuantity, onDecreaseQuantity, onIncreaseWristSize, onDecreaseWristSize }) => {
   return (
     <div className={styles.options}>
-      <select id="charm" className={styles.select}>
-        <option>Charm</option>
-        <option>Charm 1</option>
-        <option>Charm 2</option>
-      </select>
-      <select id="size" className={styles.select}>
-        <option>Size Viên Đá</option>
-        <option>Size 1</option>
-        <option>Size 2</option>
-      </select>
+      <div className={styles.stoneSize}>
+        <label>KÍCH THƯỚC VIÊN ĐÁ</label>
+        <span className={styles.stoneSizeSpan}>{stoneSize}</span>
+      </div>
       <div className={styles.wristSize}>
         <label>KÍCH THƯỚC CỔ TAY</label>
-        <button onClick={onDecreaseWristSize}>-</button>
-        <span id="wrist-size" className={styles.wristSizeSpan}>{wristSize}</span> cm
-        <button onClick={onIncreaseWristSize}>+</button>
+        <button 
+          onClick={onDecreaseWristSize} 
+          disabled={wristSize <= sizeRange[0]}
+          aria-label="Giảm kích thước cổ tay"
+        >
+          -
+        </button>
+        <span id="wrist-size" className={styles.wristSizeSpan}>{wristSize.toFixed(1)} cm</span>
+        <button 
+          onClick={onIncreaseWristSize} 
+          disabled={wristSize >= sizeRange[1]}
+          aria-label="Tăng kích thước cổ tay"
+        >
+          +
+        </button>
       </div>
       <p><a href="#" className={styles.link}>Xem cách đo cổ tay</a></p>
       <div className={styles.quantity}>
         <label>SỐ LƯỢNG</label>
-        <button onClick={onDecreaseQuantity}>-</button>
+        <button 
+          onClick={onDecreaseQuantity} 
+          disabled={quantity <= 1}
+          aria-label="Giảm số lượng"
+        >
+          -
+        </button>
         <span id="quantity" className={styles.quantitySpan}>{quantity}</span>
-        <button onClick={onIncreaseQuantity}>+</button>
+        <button 
+          onClick={onIncreaseQuantity} 
+          aria-label="Tăng số lượng"
+        >
+          +
+        </button>
       </div>
-      {/* <button className={styles.addToCart} onClick={handleAddToCart}>THÊM VÀO GIỎ HÀNG</button> */}
     </div>
   );
 };
