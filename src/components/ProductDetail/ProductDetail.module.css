@@ -75,12 +75,12 @@
   transition: all 0.3s ease; /* Hiệu ứng chuyển đổi chậm 0.3s */
 }
 
-.nav-tabs .nav-link:hover {
+.nav-tabs .nav-link1:hover {
   background-color: rgba(160, 82, 45, 0.1); /* Màu nâu nhạt trong suốt khi hover */
   color: #000; /* Giữ chữ đen khi hover */
 }
 
-.nav-tabs .nav-link.active {
+.nav-tabs .nav-link1.active {
   color: #8B4513; /* Màu nâu khi active */
   border-bottom: 2px solid #8B4513; /* Màu nâu cho viền dưới khi active */
   background: none;
