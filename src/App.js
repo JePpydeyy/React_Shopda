@@ -28,17 +28,10 @@ function App() {
             <Route path="/product" element={<ProductSite />} />
             <Route path="/detail/:id" element={<ProductDetail />} />
             <Route path="/About" element={<About />} />
-<<<<<<< HEAD
             <Route path="/Contact" element={<Contactus />} />
             <Route path="/New" element={<Newsite />} />
             <Route path="/Newdetail" element={<PostDetail />} />
-=======
-            <Route path="/cart" element={<Cart />} />
-            <Route path="/new" element={<News />}/>
-            <Route path="/newdetail" element={<Newdetails />}/>
-            
-            
->>>>>>> 5816c20f9a80065b1135f8699734a501ede6dfc5
+            <Route path="/Cart" element={<Cart />} />
           </Routes>
         </div>
       </Router>

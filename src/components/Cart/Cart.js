@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
@@ -160,7 +160,7 @@ const Cart = () => {
                 <td className={styles.labelCell}>Thành tiền</td>
                 <td className={styles.valueCell}>{formatPrice(subtotal)}</td>
               </tr>
-              <tr>
+              {/* <tr>
                 <td className={styles.labelCell}>Giao Hàng</td>
                 <td className={styles.valueCell}>
                   <div className={styles.shippingDetails}>
@@ -169,7 +169,7 @@ const Cart = () => {
                     <div className={styles.calcShipping}>Tính phí giao hàng</div>
                   </div>
                 </td>
-              </tr>
+              </tr> */}
               <tr className={styles.totalRow}>
                 <td className={styles.labelCell}>Tổng tiền</td>
                 <td className={styles.valueCell}>{formatPrice(grandTotal)}</td>

@@ -1,13 +1,9 @@
 import React, { useState, useEffect } from 'react';
-<<<<<<< HEAD
+import { Link } from 'react-router-dom'; // <-- thêm dòng này
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faStar } from '@fortawesome/free-regular-svg-icons';
 
-import styles from './product.module.css';
-=======
-import { Link } from 'react-router-dom';
 import styles from './Product.module.css';
->>>>>>> 3738fcc2fbe77d009c2a69f827d0d584a3316972
 
 const API_URL = process.env.REACT_APP_API_URL;
 const PRODUCTS_PER_PAGE = 9;
