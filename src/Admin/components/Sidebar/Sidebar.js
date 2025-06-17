@@ -56,26 +56,28 @@ const Sidebar = ({ isAlwaysVisible = false }) => {
               <i className="fa-solid fa-chart-line"></i> Dashboard
             </Link>
           </li>
+        
           <li>
-            <Link to="/admin/news">
-              <i className="fa-regular fa-newspaper"></i> Tin Tức
+            <Link to="/admin/category">
+              <i className="fa-regular fa-newspaper"></i> danh mục
             </Link>
           </li>
-          <li>
-            <Link to="/admin/jobs">
-              <i className="fa-solid fa-briefcase"></i> Quản Lý Công Việc
+            <li>
+            <Link to="/admin/product">
+              <i className="fa-regular fa-newspaper"></i> Sản Phẩm
             </Link>
           </li>
-          <li>
-            <Link to="/admin/submit-profile">
-              <i className="fa-solid fa-address-card"></i> Hồ Sơ Ứng Tuyển
+            <li>
+            <Link to="/admin/order">
+              <i className="fa-regular fa-newspaper"></i> đơn hàng
             </Link>
           </li>
-          <li>
-            <Link to="/admin/contact">
-              <i class="fa-solid fa-address-book"></i> Quản Lý Liên Hệ
+           <li>
+            <Link to="/admin/new">
+              <i className="fa-regular fa-newspaper"></i> tin tức
             </Link>
           </li>
+         
          
           <li>
             <button onClick={handleLogout} className={styles.logoutBtn}>

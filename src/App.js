@@ -12,7 +12,12 @@ import Cart from './pages/Cart';
 import ProductDetail from './pages/ProductDetail';
 import Adminpage from './Admin/pages/Dashboard';
 import AdminLogin from './Admin/pages/Login';
-import NewAdmin from './Admin/pages/News'; 
+import AD_Product from './Admin/pages/Product'; 
+import AD_Order from './Admin/pages/Order'; 
+import AD_Category from './Admin/pages/Category'; 
+import AD_New from './Admin/pages/New'; 
+
+
 import './App.css';
 
 function App() {
@@ -35,7 +40,12 @@ function App() {
             {/* Admin routes */}
             <Route path="/admin" element={<Adminpage />} />
             <Route path="/admin/login" element={<AdminLogin />} />
-            <Route path="/admin/news" element={<NewAdmin />} />
+            <Route path="/admin/product" element={<AD_Product />} />
+            <Route path="/admin/order" element={<AD_Order />} />
+            <Route path="/admin/category" element={<AD_Category />} />
+            <Route path="/admin/new" element={<AD_New />} />
+
+
 
             {/* Redirect to home for any unmatched routes */}
           </Routes>
