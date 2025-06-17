@@ -54,9 +54,9 @@
   right: 20px;
 }
 
-.product-content {
+.productContent {
   max-width: 900px;
-  margin: 50px auto !important;
+  margin: 50px auto;
   background: #fff;
   padding: 20px;
   border-radius: 8px;
@@ -65,154 +65,71 @@
 
 .navTabs {
   border-bottom: 1px solid #e0c4a0;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+  display: flex;
 }
 
-.navLink {
-  color: #6b3900;
+/* Thiết lập cho nút tab */
+.navLink1 {
+  color: #000;
   border: none;
   border-bottom: 2px solid transparent;
   padding: 10px 20px;
-  transition: all 0.3s ease; /* Hiệu ứng chuyển đổi chậm 0.3s */
-}
-
-.nav-tabs .nav-link:hover {
-  background-color: rgba(160, 82, 45, 0.1); /* Màu nâu nhạt trong suốt khi hover */
-  color: #000; /* Giữ chữ đen khi hover */
-}
-
-.nav-tabs .nav-link.active {
-  color: #8B4513; /* Màu nâu khi active */
-  border-bottom: 2px solid #8B4513; /* Màu nâu cho viền dưới khi active */
+  transition: all 0.3s ease;
   background: none;
+  font-weight: 500;
+  cursor: pointer;
 }
 
-.tab-content {
-  padding-top: 20px;
-  margin-top: 50px;
-}
-
-
-.tab-pane h5 {
-  color: #333;
-  margin-bottom: 15px;
-}
-
-.tab-pane p {
-  line-height: 1.6;
-  color: #666;
-}
-
-.tab-pane strong {
+/* Hiệu ứng khi hover */
+.navLink1:hover {
+  background-color: rgba(139, 69, 19, 0.1);
   color: #000;
 }
 
-.review-section {
-  margin-top: 20px;
+/* Thiết lập khi active */
+.navLink1.active {
+  color: #8B4513;
+  border-bottom: 2px solid #8B4513;
+  background: none;
 }
 
-.review-item {
-  border-bottom: 1px solid #eee;
-  padding-bottom: 15px;
-  margin-bottom: 15px;
+.navItem {
+  margin-right: 10px;
 }
 
-.rating {
-  color: #ffca08;
+.tabContent {
+  padding-top: 20px;
 }
 
-.form-label {
-  font-weight: bold;
-}
-
-button {
-  background-color: #ff5e00;
-  color: #fff;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-button:hover {
-  background-color: #ff5e00;
-}
-
-.formContainer {
-  margin-top: 20px;
-  padding: 20px;
-  background-color: #f9f9f9;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-}
-
-.formTitle {
-  font-size: 1.5rem;
-  font-weight: bold;
-  margin-bottom: 15px;
-  color: #333;
-}
-
-.form {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-}
-
-.formGroup {
-  display: flex;
-  flex-direction: column;
-}
-
-.formGroup label {
-  font-weight: bold;
-  margin-bottom: 5px;
-  color: #555;
-}
-
-.formGroup input,
-.formGroup textarea {
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  font-size: 1rem;
-}
-
-.formGroup textarea {
-  height: 100px;
-  resize: vertical;
-}
-
-.submitButton {
-  padding: 10px 20px;
-  background-color: #007bff;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-
-.submitButton:hover {
-  background-color: #0056b3;
-}
-
-/* Thêm class bổ sung nếu cần */
-.tab-grid {
+.tabGrid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 20px;
 }
 
-.tab-column {
+.tabColumn {
   padding-right: 20px;
   border-right: 1px solid #ddd;
 }
 
-.tab-column:last-child {
+.tabColumn:last-child {
   border-right: none;
   padding-right: 0;
 }
+
+.error {
+  color: red;
+  text-align: center;
+}
+
+.loading {
+  text-align: center;
+  padding: 20px;
+}
+
 .addToCart {
   background-color: #9b6013;
   color: white;
@@ -222,9 +139,11 @@ button:hover {
   font-size: 16px;
   cursor: pointer;
 }
+
 .stoneSize {
   margin-bottom: 1rem;
 }
+
 .stoneSizeSpan {
   font-weight: bold;
   margin-left: 0.5rem;

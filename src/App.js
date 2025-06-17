@@ -10,6 +10,7 @@ import Checkout from './pages/Checkout';
 import Cart from './pages/Cart';
 
 import ProductDetail from './pages/ProductDetail';
+import { Tab } from 'bootstrap';
 
 import './App.css';
 

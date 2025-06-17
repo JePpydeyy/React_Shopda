@@ -4,13 +4,13 @@ import ImageGallery from '../ImageGallery/ImageGallery';
 import ProductOptions from '../ProductOptions/ProductOptions';
 import ToastNotification from '../ToastNotification/ToastNotification';
 import styles from './ProductDetail.module.css';
-import 'bootstrap/dist/css/bootstrap.min.css';
+import 'bootstrap/dist/css/bootstrap.min.css'; // Chỉ import CSS, JS được nạp qua CDN
 
 const DeliveryTab = () => (
-  <div className="tab-pane">
+  <div className="tab-pane fade" id="delivery-tab" role="tabpanel">
     <h5>THÔNG TIN VẬN CHUYỂN VÀ HOÀN TRẢ</h5>
-    <div className="tab-grid">
-      <div className="tab-column">
+    <div className={styles.tabGrid}>
+      <div className={styles.tabColumn}>
         <p><strong>Giao hàng</strong><br />
           – Nội thành: Giao từ 1 – 3 ngày; Miễn phí giao hàng trong bán kính 10km<br />
           – Tỉnh khác: Giao từ 5 – 7 ngày; 30.000 VNĐ / đơn<br />
@@ -19,7 +19,7 @@ const DeliveryTab = () => (
           Nếu khách hàng có yêu cầu về Giấy Kiểm Định Đá, đơn hàng sẽ cộng thêm 20 ngày để hoàn thành thủ tục.
         </p>
       </div>
-      <div className="tab-column">
+      <div className={styles.tabColumn}>
         <p><strong>Chính sách hoàn trả</strong><br />
           – Chúng tôi chấp nhận đổi / trả sản phẩm ngay lúc khách kiểm tra và xác nhận hàng hóa. Chúng tôi cam kết sẽ hỗ trợ và áp dụng chính sách bảo hành tốt nhất tới Quý khách, đảm bảo mọi quyền lợi Quý khách được đầy đủ.<br />
           – Những trình trạng bể, vỡ do quá trình quý khách sử dụng chúng tôi xin từ chối đổi hàng.<br />
@@ -32,7 +32,7 @@ const DeliveryTab = () => (
 );
 
 const DescriptionTab = ({ product }) => (
-  <div className="tab-pane">
+  <div className="tab-pane fade" id="description-tab" role="tabpanel">
     <p><b>{product.material}</b></p>
     <p><b>Sơ lược:</b> {product.short_description}</p>
     <p><b>Khu vực được khai thác:</b> {product.origin}</p>
@@ -64,9 +64,9 @@ const ProductDetail = () => {
   const { id } = useParams();
   const [product, setProduct] = useState(null);
   const [quantity, setQuantity] = useState(1);
-  const [wristSize, setWristSize] = useState(12);
+  const [wristSize, setWristSize] = useState(null); // String từ size_name với stock > 0
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [activeTab, setActiveTab] = useState('delivery');
+  const [activeTab, setActiveTab] = useState('delivery'); // Thêm khai báo state cho tab
   const [error, setError] = useState(null);
   const [toast, setToast] = useState(null);
 
@@ -79,7 +79,12 @@ const ProductDetail = () => {
         }
         const data = await response.json();
         setProduct(data);
-        setWristSize(data.size?.[0] || 12);
+        // Lấy kích thước mặc định có stock > 0 và stock cao nhất
+        const availableSizes = data.size?.filter(item => item.stock > 0) || [];
+        const defaultSize = availableSizes.length > 0
+          ? availableSizes.reduce((max, current) => max.stock > current.stock ? max : current).size_name
+          : null;
+        setWristSize(defaultSize);
       } catch (err) {
         setError(err.message);
         setProduct(null);
@@ -103,8 +108,23 @@ const ProductDetail = () => {
 
   const handleIncreaseQuantity = () => setQuantity(quantity + 1);
   const handleDecreaseQuantity = () => quantity > 1 && setQuantity(quantity - 1);
-  const handleIncreaseWristSize = () => setWristSize(prev => Math.min(prev + 0.5, product.size[1]));
-  const handleDecreaseWristSize = () => wristSize > product.size[0] && setWristSize(prev => prev - 0.5);
+
+  // Xử lý kích thước dựa trên mảng size object với stock > 0
+  const availableSizes = product.size?.filter(item => item.stock > 0).map(item => item.size_name) || [];
+  const currentSizeStock = product.size?.find(item => item.size_name === wristSize)?.stock || 0;
+  const handleIncreaseWristSize = () => {
+    const currentIndex = availableSizes.indexOf(wristSize);
+    if (currentIndex < availableSizes.length - 1) {
+      setWristSize(availableSizes[currentIndex + 1]);
+    }
+  };
+  const handleDecreaseWristSize = () => {
+    const currentIndex = availableSizes.indexOf(wristSize);
+    if (currentIndex > 0) {
+      setWristSize(availableSizes[currentIndex - 1]);
+    }
+  };
+
   const handleNextImage = () => setCurrentImageIndex((currentImageIndex + 1) % images.length);
   const handlePrevImage = () => setCurrentImageIndex((currentImageIndex - 1 + images.length) % images.length);
   const handleThumbnailClick = (index) => setCurrentImageIndex(index);
@@ -115,7 +135,7 @@ const ProductDetail = () => {
   };
 
   const handleAddToCart = () => {
-    const cart = JSON.parse(localStorage.getItem('cart_da')) || [];
+    const cart = JSON.parse(localStorage.getItem('cart_da') || '[]');
     const cartItem = {
       _id: product._id,
       name: product.name,
@@ -123,19 +143,19 @@ const ProductDetail = () => {
       quantity,
       charm: product.Collection,
       stoneSize: product.weight || '10,5 Li',
-      wristSize: wristSize.toFixed(1),
+      wristSize: wristSize || '12', // Sử dụng trực tiếp string size_name
       image: product.images && product.images.length > 0
         ? `https://api-tuyendung-cty.onrender.com/${product.images[0]}`
         : 'https://via.placeholder.com/300',
-      stock: product.stock
+      stock: currentSizeStock // Sử dụng stock của kích thước hiện tại
     };
     const existIndex = cart.findIndex(item => item._id === cartItem._id && item.wristSize === cartItem.wristSize);
     let totalQuantity = quantity;
     if (existIndex !== -1) {
       totalQuantity += cart[existIndex].quantity;
     }
-    if (totalQuantity > product.stock) {
-      showToast(`Số lượng vượt quá tồn kho (${product.stock})!`, 'error');
+    if (totalQuantity > currentSizeStock) {
+      showToast(`Số lượng vượt quá tồn kho (${currentSizeStock})!`, 'error');
       return;
     }
     if (existIndex !== -1) {
@@ -170,14 +190,14 @@ const ProductDetail = () => {
         />
         <div className={styles.rightColumn}>
           <p><strong>Mã sản phẩm: {product._id}</strong></p>
-          {product.status === 'Sale' && (
+          {product.status === 'sale' && (
             <span className={styles.sale}><strong>Trạng thái:</strong> SALE</span>
           )}
           <p><strong>NỘI DUNG SẢN PHẨM:</strong></p>
           <p>{product.description || 'Không có mô tả'}</p>
           <p><strong>MẠNG PHÙ HỢP: {product.element || 'Hỏa - Thổ'}</strong></p>
           <div>
-            <b>số lượng sản phẩm còn trong kho:</b> {product.stock}
+            <b>số lượng sản phẩm còn trong kho:</b> {currentSizeStock} (kích thước {wristSize})
           </div>
           <hr />
           <p><strong>Giá: {formatPrice(product.price)} VND</strong></p>
@@ -189,43 +209,43 @@ const ProductDetail = () => {
             onIncreaseWristSize={handleIncreaseWristSize}
             onDecreaseWristSize={handleDecreaseWristSize}
             weight={product.weight}
-            size={product.size}
+            size={availableSizes}
           />
           <button className={styles.addToCart} onClick={handleAddToCart}>
             Thêm vào giỏ hàng
           </button>
         </div>
       </div>
-      <div className="product-content">
-        <ul className="nav nav-tabs" role="tablist">
-          <li className="nav-item" role="presentation">
+      <div className={styles.productContent}>
+        <ul className={`${styles.navTabs} nav nav-tabs`} role="tablist">
+          <li className={styles.navItem} role="presentation">
             <button
-              className={`nav-link tab1 ${activeTab === 'delivery' ? 'active' : ''}`}
-              onClick={() => setActiveTab('delivery')}
+              className={`${styles.navLink1} nav-link ${activeTab === 'delivery' ? 'active' : ''}`} // Dòng 222
+              data-bs-toggle="tab"
+              data-bs-target="#delivery-tab"
+              onClick={() => setActiveTab('delivery')} // Dòng 225
               role="tab"
-              aria-selected={activeTab === 'delivery'}
+              aria-selected={activeTab === 'delivery'} // Dòng 227
             >
               Thông tin giao hàng
             </button>
           </li>
-          <li className="nav-item" role="presentation">
+          <li className={styles.navItem} role="presentation">
             <button
-              className={`nav-link tab1 ${activeTab === 'description' ? 'active' : ''}`}
-              onClick={() => setActiveTab('description')}
+              className={`${styles.navLink1} nav-link ${activeTab === 'description' ? 'active' : ''}`} // Dòng 234
+              data-bs-toggle="tab"
+              data-bs-target="#description-tab"
+              onClick={() => setActiveTab('description')} // Dòng 237
               role="tab"
-              aria-selected={activeTab === 'description'}
+              aria-selected={activeTab === 'description'} // Dòng 239
             >
               Chi tiết sản phẩm
             </button>
           </li>
         </ul>
-        <div className="tab-content">
-          <div className={`tab-pane ${activeTab === 'delivery' ? 'active' : ''}`} role="tabpanel">
-            <DeliveryTab />
-          </div>
-          <div className={`tab-pane ${activeTab === 'description' ? 'active' : ''}`} role="tabpanel">
-            <DescriptionTab product={product} />
-          </div>
+        <div className={`${styles.tabContent} tab-content`}>
+          <DeliveryTab />
+          <DescriptionTab product={product} />
         </div>
       </div>
     </div>
