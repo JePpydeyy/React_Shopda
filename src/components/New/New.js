@@ -1,24 +1,11 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom'; // Import Link from react-router-dom
 import styles from './New.module.css';
 
 const New = () => {
-  const newsItems = [
-    { id: 1, date: 'Tháng Năm 23, 2025', title: 'CÁC VÒNG ĐÁ CHO NĂM NĂNG LƯỢNG SỐ 9', image: 'img1.jpg' },
-    { id: 2, date: 'Tháng Hai 7, 2025', title: 'CHỌN VÒNG ĐÁ PHONG THỦY ĐÚNG CÁCH', image: 'img2.jpg' },
-    { id: 3, date: 'Tháng Hai 7, 2025', title: 'CHỌN VÒNG ĐÁ PHONG THỦY ĐÚNG CÁCH', image: 'img2.jpg' },
-    { id: 4, date: 'Tháng Hai 7, 2025', title: 'CHỌN VÒNG ĐÁ PHONG THỦY ĐÚNG CÁCH', image: 'img2.jpg' },
-    { id: 5, date: 'Tháng Hai 7, 2025', title: 'CHỌN VÒNG ĐÁ PHONG THỦY ĐÚNG CÁCH', image: 'img2.jpg' },
-    { id: 6, date: 'Tháng Hai 7, 2025', title: 'CHỌN VÒNG ĐÁ PHONG THỦY ĐÚNG CÁCH', image: 'img2.jpg' },
-    { id: 7, date: 'Tháng Hai 7, 2025', title: 'CHỌN VÒNG ĐÁ PHONG THỦY ĐÚNG CÁCH', image: 'img2.jpg' },
-    { id: 8, date: 'Tháng Hai 7, 2025', title: 'CHỌN VÒNG ĐÁ PHONG THỦY ĐÚNG CÁCH', image: 'img2.jpg' },
-    { id: 9, date: 'Tháng Hai 7, 2025', title: 'CHỌN VÒNG ĐÁ PHONG THỦY ĐÚNG CÁCH', image: 'img2.jpg' },
-    { id: 10, date: 'Tháng Hai 7, 2025', title: 'CHỌN VÒNG ĐÁ PHONG THỦY ĐÚNG CÁCH', image: 'img2.jpg' },
-    { id: 11, date: 'Tháng Hai 7, 2025', title: 'CHỌN VÒNG ĐÁ PHONG THỦY ĐÚNG CÁCH', image: 'img2.jpg' },
-    { id: 12, date: 'Tháng Hai 7, 2025', title: 'CHỌN VÒNG ĐÁ PHONG THỦY ĐÚNG CÁCH', image: 'img2.jpg' },
-    { id: 13, date: 'Tháng Hai 7, 2025', title: 'CHỌN VÒNG ĐÁ PHONG THỦY ĐÚNG CÁCH', image: 'img2.jpg' },
-    { id: 14, date: 'Tháng Hai 7, 2025', title: 'CHỌN VÒNG ĐÁ PHONG THỦY ĐÚNG CÁCH', image: 'img2.jpg' },
-    { id: 15, date: 'Tháng Hai 7, 2025', title: 'CHỌN VÒNG ĐÁ PHONG THỦY ĐÚNG CÁCH', image: 'img2.jpg' },
-  ];
+  const [newsItems, setNewsItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   const categories = [
     { name: 'Phong Thủy', href: 'phong-thuy.html' },
@@ -26,6 +13,47 @@ const New = () => {
     { name: 'Tin Khuyến Mãi', href: 'tin-khuyen-mai.html' },
     { name: 'Giải Trí', href: 'giai-tri.html' },
   ];
+
+  useEffect(() => {
+    const fetchNews = async () => {
+      try {
+        const response = await fetch('https://api-tuyendung-cty.onrender.com/api/new');
+        if (!response.ok) {
+          throw new Error('Failed to fetch news');
+        }
+        const data = await response.json();
+        // Map API data to match the structure expected by the component
+        const formattedNews = data.map(item => ({
+          id: item._id,
+          date: new Date(item.publishedAt).toLocaleDateString('vi-VN', {
+            month: 'long',
+            day: 'numeric',
+            year: 'numeric',
+          }),
+          title: item.title,
+          image: item.thumbnailUrl, // Đường dẫn ảnh thô từ API
+        }));
+        setNewsItems(formattedNews);
+        setLoading(false);
+      } catch (err) {
+        setError(err.message);
+        setLoading(false);
+      }
+    };
+
+    fetchNews();
+  }, []);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
+
+  // Lấy biến môi trường cho đường dẫn ảnh
+  const API_BASE_URL = process.env.REACT_APP_API_BASE;
 
   return (
     <main className={styles.newsContainer}>
@@ -47,7 +75,7 @@ const New = () => {
           {newsItems.map((item) => (
             <div key={item.id} className={styles.newsPost}>
               <div className={styles.postImage}>
-                <img src={item.image} alt={item.title} />
+                <img src={`${API_BASE_URL}/${item.image}`} alt={item.title} /> {/* Thêm tiền tố đường dẫn */}
               </div>
               <div className={styles.postContent}>
                 <p>
@@ -55,7 +83,7 @@ const New = () => {
                 </p>
                 <h3>{item.title}</h3>
                 <div className={styles.postLink}>
-                  <a href="newdetail.html">XEM THÊM</a>
+                  <Link to={`/newdetail/${item.id}`}>XEM THÊM</Link> {/* Sử dụng Link */}
                 </div>
               </div>
             </div>

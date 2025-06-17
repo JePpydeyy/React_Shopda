@@ -1,4 +1,3 @@
-
 .mainContainer {
   margin: 0 auto;
   background: white;
@@ -9,21 +8,21 @@
 
 .heroImage {
   margin: 0 auto;
-  width: 1290px;
+  max-width: 100%; /* Replace fixed 1290px */
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .heroImage img {
-  height: 500px;
-  width: 100%;
+  max-height: 500px;
+ 
   object-fit: cover;
 }
 
 .contentSection {
   margin: 0 auto;
-  width: 1290px;
+max-width: 80%;
   display: flex;
   padding: 60px 40px;
   gap: 40px;
@@ -101,7 +100,7 @@
   color: white;
   font-weight: bold;
   font-size: 18px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
 
 .authorInfo h4 {
@@ -120,7 +119,8 @@
 .restaurantImage {
   flex: 1;
   position: relative;
-  background: linear-gradient(rgba(0,0,0,0.1), rgba(0,0,0,0.1)), url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 645 500"><rect width="645" height="500" fill="%23654321"/><rect x="50" y="50" width="545" height="400" fill="%238B4513"/><rect x="100" y="100" width="200" height="150" fill="%23A0522D"/><rect x="350" y="80" width="180" height="200" fill="%23654321"/><rect x="80" y="300" width="180" height="120" fill="%238B0000"/><rect x="300" y="320" width="150" height="100" fill="%232F4F2F"/><circle cx="150" cy="50" r="15" fill="%23FFE4B5"/><circle cx="200" cy="40" r="12" fill="%23FFE4B5"/><circle cx="120" cy="70" r="10" fill="%23FFE4B5"/><circle cx="180" cy="80" r="8" fill="%23FFE4B5"/><circle cx="520" cy="180" r="40" fill="%23F5F5DC"/><circle cx="580" cy="200" r="25" fill="%232F4F2F"/><circle cx="460" cy="220" r="30" fill="%238B0000"/><rect x="200" y="350" width="100" height="80" fill="%234A4A4A"/><rect x="320" y="360" width="80" height="60" fill="%23696969"/></svg>');
+  background: linear-gradient(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.1)),
+    url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 645 500"><rect width="645" height="500" fill="%23654321"/><rect x="50" y="50" width="545" height="400" fill="%238B4513"/><rect x="100" y="100" width="200" height="150" fill="%23A0522D"/><rect x="350" y="80" width="180" height="200" fill="%23654321"/><rect x="80" y="300" width="180" height="120" fill="%238B0000"/><rect x="300" y="320" width="150" height="100" fill="%232F4F2F"/><circle cx="150" cy="50" r="15" fill="%23FFE4B5"/><circle cx="200" cy="40" r="12" fill="%23FFE4B5"/><circle cx="120" cy="70" r="10" fill="%23FFE4B5"/><circle cx="180" cy="80" r="8" fill="%23FFE4B5"/><circle cx="520" cy="180" r="40" fill="%23F5F5DC"/><circle cx="580" cy="200" r="25" fill="%232F4F2F"/><circle cx="460" cy="220" r="30" fill="%238B0000"/><rect x="200" y="350" width="100" height="80" fill="%234A4A4A"/><rect x="320" y="360" width="80" height="60" fill="%23696969"/></svg>');
   background-size: cover;
   background-position: center;
 }
@@ -149,7 +149,7 @@
   border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
   top: 60px;
   left: 150px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
 }
 
 .lantern2 {
@@ -185,7 +185,7 @@
 
 .content {
   font-size: 24px;
-  max-width: 1290px;
+  max-width: 80%;
   margin: 0 auto;
   line-height: 1.5;
   padding: 20px;
@@ -194,6 +194,182 @@
 .border {
   border-bottom: 5px solid #8B0000;
   width: 100%;
-  position: fixed;
-  bottom: 0;
+  position: relative; /* Change from fixed to relative */
+}
+
+/* Media Queries for Responsiveness */
+
+/* Tablet (≤1024px) */
+@media (max-width: 1024px) {
+  .heroImage img {
+    max-height: 400px; /* Reduce hero image height */
+  }
+
+  .contentSection {
+    flex-direction: column; /* Stack columns vertically */
+    padding: 40px 20px;
+    gap: 20px;
+  }
+
+  .divider {
+    width: 100%; /* Horizontal divider */
+    height: 1px;
+    margin: 20px 0;
+  }
+
+  .column {
+    padding: 0 10px;
+  }
+
+  .columnTitle {
+    font-size: 28px;
+  }
+
+  .column p {
+    font-size: 16px;
+  }
+
+  .testimonialContainer {
+    flex-direction: column; /* Stack testimonial content and image */
+  }
+
+  .testimonialContent {
+    padding: 60px 40px;
+  }
+
+  .quoteText {
+    font-size: 20px;
+    max-width: 100%;
+  }
+
+  .restaurantImage {
+    min-height: 300px; /* Ensure image section has height */
+  }
+
+  .lantern,
+  .lantern2,
+  .lantern3 {
+    display: none; /* Hide lanterns on smaller screens */
+  }
+
+  .content {
+    font-size: 20px;
+    padding: 15px;
+  }
+}
+
+/* Mobile (≤768px) */
+@media (max-width: 768px) {
+  .heroImage img {
+    max-height: 300px; /* Further reduce hero image height */
+  }
+
+  .contentSection {
+    padding: 30px 15px;
+  }
+
+  .columnTitle {
+    font-size: 24px;
+  }
+
+  .column p {
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  .testimonialContent {
+    padding: 40px 20px;
+  }
+
+  .quoteText {
+    font-size: 18px;
+  }
+
+  .authorAvatar {
+    width: 50px;
+    height: 50px;
+    font-size: 16px;
+  }
+
+  .authorInfo h4 {
+    font-size: 16px;
+  }
+
+  .authorInfo p {
+    font-size: 12px;
+  }
+
+  .newWrapper {
+    padding: 30px 0;
+  }
+
+  .title {
+    font-size: 1.8em;
+  }
+
+  .subtitle {
+    font-size: 1.3em;
+  }
+
+  .content {
+    font-size: 18px;
+    padding: 10px;
+  }
+
+  .border {
+    margin-bottom: 20px; /* Add space below border */
+  }
+}
+
+/* Small Mobile (≤480px) */
+@media (max-width: 480px) {
+  .heroImage img {
+    max-height: 250px;
+  }
+
+  .contentSection {
+    padding: 20px 10px;
+  }
+
+  .columnTitle {
+    font-size: 20px;
+  }
+
+  .column p {
+    font-size: 13px;
+  }
+
+  .testimonialContent {
+    padding: 30px 15px;
+  }
+
+  .quoteText {
+    font-size: 16px;
+  }
+
+  .authorAvatar {
+    width: 40px;
+    height: 40px;
+    font-size: 14px;
+  }
+
+  .authorInfo h4 {
+    font-size: 14px;
+  }
+
+  .authorInfo p {
+    font-size: 11px;
+  }
+
+  .title {
+    font-size: 1.5em;
+  }
+
+  .subtitle {
+    font-size: 1.2em;
+  }
+
+  .content {
+    font-size: 16px;
+  }
 }
