@@ -1,6 +1,8 @@
 .header {
-  background: linear-gradient(135deg, #F4C430 0%, #E6B800 100%);
-  padding: 15px 0;
+  background: linear-gradient(135deg, #f4c430 0%, #e6b800 100%);
+  
+  width: 100%;
+  position: relative;
 }
 
 .container {
@@ -8,131 +10,225 @@
   justify-content: space-between;
   align-items: center;
   max-width: 1290px;
+  width: 90%;
   margin: 0 auto;
+  flex-wrap: wrap;
 }
 
 .logo {
   display: flex;
   align-items: center;
-  color: #8B4513;
+  color: #8b4513;
   text-decoration: none;
 }
 
 .logoIcon {
-  width: 40px;
-  height: 40px;
-  background: #8B4513;
+  width: 2.5rem;
+  height: 2.5rem;
+  background: #8b4513;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #F4C430;
+  color: #f4c430;
   font-weight: bold;
-  font-size: 18px;
-  margin-right: 10px;
+  font-size: 1.125rem;
+  margin-right: 0.625rem;
 }
 
 .logoText {
-  font-size: 24px;
+  font-size: 1.5rem;
   font-weight: bold;
 }
 
 .logoSubtitle {
-  font-size: 12px;
-  color: #8B4513;
+  font-size: 0.75rem;
+  color: #8b4513;
   opacity: 0.8;
 }
 
 .headerRight {
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 1.25rem;
 }
 
 .searchCart {
   display: flex;
   align-items: center;
-  gap: 15px;
+  gap: 0.9375rem;
 }
 
 .searchIcon,
 .cartIcon {
-  font-size: 24px;
+  font-size: 1.5rem;
   cursor: pointer;
-  color: #8B4513;
+  color: #8b4513;
 }
 
 .cartContainer {
   position: relative;
+  text-decoration: none;
 }
 
 .cartBadge {
   position: absolute;
-  top: -8px;
-  right: -8px;
+  top: -0.5rem;
+  right: -0.5rem;
   background: #dc3545;
   color: white;
   border-radius: 50%;
-  width: 18px;
-  height: 18px;
-  font-size: 10px;
+  width: 1.125rem;
+  height: 1.125rem;
+  font-size: 0.625rem;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .languageSelector {
-  color: #8B4513;
-  font-size: 14px;
+  color: #8b4513;
+  font-size: 0.875rem;
   cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 0.3125rem;
+}
+
+.hamburger {
+  display: none;
+  font-size: 1.5rem;
+  color: #8b4513;
+  cursor: pointer;
 }
 
 .navbar {
-  background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
-  padding: 12px 0;
+  margin-top:10px;
+  background: linear-gradient(135deg, #8b4513 0%, #a0522d 100%);
+  padding: 0.75rem 0;
+  width: 100%;
 }
 
 .navContainer {
-  width: 1290px;
+  width: 90%;
+  max-width: 1290px;
   margin: 0 auto;
   display: flex;
   align-items: center;
-  gap: 30px;
+  gap: 1.875rem;
 }
 
 .navHighlight {
-  color: #F4C430;
-  font-size: 14px;
+  color: #f4c430;
+  font-size: 0.875rem;
   font-weight: 500;
 }
 
 .navDivider {
-  color: #F4C430;
-  font-size: 18px;
+  color: #f4c430;
+  font-size: 1.125rem;
 }
 
 .navMenu {
   display: flex;
   list-style: none;
-  gap: 30px;
+  gap: 1.875rem;
+  margin-bottom: 0;
 }
 
 .navMenu a {
   color: white;
   text-decoration: none;
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: 500;
   transition: color 0.3s ease;
 }
 
 .navMenu a:hover {
-  color: #F4C430;
+  color: #f4c430;
 }
 
 .dropdownArrow {
-  margin-left: 5px;
-  font-size: 10px;
+  margin-left: 0.3125rem;
+  font-size: 0.625rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .container {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .headerRight {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .hamburger {
+    display: block;
+  }
+
+  .navbar {
+    display: none;
+  }
+
+  .navbar.active {
+    display: block;
+  }
+
+  .navContainer {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 1rem;
+  }
+
+  .navMenu {
+    flex-direction: column;
+    gap: 1rem;
+    width: 100%;
+  }
+
+  .navMenu a {
+    font-size: 1rem;
+  }
+
+  .navHighlight,
+  .navDivider {
+    font-size: 0.75rem;
+  }
+
+  .logoText {
+    font-size: 1.25rem;
+  }
+
+  .logoSubtitle {
+    font-size: 0.625rem;
+  }
+
+  .logoIcon {
+    width: 2rem;
+    height: 2rem;
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .searchIcon,
+  .cartIcon {
+    font-size: 1.25rem;
+  }
+
+  .languageSelector {
+    font-size: 0.75rem;
+  }
+
+  .hamburger {
+    font-size: 1.25rem;
+  }
+
+  .navMenu a {
+    font-size: 0.875rem;
+  }
 }

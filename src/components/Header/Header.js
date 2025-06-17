@@ -1,28 +1,16 @@
-import React, { useState, useEffect } from 'react'; // Added useState and useEffect
-import { Link } from 'react-router-dom'; // Added Link import
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import styles from './Header.module.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faMagnifyingGlass, faCartShopping, faCaretDown } from '@fortawesome/free-solid-svg-icons';
+import { faMagnifyingGlass, faCartShopping, faCaretDown, faBars, faTimes } from '@fortawesome/free-solid-svg-icons';
 
 const Header = () => {
-  // const [cartCount, setCartCount] = useState(0); // Added state for cartCount
+  // State for hamburger menu toggle
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  // useEffect(() => {
-  //   // Lấy số lượng sản phẩm trong localStorage
-  //   const cart = JSON.parse(localStorage.getItem('cart')) || [];
-  //   // Đếm tổng số lượng sản phẩm (tổng quantity)
-  //   const total = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
-  //   setCartCount(total);
-
-  //   // Nếu muốn cập nhật realtime khi có thay đổi cart:
-  //   const handleStorage = () => {
-  //     const cart = JSON.parse(localStorage.getItem('cart')) || [];
-  //     const total = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
-  //     setCartCount(total);
-  //   };
-  //   window.addEventListener('storage', handleStorage);
-  //   return () => window.removeEventListener('storage', handleStorage);
-  // }, []);
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+  };
 
   return (
     <header className={styles.header}>
@@ -46,29 +34,33 @@ const Header = () => {
             <span>Tiếng Việt</span>
             <FontAwesomeIcon icon={faCaretDown} />
           </div>
+          <div className={styles.hamburger} onClick={toggleMenu}>
+            <FontAwesomeIcon icon={isMenuOpen ? faTimes : faBars} />
+          </div>
         </div>
       </div>
+      <Navbar isMenuOpen={isMenuOpen} toggleMenu={toggleMenu} />
     </header>
   );
 };
 
-const Navbar = () => {
+const Navbar = ({ isMenuOpen, toggleMenu }) => {
   return (
-    <nav className={styles.navbar}>
+    <nav className={`${styles.navbar} ${isMenuOpen ? styles.active : ''}`}>
       <div className={styles.navContainer}>
         <span className={styles.navHighlight}>CAM KẾT SẢN PHẨM HOÀN TOÀN LÀ ĐÁ TỰ NHIÊN</span>
         <span className={styles.navDivider}>|</span>
         <ul className={styles.navMenu}>
-          <li><a href="/">TRANG CHỦ</a></li>
-          <li><a href="/about">GIỚI THIỆU</a></li>
+          <li><a href="/" onClick={toggleMenu}>TRANG CHỦ</a></li>
+          <li><a href="/about" onClick={toggleMenu}>GIỚI THIỆU</a></li>
           <li>
-            <a href="/product">
+            <a href="/product" onClick={toggleMenu}>
               SẢN PHẨM
               <FontAwesomeIcon icon={faCaretDown} className={styles.dropdownArrow} />
             </a>
           </li>
-          <li><a href="#">BÀI VIẾT</a></li>
-          <li><a href="/contact">LIÊN HỆ</a></li>
+          <li><a href="/new" onClick={toggleMenu}>BÀI VIẾT</a></li>
+          <li><a href="/contact" onClick={toggleMenu}>LIÊN HỆ</a></li>
         </ul>
       </div>
     </nav>
@@ -76,12 +68,7 @@ const Navbar = () => {
 };
 
 const HeaderAndNav = () => {
-  return (
-    <>
-      <Header />
-      <Navbar />
-    </>
-  );
+  return <Header />;
 };
 
 export default HeaderAndNav;

@@ -16,6 +16,7 @@ const Product = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedLevels, setSelectedLevels] = useState([]);
   const [sortType, setSortType] = useState('newest');
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
 
   // Fetch products from API
   useEffect(() => {
@@ -58,7 +59,7 @@ const Product = () => {
   if (sortType === 'price-asc') {
     sortedProducts = [...filteredProducts].sort((a, b) => a.price - b.price);
   } else if (sortType === 'price-desc') {
-    sortedProducts = [...filteredProducts].sort((a, b) => b.price - a.price);
+    sortedProducts = [...filteredProducts].sort((a, b) => b.price - b.price);
   } else if (sortType === 'newest') {
     sortedProducts = [...filteredProducts].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
   }
@@ -120,7 +121,7 @@ const Product = () => {
           className={currentPage === 1 ? styles.disabled : ''}
           aria-label="Previous page"
         >
-          &lt;
+          {'<'}
         </a>
         {pageNumbers.map(num => (
           <a
@@ -145,7 +146,7 @@ const Product = () => {
           className={currentPage === totalPages ? styles.disabled : ''}
           aria-label="Next page"
         >
-          &gt;
+          {'>'}
         </a>
       </div>
     );
@@ -163,12 +164,28 @@ const Product = () => {
     );
   };
 
+  const toggleFilter = () => {
+    setIsFilterOpen(prev => !prev);
+  };
+
+  const closeFilter = () => {
+    setIsFilterOpen(false);
+  };
+
   return (
     <section className={`${styles.productPage} ${styles.shop}`}>
       <div className={styles.container}>
         <div className={styles.row}>
-          <div className={styles.colLg3}>
+          <div
+            className={`${styles.colLg3} ${isFilterOpen ? styles.filterOpen : styles.filterClosed}`}
+            onClick={e => {
+              if (e.target === e.currentTarget) closeFilter();
+            }}
+          >
             <div className={styles.shopSidebar}>
+              <button className={styles.filterCloseBtn} onClick={closeFilter} aria-label="Đóng bộ lọc">
+                <i className="fa fa-times"></i>
+              </button>
               <div className={styles.shopSidebarSearch}>
                 <form onSubmit={e => e.preventDefault()}>
                   <input
@@ -268,6 +285,9 @@ const Product = () => {
                 <p>
                   Hiển thị {paginatedProducts.length} trong {sortedProducts.length} kết quả
                 </p>
+                <button className={styles.filterToggleBtn} onClick={toggleFilter} aria-label={isFilterOpen ? 'Đóng bộ lọc' : 'Mở bộ lọc'}>
+                  <i className={`fa ${isFilterOpen ? 'fa-times' : 'fa-filter'}`}></i> Bộ lọc
+                </button>
               </div>
               <div className={styles.shopProductOptionRight}>
                 <select

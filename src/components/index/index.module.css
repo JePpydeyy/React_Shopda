@@ -1,6 +1,6 @@
-
 .indexContainer {
   width: 100%;
+  overflow-x: hidden;
 }
 
 /* Banner Section */
@@ -12,19 +12,24 @@
   width: 100%;
   height: auto;
   display: block;
+  object-fit: cover;
+}
+
+.newsTitle {
+  text-align: center;
 }
 
 /* Collections Section */
 .collectionsSection {
-  padding: 50px 0;
+  padding: 3rem 0;
 }
 
 .collectionsTitle {
   text-align: center;
-  font-size: 2.5rem;
+  font-size: 2rem;
   font-weight: 600;
   color: #2c3e50;
-  margin-bottom: 50px;
+  margin-bottom: 2.5rem;
   letter-spacing: -0.5px;
 }
 
@@ -32,13 +37,17 @@
   margin: 0 auto;
   display: flex;
   flex-direction: row;
-  width: 1290px;
-  gap: 30px;
-  padding: 0 20px;
+  flex-wrap: wrap;
+  max-width: 1290px;
+  gap: 1.5rem;
+  padding: 0 1rem;
+  justify-content: center;
 }
 
 .collectionCard {
-  width: 400px;
+  width: 100%;
+  max-width: 400px;
+  flex: 1 1 300px;
   position: relative;
   height: 250px;
   border-radius: 15px;
@@ -97,27 +106,26 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  padding: 30px;
+  padding: 1.5rem;
   z-index: 2;
 }
 
 .collectionTitle {
-  font-size: 1.8rem;
+  font-size: 1.5rem;
   font-weight: 600;
   color: white;
   text-align: center;
-  margin-bottom: 20px;
+  margin-bottom: 1rem;
   letter-spacing: 0.5px;
-  margin-top: 30px;
 }
 
 .shopNowBtn {
   background: white;
   color: #2c3e50;
   border: none;
-  padding: 12px 30px;
+  padding: 0.75rem 1.5rem;
   border-radius: 25px;
-  font-size: 1rem;
+  font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -139,141 +147,173 @@
 }
 
 /* New Product Section */
-.newProduct {
-  background: url('/public/images/Banner.png');
-  padding: 50px 0;
-}
-
 .newProductSection {
+  max-width: 1290px;
+  margin: 0 auto;
+  padding: 3rem 1rem;
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 30px;
-  align-items: center;
-  min-height: 400px;
-  padding: 0 20px;
+  grid-template-columns: 3fr 2fr;
+  gap: 2rem;
+  align-items: start;
 }
 
-.productTextColumn {
-  position: relative;
-  color: white;
-  padding: 60px 40px;
+.newProductContainer {
+  display: contents;
+}
+
+.newProductLeft {
+  padding: 1.5rem;
+  background: linear-gradient(135deg, #B91C1C 0%, #DC2626 100%);
   border-radius: 15px;
-  text-align: center;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  color: white;
+}
+
+.newProductTextContent {
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  min-height: 350px;
+  gap: 1rem;
 }
 
-.productTextColumn::before {
-  content: '';
+.newProductTitle {
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1.3;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.newProductDescription {
+  font-size: 0.9rem;
+  line-height: 1.8;
+  text-align: justify;
+}
+
+.newProductDescription p {
+  margin-bottom: 0.75rem;
+}
+
+.viewAllBtn {
+  background: white;
+  color: #2c3e50;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 25px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  align-self: flex-start;
+  text-decoration: none;
+}
+
+.viewAllBtn:hover {
+  background: #f8f9fa;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.newProductRight {
+  display: flex;
+  justify-content: center;
+}
+
+.productsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+.productCard {
+  background: white;
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.productCard:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+}
+
+.productImageWrapper {
+  position: relative;
+  width: 100%;
+  height: 200px;
+  overflow: hidden;
+}
+
+.productCardImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.productOverlay {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(135deg, #B91C1C 0%, #DC2626 100%);
-  border-radius: 15px;
-  z-index: -1;
-  box-shadow: 0 10px 30px rgba(185, 28, 28, 0.3);
-}
-
-.newProductTitle {
-  font-size: 2.2rem;
-  font-weight: 700;
-  line-height: 1.3;
-  margin-bottom: 15px;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-}
-
-.imageColumn {
+  background: rgba(0, 0, 0, 0.3);
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
 }
 
-.productImageContainer {
-  position: relative;
-  width: 400px;
-  border-radius: 15px;
-  overflow: hidden;
-  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
-  transition: transform 0.3s ease;
+.productCard:hover .productOverlay {
+  opacity: 1;
 }
 
-.productImageContainer:hover {
-  transform: scale(1.05);
-}
-
-.productImage {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border-radius: 15px;
-}
-
-.newProductDesc {
-  padding: 30px;
+.quickViewBtn {
   background: white;
-  border-radius: 15px;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
-}
-
-.productCategory {
-  color: #6B7280;
-  font-size: 0.9rem;
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  margin-bottom: 10px;
-}
-
-.productName {
-  color: #F4C430;
-  font-size: 2rem;
-  font-weight: 700;
-  margin-bottom: 20px;
-  line-height: 1.3;
-}
-
-.productDescription {
-  color: #4B5563;
-  font-size: 1rem;
-  line-height: 1.7;
-  margin-bottom: 30px;
-  text-align: justify;
-}
-
-.ctaButton {
-  background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
-  color: white;
+  color: #2c3e50;
   border: none;
-  padding: 15px 30px;
-  border-radius: 8px;
-  font-size: 1rem;
+  padding: 0.5rem 1rem;
+  border-radius: 25px;
+  font-size: 0.8rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  box-shadow: 0 4px 15px rgba(139, 69, 19, 0.3);
+  text-decoration: none;
 }
 
-.ctaButton:hover {
+.quickViewBtn:hover {
+  background: #f8f9fa;
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(139, 69, 19, 0.4);
-  background: linear-gradient(135deg, #A0522D 0%, #8B4513 100%);
+}
+
+.productInfo {
+  padding: 0.75rem;
+  text-align: center;
+}
+
+.productName {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 0.5rem;
+}
+
+.productPrice {
+  font-size: 0.9rem;
+  color: #B91C1C;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
 }
 
 /* Ngũ Hành Section */
 .nguHanhSection {
-  width: 1290px;
+  max-width: 1290px;
   margin: 0 auto;
-  padding: 50px 20px;
+  padding: 3rem 1rem;
   display: grid;
   grid-template-columns: 1fr 2fr;
   grid-template-areas: 'ngu-hanh-desc ngu-hanh-grid';
-  gap: 40px;
+  gap: 2rem;
   align-items: center;
 }
 
@@ -282,7 +322,7 @@
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   grid-template-rows: repeat(2, 1fr);
-  gap: 15px;
+  gap: 0.75rem;
   height: auto;
 }
 
@@ -354,7 +394,7 @@
 
 .nguHanhDesc {
   grid-area: ngu-hanh-desc;
-  padding: 30px;
+  padding: 1.5rem;
   background: white;
   border-radius: 15px;
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
@@ -363,18 +403,18 @@
 
 .nguHanhTitle {
   color: #2c3e50;
-  font-size: 2.5rem;
+  font-size: 2rem;
   font-weight: 700;
-  margin-bottom: 25px;
+  margin-bottom: 1.25rem;
   line-height: 1.2;
 }
 
 .nguHanhText {
   color: #4B5563;
-  font-size: 1rem;
+  font-size: 0.9rem;
   line-height: 1.8;
   text-align: left;
-  margin-bottom: 25px;
+  margin-bottom: 1.25rem;
 }
 
 .nguHanhHighlight {
@@ -382,87 +422,26 @@
   font-weight: 600;
 }
 
-/* Product Slider Section */
-.containerProduct {
-  position: relative;
-  width: 100%;
-  width: 1290px;
-  margin: 0 auto;
-  overflow: hidden;
-}
-
-.scrollWrapper {
-  display: flex;
-  gap: 10px;
-  padding: 20px 0;
-  overflow-x: hidden;
-  
-}
-
-.product {
-  min-width: 277.5px;
-  height: 300px;
-  background: #f9e4d4;
-  border: 5px solid #a31f34;
-  border-radius: 10px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-shrink: 0;
-  position: relative;
-}
-
-.productImage {
-  max-width: 100%;
-  max-height: 100%;
-  object-fit: contain;
-}
-
-.btn {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  background: rgba(163, 31, 52, 0.8);
-  color: white;
-  border: none;
-  padding: 15px;
-  cursor: pointer;
-  font-size: 18px;
-  z-index: 20;
-  border-radius: 50%;
-  width: 50px;
-  height: 50px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background 0.3s;
-}
-
-.btn:hover {
-  background: rgba(163, 31, 52, 1);
-}
-
-.btnLeft {
-  left: 10px;
-}
-
-.btnRight {
-  right: 10px;
-}
-
 /* News Section */
-.news {
-  gap: 42px;
+.newsSection {
+  padding: 3rem 1rem;
+}
+
+.newsGrid {
   margin: 0 auto;
-  width: 1290px;
+  max-width: 1290px;
   display: flex;
   flex-direction: row;
+  flex-wrap: wrap;
+  gap: 2rem;
+  padding: 0 1rem;
+  justify-content: center;
 }
 
 .newsPost {
   width: 100%;
   max-width: 400px;
-  margin: 0 auto;
+  flex: 1 1 300px;
   overflow: hidden;
   display: grid;
   grid-template-rows: auto 1fr;
@@ -475,8 +454,8 @@
   width: 100%;
   height: 250px;
   position: relative;
-  background-size: contain, contain, cover;
-  background-position: bottom left, top right, center;
+  background-size: cover;
+  background-position: center;
 }
 
 .postImageImg {
@@ -485,15 +464,15 @@
   left: 50%;
   transform: translate(-50%, -50%);
   width: 100%;
-  height: auto;
-  object-fit: contain;
+  height: 100%;
+  object-fit: cover;
   z-index: 1;
 }
 
 .postContent {
   position: relative;
   top: -40px;
-  width: 300px;
+  width: 90%;
   margin: 0 auto;
   padding: 1.25rem;
   background-color: #ffffff;
@@ -508,7 +487,7 @@
   display: flex;
   align-items: center;
   color: #6b7280;
-  font-size: 0.9rem;
+  font-size: 0.8rem;
   margin-bottom: 0.625rem;
 }
 
@@ -520,7 +499,7 @@
 }
 
 .postTitle {
-  font-size: 1.5rem;
+  font-size: 1.2rem;
   font-weight: 700;
   color: #1f2937;
   margin-bottom: 0.9375rem;
@@ -537,7 +516,7 @@
   color: #1f2937;
   text-decoration: none;
   font-weight: 600;
-  font-size: 1rem;
+  font-size: 0.9rem;
   padding-bottom: 2px;
   position: relative;
   transition: color 0.3s ease-in-out;
@@ -563,3 +542,156 @@
   background-color: #2C7DA0;
 }
 
+/* Media Queries for Responsiveness */
+@media (max-width: 1024px) {
+  .collectionsGrid {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .collectionCard {
+    max-width: 500px;
+    height: 200px;
+  }
+
+  .newProductSection {
+    grid-template-columns: 1fr;
+  }
+
+  .newProductLeft,
+  .newProductRight {
+    width: 100%;
+  }
+
+  .productsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .nguHanhSection {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      'ngu-hanh-desc'
+      'ngu-hanh-grid';
+  }
+
+  .nguHanhGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .newsGrid {
+
+    align-items: center;
+  }
+
+  .newsPost {
+    max-width: 500px;
+  }
+}
+
+@media (max-width: 768px) {
+  .collectionsTitle,
+  .newProductTitle,
+  .nguHanhTitle {
+    font-size: 1.5rem;
+  }
+
+  .collectionTitle {
+    font-size: 1.2rem;
+  }
+
+  .newProductDescription,
+  .nguHanhText {
+    font-size: 0.8rem;
+  }
+
+  .shopNowBtn,
+  .viewAllBtn,
+  .quickViewBtn {
+    font-size: 0.8rem;
+    padding: 0.5rem 1rem;
+  }
+
+  .productName {
+    font-size: 0.9rem;
+  }
+
+  .productPrice {
+    font-size: 0.8rem;
+  }
+
+  .postTitle {
+    font-size: 1rem;
+  }
+
+  .postLinkA {
+    font-size: 0.8rem;
+  }
+
+  .nguHanhGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .elementCard {
+    height: 200px;
+  }
+
+  .postContent {
+    top: -30px;
+    width: 95%;
+  }
+}
+
+@media (max-width: 480px) {
+  .collectionsSection,
+  .newProductSection,
+  .nguHanhSection,
+  .newsSection {
+    padding: 1.5rem 0.5rem;
+  }
+
+  .collectionsGrid,
+  .newsGrid {
+    gap: 1rem;
+  }
+
+  .collectionCard,
+  .newsPost {
+    max-width: 100%;
+    flex: 1 1 100%;
+  }
+
+  .productImageWrapper {
+    height: 150px;
+  }
+
+  .postImage {
+    height: 200px;
+  }
+
+  .postContent {
+    top: -20px;
+    padding: 0.75rem;
+  }
+
+  .collectionsTitle,
+  .newProductTitle,
+  .nguHanhTitle {
+    font-size: 1.2rem;
+  }
+
+  .collectionTitle {
+    font-size: 1rem;
+  }
+
+  .newProductDescription,
+  .nguHanhText {
+    font-size: 0.75rem;
+  }
+
+  .shopNowBtn,
+  .viewAllBtn,
+  .quickViewBtn {
+    font-size: 0.7rem;
+    padding: 0.4rem 0.8rem;
+  }
+}

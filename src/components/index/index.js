@@ -1,143 +1,207 @@
-
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faChevronLeft, faChevronRight, faCalendarDays } from '@fortawesome/free-solid-svg-icons';
+import { faCalendarDays } from '@fortawesome/free-solid-svg-icons';
 import styles from './index.module.css';
+import { Link } from 'react-router-dom'; 
 
 const Index = () => {
-  const scrollWrapperRef = useRef(null);
-  const leftBtnRef = useRef(null);
-  const rightBtnRef = useRef(null);
-  const [currentIndex, setCurrentIndex] = useState(3); // Start at index 3
-  const [isDragging, setIsDragging] = useState(false);
-  const [startX, setStartX] = useState(0);
-  const [startTranslate, setStartTranslate] = useState(0);
-  const PRODUCT_WIDTH = 287.5; // 277.5px + 10px gap
-  const VISIBLE_PRODUCTS = 3;
-  const TOTAL_PRODUCTS = 10;
+  const [products, setProducts] = useState([]);
+  const [news, setNews] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [toast, setToast] = useState(null);
 
-  // Product data
-  const products = [
-    'https://tinhlamjw.com/wp-content/uploads/2024/01/z5058266514556_867e50e8106010032c3bcdb3337bf5e7.jpg',
-    'https://tinhlamjw.com/wp-content/uploads/2024/01/z5058265207049_a26e39eec124c4561326e44d1e859505.jpg',
-    'https://tinhlamjw.com/wp-content/uploads/2024/01/z5058266519758_4c205caaace0ce22de0eb9df57fd4260.jpg',
-    'https://tinhlamjw.com/wp-content/uploads/2024/01/z5058265213422_27be2f47ee8685098b2a3a4f56828b91.jpg',
-    'https://tinhlamjw.com/wp-content/uploads/2024/01/z5058266514556_867e50e8106010032c3bcdb3337bf5e7.jpg',
-    'https://tinhlamjw.com/wp-content/uploads/2024/01/z5058265207049_a26e39eec124c4561326e44d1e859505.jpg',
-    'https://tinhlamjw.com/wp-content/uploads/2024/01/z5058266519758_4c205caaace0ce22de0eb9df57fd4260.jpg',
-    'https://tinhlamjw.com/wp-content/uploads/2024/01/z5058265213422_27be2f47ee8685098b2a3a4f56828b91.jpg',
-    'https://tinhlamjw.com/wp-content/uploads/2024/01/z5058266514556_867e50e8106010032c3bcdb3337bf5e7.jpg',
-    'https://tinhlamjw.com/wp-content/uploads/2024/01/z5058265207049_a26e39eec124c4561326e44d1e859505.jpg',
-  ];
+  // API URLs
+  const API_BASE = process.env.REACT_APP_API_BASE;
+  const API_URL = process.env.REACT_APP_API_URL;
 
-  // Move to specific index
-  const moveToIndex = (index, smooth = true) => {
-    if (isDragging) return;
-
-    setCurrentIndex(index);
-    const scrollWrapper = scrollWrapperRef.current;
-    scrollWrapper.style.transition = smooth ? 'transform 0.5s ease' : 'none';
-    const newTranslate = -index * PRODUCT_WIDTH;
-    setStartTranslate(newTranslate);
-    scrollWrapper.style.transform = `translate3d(${newTranslate}px, 0, 0)`;
-
-    // Infinite reset
-    if (index <= -VISIBLE_PRODUCTS) {
-      setTimeout(() => {
-        setCurrentIndex(TOTAL_PRODUCTS);
-        moveToIndex(TOTAL_PRODUCTS, false);
-      }, 50);
-    } else if (index >= TOTAL_PRODUCTS + VISIBLE_PRODUCTS) {
-      setTimeout(() => {
-        setCurrentIndex(0);
-        moveToIndex(0, false);
-      }, 50);
-    }
+  // Toast notification
+  const showToast = (message, type) => {
+    setToast({ message, type });
+    setTimeout(() => setToast(null), 3000);
   };
 
-  // Handle mouse drag
-  const handleMouseDown = (e) => {
-    e.preventDefault();
-    setIsDragging(true);
-    setStartX(e.pageX);
-    setStartTranslate(-currentIndex * PRODUCT_WIDTH);
-    scrollWrapperRef.current.style.transition = 'none';
-    scrollWrapperRef.current.style.cursor = 'grabbing';
-  };
-
-  const handleMouseMove = (e) => {
-    if (!isDragging) return;
-    const deltaX = e.pageX - startX;
-    const newTranslate = startTranslate + deltaX;
-    scrollWrapperRef.current.style.transform = `translate3d(${newTranslate}px, 0, 0)`;
-  };
-
-  const handleMouseUp = () => {
-    if (!isDragging) return;
-    setIsDragging(false);
-    scrollWrapperRef.current.style.cursor = 'grab';
-
-    const currentTranslate = startTranslate + (scrollWrapperRef.current.getBoundingClientRect().left - startX);
-    let newIndex = Math.round(-currentTranslate / PRODUCT_WIDTH);
-    newIndex = Math.max(-VISIBLE_PRODUCTS, Math.min(newIndex, TOTAL_PRODUCTS + VISIBLE_PRODUCTS));
-    moveToIndex(newIndex);
-  };
-
-  // Handle touch drag
-  const handleTouchStart = (e) => {
-    setIsDragging(true);
-    setStartX(e.touches[0].pageX);
-    setStartTranslate(-currentIndex * PRODUCT_WIDTH);
-    scrollWrapperRef.current.style.transition = 'none';
-  };
-
-  const handleTouchMove = (e) => {
-    if (!isDragging) return;
-    const deltaX = e.touches[0].pageX - startX;
-    const newTranslate = startTranslate + deltaX;
-    scrollWrapperRef.current.style.transform = `translate3d(${newTranslate}px, 0, 0)`;
-  };
-
-  const handleTouchEnd = () => {
-    if (!isDragging) return;
-    setIsDragging(false);
-
-    const currentTranslate = startTranslate + (scrollWrapperRef.current.getBoundingClientRect().left - startX);
-    let newIndex = Math.round(-currentTranslate / PRODUCT_WIDTH);
-    newIndex = Math.max(-VISIBLE_PRODUCTS, Math.min(newIndex, TOTAL_PRODUCTS + VISIBLE_PRODUCTS));
-    moveToIndex(newIndex);
-  };
-
-  // Initialize carousel
-  useEffect(() => {
-    const scrollWrapper = scrollWrapperRef.current;
-    scrollWrapper.style.width = `${(TOTAL_PRODUCTS + 2 * VISIBLE_PRODUCTS) * PRODUCT_WIDTH}px`;
-    scrollWrapper.style.cursor = 'grab';
-    moveToIndex(VISIBLE_PRODUCTS);
-
-    const leftBtn = leftBtnRef.current;
-    const rightBtn = rightBtnRef.current;
-
-    const handleLeftClick = () => moveToIndex(currentIndex - 1);
-    const handleRightClick = () => moveToIndex(currentIndex + 1);
-
-    leftBtn.addEventListener('click', handleLeftClick);
-    rightBtn.addEventListener('click', handleRightClick);
-
-    return () => {
-      leftBtn.removeEventListener('click', handleLeftClick);
-      rightBtn.removeEventListener('click', handleRightClick);
+  // Add to cart function
+  const handleAddToCart = (product) => {
+    const cart = JSON.parse(localStorage.getItem('cart_da') || '[]');
+    const cartItem = {
+      _id: product.id || product._id,
+      name: product.name,
+      price: product.price,
+      quantity: 1,
+      charm: product.Collection || '',
+      stoneSize: product.weight || '10,5 Li',
+      wristSize: '12', // Kích thước mặc định
+      image: getImageUrl(product.images),
+      stock: 99 // Giả sử có stock
     };
-  }, [currentIndex]);
+
+    const existIndex = cart.findIndex(item => item._id === cartItem._id && item.wristSize === cartItem.wristSize);
+    
+    if (existIndex !== -1) {
+      cart[existIndex].quantity += 1;
+    } else {
+      cart.push(cartItem);
+    }
+    
+    localStorage.setItem('cart_da', JSON.stringify(cart));
+    showToast('Đã thêm vào giỏ hàng!', 'success');
+  };
+
+  // Fetch data from API
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        
+        // Fetch products
+        const productsResponse = await fetch(`${API_URL}/product`);
+        const productsData = await productsResponse.json();
+        
+        // Fetch news
+        const newsResponse = await fetch(`${API_URL}/new`);
+        const newsData = await newsResponse.json();
+        
+        // Get latest 4 products and 3 news (sorted by createdAt)
+        const latestProducts = productsData.slice(0, 4);
+        const latestNews = newsData.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 3);
+        
+        // Format news data to match the structure (similar to New component)
+        const formattedNews = latestNews.map(item => ({
+          _id: item._id,
+          id: item._id, // Backup for compatibility
+          title: item.title,
+          createdAt: item.createdAt,
+          publishedAt: item.publishedAt,
+          thumbnailUrl: item.thumbnailUrl,
+          contentBlocks: item.contentBlocks
+        }));
+        
+        setProducts(latestProducts);
+        setNews(formattedNews);
+        
+      } catch (error) {
+        console.error('Error fetching data:', error);
+        // Fallback to dummy data if API fails
+        setProducts([
+          { id: 1, name: 'Sản phẩm 1', image: '/images/product1.jpg', price: '500000' },
+          { id: 2, name: 'Sản phẩm 2', image: '/images/product2.jpg', price: '600000' },
+          { id: 3, name: 'Sản phẩm 3', image: '/images/product3.jpg', price: '700000' },
+          { id: 4, name: 'Sản phẩm 4', image: '/images/product4.jpg', price: '800000' }
+        ]);
+        setNews([
+          { _id: 1, id: 1, title: 'Tin tức 1', content: 'Nội dung tin tức 1', createdAt: '2025-05-23', thumbnailUrl: '/images/news1.jpg' },
+          { _id: 2, id: 2, title: 'Tin tức 2', content: 'Nội dung tin tức 2', createdAt: '2025-05-22', thumbnailUrl: '/images/news2.jpg' },
+          { _id: 3, id: 3, title: 'Tin tức 3', content: 'Nội dung tin tức 3', createdAt: '2025-05-21', thumbnailUrl: '/images/news3.jpg' }
+        ]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [API_URL]);
+
+  // Format date
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    const options = { year: 'numeric', month: 'long', day: 'numeric' };
+    return date.toLocaleDateString('vi-VN', options);
+  };
+
+  // Format price
+  const formatPrice = (price) => {
+    return new Intl.NumberFormat('vi-VN', {
+      style: 'currency',
+      currency: 'VND'
+    }).format(price);
+  };
+
+  // Get full image URL
+  const getImageUrl = (imagePath) => {
+    if (!imagePath) return '/images/placeholder.jpg';
+    if (Array.isArray(imagePath)) imagePath = imagePath[0]; // Handle array of images (e.g., product.images)
+    if (imagePath.startsWith('http')) return imagePath;
+    return `${API_BASE}/${imagePath}`;
+  };
+
+  if (loading) {
+    return (
+      <div className={styles.loading}>
+        <div className={styles.loadingSpinner}>Đang tải...</div>
+      </div>
+    );
+  }
 
   return (
     <div className={styles.indexContainer}>
+      {/* Toast notification */}
+      {toast && (
+        <div className={`${styles.toast} ${styles[toast.type]}`}>
+          {toast.message}
+        </div>
+      )}
+
       {/* Banner Section */}
       <div className={styles.banner}>
         <img src="images/Banner-Web-KimLongPhatLoc.png" alt="Banner" className={styles.bannerImage} />
       </div>
 
-      {/* Collections Section */}
+      {/* New Product Section */}
+      <div className={styles.newProductSection}>
+        <div className={styles.newProductContainer}>
+          <div className={styles.newProductRight}>
+            <div className={styles.productsGrid}>
+              {products.map((product, index) => (
+                <div key={product.id || product._id} className={styles.productCard}>
+                  <div className={styles.productImageWrapper}>
+                    <img 
+                      src={getImageUrl(product.images)} // Use product.images array
+                      alt={product.name}
+                      className={styles.productCardImage}
+                      onError={(e) => {
+                        e.target.src = '/images/placeholder.jpg';
+                      }}
+                    />
+                    <div className={styles.productOverlay}>
+                      <Link 
+                        to={`/detail/${product.id || product._id}`} 
+                        className={styles.quickViewBtn}
+                      >
+                        Xem Nhanh
+                      </Link>
+                    </div>
+                  </div>
+                  <div className={styles.productInfo}>
+                    <h3 className={styles.productName}>{product.name}</h3>
+                    <p className={styles.productPrice}>{formatPrice(product.price)}</p>
+                   
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className={styles.newProductLeft}>
+            <div className={styles.newProductTextContent}>
+              <h2 className={styles.newProductTitle}>Sản Phẩm Mới</h2>
+              <div className={styles.newProductDescription}>
+                <p>
+                  Khám phá bộ sưu tập sản phẩm mới nhất từ Tinh Lâm Jewelry. 
+                  Những thiết kế độc đáo, tinh tế được chế tác từ những viên đá có trong tự nhiên, với những màu sắc khác nhau và được chế tác vô cùng kỹ công.
+                </p>
+                <p>
+                  Mỗi sản phẩm được lựa chọn kỹ lưỡng theo ngũ hành phong thủy, 
+                  phù hợp với từng mệnh, giúp gia tăng năng lượng tích cực và 
+                  thu hút tài lộc trong cuộc sống.
+                </p>
+                <Link to="/product" className={styles.viewAllBtn}>
+                  Xem Tất Cả Sản Phẩm
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
       <div className={styles.collectionsSection}>
         <h2 className={styles.collectionsTitle}>Danh Mục Sản Phẩm</h2>
         <div className={styles.collectionsGrid}>
@@ -146,7 +210,12 @@ const Index = () => {
             <div className={styles.cardOverlay}></div>
             <div className={styles.cardContent}>
               <h3 className={styles.collectionTitle}>Vòng tay phong thủy</h3>
-              <a href="#" className={styles.shopNowBtn}>Mua ngay</a>
+              <Link 
+                to="/product?category=Phong thủy" 
+                className={styles.shopNowBtn}
+              >
+                Mua ngay
+              </Link>
             </div>
           </div>
           <div className={`${styles.collectionCard} ${styles.rings}`}>
@@ -154,7 +223,12 @@ const Index = () => {
             <div className={styles.cardOverlay}></div>
             <div className={styles.cardContent}>
               <h3 className={styles.collectionTitle}>Vòng đá thời trang</h3>
-              <a href="#" className={styles.shopNowBtn}>Mua ngay</a>
+              <Link 
+                to="/product?category=Thời trang" 
+                className={styles.shopNowBtn}
+              >
+                Mua ngay
+              </Link>
             </div>
           </div>
           <div className={`${styles.collectionCard} ${styles.bracelets}`}>
@@ -162,30 +236,13 @@ const Index = () => {
             <div className={styles.cardOverlay}></div>
             <div className={styles.cardContent}>
               <h3 className={styles.collectionTitle}>Sản phẩm hot</h3>
-              <a href="#" className={styles.shopNowBtn}>Mua ngay</a>
+              <Link 
+                to="/product" 
+                className={styles.shopNowBtn}
+              >
+                Mua ngay
+              </Link>
             </div>
-          </div>
-        </div>
-      </div>
-
-      {/* New Product Section */}
-      <div className={styles.newProduct}>
-        <div className={styles.newProductSection}>
-          <div className={styles.productTextColumn}>
-            <h2 className={styles.newProductTitle}>Bộ Sưu Tập<br />“Kim Long<br />Phát Lộc”</h2>
-          </div>
-          <div className={styles.imageColumn}>
-            <div className={styles.productImageContainer}>
-              <img src="images/newsproducts.png" alt="Kim Long Phát Lộc" className={styles.productImage} />
-            </div>
-          </div>
-          <div className={styles.newProductDesc}>
-            <div className={styles.productCategory}>Sản Phẩm Phong Thủy</div>
-            <h3 className={styles.productName}>Kim Long Phát Lộc</h3>
-            <p className={styles.productDescription}>
-              Trang Sức Phong Thủy Tinh Lâm cho ra mắt BST mang tên KIM LONG PHÁT LỘC nhằm đáp ứng nhu cầu mong muốn mang đến sự may mắn, nâng tương tích cực, nhằm thúc đẩy năm tài cả nhân, từ đó giúp người đeo có thêm động lực, sự tự tin, bản lĩnh để tiến bước thành công trên con đường phát triển công danh, tích lũy nhiều tài lộc và khẳng định quyền lực cá nhân... cho một năm Thìn Thịnh Vượng.
-            </p>
-            <button className={styles.ctaButton}>Mua Ngay</button>
           </div>
         </div>
       </div>
@@ -221,72 +278,46 @@ const Index = () => {
         <div className={styles.nguHanhDesc}>
           <h2 className={styles.nguHanhTitle}>Ngũ hành</h2>
           <p className={styles.nguHanhText}>
-            Vòng đá phong thủy theo ngũ hành (<span className={styles.nguHanhHighlight}>Kim, Thủy, Mộc, Hỏa, Thổ</span>) là những chiếc vòng được làm từ chính những viên đá có sẵn trong tự nhiên, với những màu sắc khác nhau và được chế tác vô cùng kỹ công. Ngoài ra, nó còn được xem là những vật phẩm có khả năng đem lại những may mắn cho con người. Mang đến tài lộc, thịnh vượng, phù trợ cho con người trong công việc cũng như cuộc sống. Đặc biệt là những người kinh doanh, buôn bán sẽ giúp bạn thuận lợi hơn trong con đường công danh sự nghiệp.
+            Vòng đá phong thủy theo ngũ hành (<span className={styles.nguHanhHighlight}>Kim, Thủy, Mộc, Hỏa, Thổ</span>) là những chiếc vòng được làm từ chính những viên đá có trong tự nhiên, với những màu sắc khác nhau và được chế tác vô cùng kỹ công. Ngoài ra, nó còn được xem là những vật phẩm có khả năng đem lại những may mắn cho con người. Mang đến tài lộc, thịnh vượng, phù trợ cho con người trong công việc cũng như cuộc sống.
           </p>
         </div>
       </div>
 
-      {/* Product Slider Section */}
-      <div className={styles.containerProduct}>
-        <button ref={leftBtnRef} className={`${styles.btn} ${styles.btnLeft}`}>
-          <FontAwesomeIcon icon={faChevronLeft} />
-        </button>
-        <button ref={rightBtnRef} className={`${styles.btn} ${styles.btnRight}`}>
-          <FontAwesomeIcon icon={faChevronRight} />
-        </button>
-        <div
-          className={styles.scrollWrapper}
-          ref={scrollWrapperRef}
-          onMouseDown={handleMouseDown}
-          onMouseMove={handleMouseMove}
-          onMouseUp={handleMouseUp}
-          onMouseLeave={handleMouseUp}
-          onTouchStart={handleTouchStart}
-          onTouchMove={handleTouchMove}
-          onTouchEnd={handleTouchEnd}
-        >
-          {/* Prepend clones of last VISIBLE_PRODUCTS items */}
-          {products.slice(-VISIBLE_PRODUCTS).map((src, index) => (
-            <div key={`clone-start-${index}`} className={styles.product}>
-              <img src={src} alt={`Sản phẩm clone ${index + 1}`} className={styles.productImage} />
-            </div>
-          ))}
-          {/* Original products */}
-          {products.map((src, index) => (
-            <div key={`original-${index}`} className={styles.product}>
-              <img src={src} alt={`Sản phẩm ${index + 1}`} className={styles.productImage} />
-            </div>
-          ))}
-          {/* Append clones of first VISIBLE_PRODUCTS items */}
-          {products.slice(0, VISIBLE_PRODUCTS).map((src, index) => (
-            <div key={`clone-end-${index}`} className={styles.product}>
-              <img src={src} alt={`Sản phẩm clone ${index + 1}`} className={styles.productImage} />
+      {/* News Section */}
+      <div className={styles.newsSection}>
+        <h2 className={styles.newsTitle}>Tin Tức Mới Nhất</h2>
+        <div className={styles.newsGrid}>
+          {news.map((article, index) => (
+            <div key={article._id} className={styles.newsPost}>
+              <div className={styles.postImage}>
+                <img 
+                  src={getImageUrl(article.thumbnailUrl)} 
+                  alt={article.title} 
+                  className={styles.postImageImg}
+                  onError={(e) => {
+                    e.target.src = '/images/kim.jpg';
+                  }}
+                />
+              </div>
+              <div className={styles.postContent}>
+                <p className={styles.postDate}>
+                  <FontAwesomeIcon icon={faCalendarDays} className={styles.postDateIcon} /> 
+                  {formatDate(article.createdAt)}
+                </p>
+                <h3 className={styles.postTitle}>{article.title}</h3>
+                <p className={styles.postExcerpt}>
+                  {article.contentBlocks?.find(block => block.type === 'text')?.content.substring(0, 100) + '...' || 'Đọc thêm để biết chi tiết...'}
+                </p>
+                <div className={styles.postLink}>
+                  <Link to={`/newdetail/${article._id}`} className={styles.postLinkA}>
+                    XEM THÊM
+                  </Link>
+                </div>
+              </div>
             </div>
           ))}
         </div>
       </div>
-
-      {/* News Section */}
-      <div className={styles.news}>
-        {Array(3).fill().map((_, index) => (
-          <div key={index} className={styles.newsPost}>
-            <div className={styles.postImage}>
-              <img src="images/kim.jpg" alt="News Post" className={styles.postImageImg} />
-            </div>
-            <div className={styles.postContent}>
-              <p className={styles.postDate}>
-                <FontAwesomeIcon icon={faCalendarDays} className={styles.postDateIcon} /> Tháng Năm 23, 2025
-              </p>
-              <h3 className={styles.postTitle}>CÁC VÒNG ĐÁ CHO NĂM NĂNG LƯỢNG SỐ 9</h3>
-              <div className={styles.postLink}>
-                <a href="#" className={styles.postLinkA}>XEM THÊM</a>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-
-    
     </div>
   );
 };
