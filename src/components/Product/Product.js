@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom'; // Thêm useLocation
+import { Link, useLocation } from 'react-router-dom';
 import styles from './Product.module.css';
 
 const API_BASE_URL = 'https://api-tuyendung-cty.onrender.com/api';
@@ -17,10 +17,9 @@ const Product = () => {
   const [selectedLevels, setSelectedLevels] = useState([]);
   const [sortType, setSortType] = useState('newest');
   
-  // Thêm useLocation để đọc URL params
   const location = useLocation();
 
-  // Helper function để đọc URL params
+  // Đọc URL params
   const getURLParams = () => {
     const params = new URLSearchParams(location.search);
     return {
@@ -30,7 +29,7 @@ const Product = () => {
     };
   };
 
-  // Fetch products from API
+  // Lấy sản phẩm từ API
   useEffect(() => {
     fetch(`${API_BASE_URL}/product`)
       .then(res => res.json())
@@ -44,7 +43,7 @@ const Product = () => {
       .catch(() => setProducts([]));
   }, []);
 
-  // Fetch categories from API
+  // Lấy danh mục từ API
   useEffect(() => {
     fetch(`${API_BASE_URL}/category`)
       .then(res => res.json())
@@ -55,50 +54,39 @@ const Product = () => {
       .catch(() => setCategories([]));
   }, []);
 
-  // Effect để xử lý URL params khi component mount hoặc URL thay đổi
+  // Đồng bộ search state với URL query
   useEffect(() => {
     const params = getURLParams();
-    
-    // Nếu có category trong URL, tự động chọn category đó
+    if (params.search) {
+      setSearch(params.search);
+    } else {
+      setSearch('');
+    }
     if (params.category) {
       setSelectedCategories([params.category]);
     }
-    
-    // Nếu có search trong URL, tự động điền vào ô tìm kiếm
-    if (params.search) {
-      setSearch(params.search);
-    }
-    
-    // Nếu có tag=hot, có thể lọc theo sản phẩm hot (tùy logic của bạn)
-    if (params.tag === 'hot') {
-      // Logic để lọc sản phẩm hot - có thể dựa vào field 'tag' trong product
-      // Hoặc có thể lọc theo điều kiện khác
-    }
   }, [location.search]);
 
-  // Filtered products - CẬP NHẬT LOGIC LỌC
+  // Lọc sản phẩm
   const filteredProducts = products.filter(p => {
-    const matchesSearch = p.name.toLowerCase().includes(search.toLowerCase());
+    const matchesSearch = p.name.toLowerCase().includes(search.toLowerCase()) ||
+      p.category?.name_categories?.toLowerCase().includes(search.toLowerCase());
     const matchesPrice = p.price >= minPrice && p.price <= maxPrice;
     const matchesLevel = selectedLevels.length === 0 || selectedLevels.map(l => l.toLowerCase()).includes(p.level.toLowerCase());
-    
-    // CẬP NHẬT LOGIC LỌC CATEGORY
     const matchesCategory = selectedCategories.length === 0 || 
       selectedCategories.some(selectedCat => 
         p.category?.name_categories?.toLowerCase().includes(selectedCat.toLowerCase()) ||
         p.category?.category?.toLowerCase().includes(selectedCat.toLowerCase())
       );
-    
-    // Nếu có tag=hot từ URL, lọc theo tag
     const params = getURLParams();
     const matchesTag = !params.tag || 
-      (params.tag === 'hot' && p.tag === 'sale') || // Giả sử sản phẩm hot có tag='sale'
-      (params.tag === 'hot' && p.isHot === true); // Hoặc có field isHot
+      (params.tag === 'hot' && p.tag === 'sale') || 
+      (params.tag === 'hot' && p.isHot === true);
 
     return matchesSearch && matchesPrice && matchesLevel && matchesCategory && matchesTag;
   });
 
-  // Sort products
+  // Sắp xếp sản phẩm
   let sortedProducts = filteredProducts;
   if (sortType === 'price-asc') {
     sortedProducts = [...filteredProducts].sort((a, b) => a.price - b.price);
@@ -108,7 +96,7 @@ const Product = () => {
     sortedProducts = [...filteredProducts].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
   }
 
-  // Pagination logic
+  // Phân trang
   const totalPages = Math.ceil(sortedProducts.length / PRODUCTS_PER_PAGE);
   const paginatedProducts = sortedProducts.slice(
     (currentPage - 1) * PRODUCTS_PER_PAGE,
@@ -117,7 +105,7 @@ const Product = () => {
 
   const formatPrice = price => new Intl.NumberFormat('vi-VN').format(price);
 
-  // Update price slider UI
+  // Cập nhật giao diện thanh giá
   useEffect(() => {
     const minPriceValue = document.getElementById('minPriceValue');
     const maxPriceValue = document.getElementById('maxPriceValue');
@@ -141,7 +129,7 @@ const Product = () => {
     }
   };
 
-  // Pagination controls
+  // Điều khiển phân trang
   const renderPagination = () => {
     if (totalPages <= 1) return null;
 
@@ -163,9 +151,9 @@ const Product = () => {
             if (currentPage > 1) setCurrentPage(currentPage - 1);
           }}
           className={currentPage === 1 ? styles.disabled : ''}
-          aria-label="Previous page"
+          aria-label="Trang trước"
         >
-          &lt;
+          &lt; {/* Sửa lỗi: sử dụng &lt; thay cho < */}
         </a>
         {pageNumbers.map(num => (
           <a
@@ -188,9 +176,9 @@ const Product = () => {
             if (currentPage < totalPages) setCurrentPage(currentPage + 1);
           }}
           className={currentPage === totalPages ? styles.disabled : ''}
-          aria-label="Next page"
+          aria-label="Trang sau"
         >
-          &gt;
+          &gt; {/* Sửa lỗi: sử dụng &gt; thay cho > */}
         </a>
       </div>
     );
@@ -312,6 +300,7 @@ const Product = () => {
               <div className={styles.shopProductOptionLeft}>
                 <p>
                   Hiển thị {paginatedProducts.length} trong {sortedProducts.length} kết quả
+                  {search && ` cho "${search}"`}
                 </p>
               </div>
               <div className={styles.shopProductOptionRight}>
