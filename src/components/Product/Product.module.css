@@ -313,6 +313,7 @@
 
 .productItem:hover { 
     transform: translateY(-5px); 
+    border-radius: 10px;
 }
 
 .productItemPic {
@@ -352,6 +353,7 @@
 
 .productItem:hover .productImgLink img { 
     transform: scale(1.05); 
+    border-radius: 10px;
 }
 
 .productItemText {
