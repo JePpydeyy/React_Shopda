@@ -4,16 +4,30 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import styles from './Cart.module.css';
 
+const API_BASE_URL = 'https://api-tuyendung-cty.onrender.com/api';
+
 const Cart = () => {
   const [cartItems, setCartItems] = useState([]);
   const [couponCode, setCouponCode] = useState('');
+  const [discounts, setDiscounts] = useState([]);
+  const [appliedDiscount, setAppliedDiscount] = useState(null);
+  const [errorMessage, setErrorMessage] = useState('');
 
+  // Fetch cart items from localStorage
   useEffect(() => {
     const cart = JSON.parse(localStorage.getItem('cart_da')) || [];
     setCartItems(cart);
   }, []);
 
-  const formatPrice = (price) => new Intl.NumberFormat('vi-VN').format(price) + ' VND';
+  // Fetch discount codes from API
+  useEffect(() => {
+    fetch(`${API_BASE_URL}/discount`)
+      .then(res => res.json())
+      .then(data => setDiscounts(data))
+      .catch(() => setDiscounts([]));
+  }, []);
+
+  const formatPrice = price => new Intl.NumberFormat('vi-VN').format(price) + ' VND';
 
   const updateQuantity = (quantity, index) => {
     const newCart = [...cartItems];
@@ -29,27 +43,55 @@ const Cart = () => {
     localStorage.setItem('cart_da', JSON.stringify(newCart));
   };
 
-  const removeItem = (index) => {
+  const removeItem = index => {
     if (window.confirm('Bạn có chắc chắn muốn xóa sản phẩm này khỏi giỏ hàng?')) {
       const newCart = cartItems.filter((_, i) => i !== index);
       setCartItems(newCart);
       localStorage.setItem('cart_da', JSON.stringify(newCart));
+      setAppliedDiscount(null); // Reset discount if cart changes
+      setErrorMessage('');
     }
   };
 
   const applyCoupon = () => {
-    if (couponCode.trim()) {
-      alert(`Mã giảm giá "${couponCode}" đang được xử lý...`);
-      setCouponCode('');
-    } else {
-      alert('Vui lòng nhập mã giảm giá!');
+    if (!couponCode.trim()) {
+      setErrorMessage('Vui lòng nhập mã giảm giá!');
+      return;
     }
+
+    const now = new Date();
+    const coupon = discounts.find(d => d.code.toUpperCase() === couponCode.toUpperCase());
+
+    if (!coupon) {
+      setErrorMessage('Mã giảm giá không tồn tại!');
+      return;
+    }
+
+    if (!coupon.isActive) {
+      setErrorMessage('Mã giảm giá không hoạt động!');
+      return;
+    }
+
+    if (new Date(coupon.expirationDate) < now) {
+      setErrorMessage('Mã giảm giá đã hết hạn!');
+      return;
+    }
+
+    if (coupon.usedCount >= coupon.usageLimit) {
+      setErrorMessage('Mã giảm giá đã hết lượt sử dụng!');
+      return;
+    }
+
+    setAppliedDiscount(coupon);
+    setErrorMessage('');
+    setCouponCode('');
+    alert(`Mã giảm giá "${coupon.code}" đã được áp dụng thành công!`);
   };
 
   const checkout = () => {
     if (cartItems.length > 0) {
-      const { quantity, price, name } = cartItems[0];
-      const total = quantity * price;
+      // Placeholder for checkout logic
+      alert('Tiến hành thanh toán...');
     } else {
       alert('Giỏ hàng trống!');
     }
@@ -57,10 +99,15 @@ const Cart = () => {
 
   const updateCart = () => {
     alert('Giỏ hàng đã được cập nhật!');
+    setAppliedDiscount(null); // Reset discount if cart is updated
+    setErrorMessage('');
   };
 
   const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
-  const grandTotal = subtotal; // Có thể thêm logic giảm giá sau này
+  const discountAmount = appliedDiscount
+    ? (subtotal * appliedDiscount.discountPercentage) / 100
+    : 0;
+  const grandTotal = subtotal - discountAmount;
 
   return (
     <div className={styles.container}>
@@ -108,7 +155,7 @@ const Cart = () => {
                         className={styles.quantityInput}
                         value={item.quantity}
                         min="1"
-                        onChange={(e) => updateQuantity(e.target.value, index)}
+                        onChange={e => updateQuantity(e.target.value, index)}
                       />
                     </td>
                     <td className={styles.totalCell}>{formatPrice(item.price * item.quantity)}</td>
@@ -132,11 +179,17 @@ const Cart = () => {
                 className={styles.couponInput}
                 placeholder="Mã giảm giá"
                 value={couponCode}
-                onChange={(e) => setCouponCode(e.target.value)}
+                onChange={e => setCouponCode(e.target.value)}
               />
               <button className={styles.applyBtn} onClick={applyCoupon}>
                 Áp dụng
               </button>
+              {errorMessage && <p className={styles.errorMessage}>{errorMessage}</p>}
+              {appliedDiscount && (
+                <p className={styles.successMessage}>
+                  Đã áp dụng mã "{appliedDiscount.code}" ({appliedDiscount.discountPercentage}% off)
+                </p>
+              )}
             </div>
 
             <div className={styles.bottomActions}>
@@ -160,16 +213,12 @@ const Cart = () => {
                 <td className={styles.labelCell}>Thành tiền</td>
                 <td className={styles.valueCell}>{formatPrice(subtotal)}</td>
               </tr>
-              {/* <tr>
-                <td className={styles.labelCell}>Giao Hàng</td>
-                <td className={styles.valueCell}>
-                  <div className={styles.shippingDetails}>
-                    <div className={styles.freeShipping}>Miễn phí vận chuyển</div>
-                    <div>Tùy chọn giao hàng sẽ được cập nhật trong quá trình thanh toán.</div>
-                    <div className={styles.calcShipping}>Tính phí giao hàng</div>
-                  </div>
-                </td>
-              </tr> */}
+              {appliedDiscount && (
+                <tr>
+                  <td className={styles.labelCell}>Giảm giá ({appliedDiscount.discountPercentage}%)</td>
+                  <td className={styles.valueCell}>-{formatPrice(discountAmount)}</td>
+                </tr>
+              )}
               <tr className={styles.totalRow}>
                 <td className={styles.labelCell}>Tổng tiền</td>
                 <td className={styles.valueCell}>{formatPrice(grandTotal)}</td>
