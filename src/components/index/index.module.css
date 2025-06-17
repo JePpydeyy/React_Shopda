@@ -12,7 +12,9 @@
   height: auto;
   display: block;
 }
-
+.newsTitle{
+  text-align: center;
+}
 /* Collections Section */
 .collectionsSection {
   padding: 50px 0;

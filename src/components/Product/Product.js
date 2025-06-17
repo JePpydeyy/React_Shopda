@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom'; // Thêm useLocation
 import styles from './Product.module.css';
 
 const API_BASE_URL = 'https://api-tuyendung-cty.onrender.com/api';
@@ -16,6 +16,19 @@ const Product = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedLevels, setSelectedLevels] = useState([]);
   const [sortType, setSortType] = useState('newest');
+  
+  // Thêm useLocation để đọc URL params
+  const location = useLocation();
+
+  // Helper function để đọc URL params
+  const getURLParams = () => {
+    const params = new URLSearchParams(location.search);
+    return {
+      category: params.get('category'),
+      tag: params.get('tag'),
+      search: params.get('search')
+    };
+  };
 
   // Fetch products from API
   useEffect(() => {
@@ -42,15 +55,47 @@ const Product = () => {
       .catch(() => setCategories([]));
   }, []);
 
-  // Filtered products
+  // Effect để xử lý URL params khi component mount hoặc URL thay đổi
+  useEffect(() => {
+    const params = getURLParams();
+    
+    // Nếu có category trong URL, tự động chọn category đó
+    if (params.category) {
+      setSelectedCategories([params.category]);
+    }
+    
+    // Nếu có search trong URL, tự động điền vào ô tìm kiếm
+    if (params.search) {
+      setSearch(params.search);
+    }
+    
+    // Nếu có tag=hot, có thể lọc theo sản phẩm hot (tùy logic của bạn)
+    if (params.tag === 'hot') {
+      // Logic để lọc sản phẩm hot - có thể dựa vào field 'tag' trong product
+      // Hoặc có thể lọc theo điều kiện khác
+    }
+  }, [location.search]);
+
+  // Filtered products - CẬP NHẬT LOGIC LỌC
   const filteredProducts = products.filter(p => {
-    return (
-      p.name.toLowerCase().includes(search.toLowerCase()) &&
-      p.price >= minPrice &&
-      p.price <= maxPrice &&
-      (selectedLevels.length === 0 || selectedLevels.map(l => l.toLowerCase()).includes(p.level.toLowerCase())) &&
-      (selectedCategories.length === 0 || selectedCategories.map(c => c.toLowerCase()).includes(p.category?.name_categories?.toLowerCase()))
-    );
+    const matchesSearch = p.name.toLowerCase().includes(search.toLowerCase());
+    const matchesPrice = p.price >= minPrice && p.price <= maxPrice;
+    const matchesLevel = selectedLevels.length === 0 || selectedLevels.map(l => l.toLowerCase()).includes(p.level.toLowerCase());
+    
+    // CẬP NHẬT LOGIC LỌC CATEGORY
+    const matchesCategory = selectedCategories.length === 0 || 
+      selectedCategories.some(selectedCat => 
+        p.category?.name_categories?.toLowerCase().includes(selectedCat.toLowerCase()) ||
+        p.category?.category?.toLowerCase().includes(selectedCat.toLowerCase())
+      );
+    
+    // Nếu có tag=hot từ URL, lọc theo tag
+    const params = getURLParams();
+    const matchesTag = !params.tag || 
+      (params.tag === 'hot' && p.tag === 'sale') || // Giả sử sản phẩm hot có tag='sale'
+      (params.tag === 'hot' && p.isHot === true); // Hoặc có field isHot
+
+    return matchesSearch && matchesPrice && matchesLevel && matchesCategory && matchesTag;
   });
 
   // Sort products
