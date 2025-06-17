@@ -1,5 +1,5 @@
 import React from 'react';
-import styles from './ImageGallery.module.css';
+import styles from '../ProductDetail/ProductDetail.module.css';
 
 const ImageGallery = ({ images, currentImageIndex, onNext, onPrev, onThumbnailClick }) => {
   return (

@@ -1,3 +1,4 @@
+/* Base styles (already provided) */
 .container {
   max-width: 1200px;
   margin: 0 auto;
@@ -55,7 +56,7 @@
 }
 
 .productContent {
-  max-width: 900px;
+  max-width: 1200px;
   margin: 50px auto;
   background: #fff;
   padding: 20px;
@@ -71,9 +72,9 @@
   display: flex;
 }
 
-/* Thiết lập cho nút tab */
 .navLink1 {
-  color: #000;
+  color: #000 !important;
+  font-weight: bold !important;
   border: none;
   border-bottom: 2px solid transparent;
   padding: 10px 20px;
@@ -83,16 +84,13 @@
   cursor: pointer;
 }
 
-/* Hiệu ứng khi hover */
 .navLink1:hover {
-  background-color: rgba(139, 69, 19, 0.1);
-  color: #000;
+  background-color: rgba(107, 50, 10, 0.2);
+  color: #973f05 !important;
 }
 
-/* Thiết lập khi active */
 .navLink1.active {
-  color: #8B4513;
-  border-bottom: 2px solid #8B4513;
+  border-bottom: 2px solid #8B4513 !important;
   background: none;
 }
 
@@ -147,4 +145,332 @@
 .stoneSizeSpan {
   font-weight: bold;
   margin-left: 0.5rem;
+}
+
+.options {
+  margin: 20px 0;
+}
+
+.options label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.select {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin-right: 10px;
+}
+
+.wristSize {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 10px 0;
+}
+
+.wristSize label {
+  font-weight: bold;
+  margin-right: 10px;
+  white-space: nowrap;
+}
+
+.wristSize button {
+  padding: 5px 10px;
+  background-color: #9b6013;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  width: 30px;
+  height: 25px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.wristSizeSpan {
+  display: flex;
+  align-items: center;
+  height: 30px;
+  width: 65px;
+  padding: 0 5px;
+}
+
+.link {
+  color: #9b6013;
+  text-decoration: none;
+}
+
+.quantity {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 20px 0;
+}
+
+.quantity button {
+  padding: 5px 10px;
+  width: 30px;
+  height: 25px;
+  background-color: #9b6013;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.quantitySpan {
+  display: flex;
+  align-items: center;
+  height: 30px;
+  padding: 0 5px;
+}
+
+.leftColumn {
+  flex: 1;
+  text-align: center;
+  position: relative;
+}
+
+.mainImage {
+  width: 100%;
+  max-width: 400px;
+  height: 370px;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  transition: opacity 1.5s ease !important;
+}
+
+.prevBtn, .nextBtn {
+  position: absolute;
+  top: 35%;
+  transform: translateY(-50%);
+  background-color: #4a2c2a;
+  color: white;
+  border: 2px solid #fff;
+  padding: 10px;
+  cursor: pointer;
+  font-size: 20px;
+  width: 40px;
+  height: 40px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.prevBtn {
+  left: 8px;
+}
+
+.nextBtn {
+  right: 8px;
+}
+
+.thumbnailGallery {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+.thumbnail {
+  width: 60px;
+  height: 60px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: transform 0.3s ease !important;
+}
+
+.thumbnail:hover {
+  transform: scale(1.1);
+}
+
+/* Responsive styles for iPad (768px–1024px) */
+@media (max-width: 1024px) {
+  .container {
+    max-width: 90%;
+    padding: 30px;
+  }
+
+  .nameProduct {
+    font-size: 20px;
+  }
+
+  .content {
+    flex-direction: column; /* Stack columns vertically */
+    gap: 15px;
+  }
+
+  .leftColumn,
+  .rightColumn {
+    flex: 1; /* Equal width */
+  }
+
+  .mainImage {
+    max-width: 100%;
+    height: 300px; /* Reduce image height */
+  }
+
+  .thumbnail {
+    width: 50px;
+    height: 50px;
+  }
+
+  .navTabs {
+    flex-wrap: wrap; /* Allow tabs to wrap */
+  }
+
+  .navLink1 {
+    padding: 8px 15px;
+    font-size: 14px;
+  }
+
+  .tabGrid {
+    grid-template-columns: 1fr; /* Single column layout */
+    gap: 15px;
+  }
+
+  .tabColumn {
+    padding-right: 0;
+    border-right: none;
+  }
+
+  .productContent {
+    max-width: 90%;
+    margin: 30px auto;
+    padding: 15px;
+  }
+
+  .addToCart {
+    font-size: 14px;
+    padding: 8px 15px;
+  }
+
+  .contact {
+    padding: 8px 15px;
+    font-size: 14px;
+  }
+
+  .wristSizeSpan {
+    width: 65px;
+  }
+}
+
+/* Responsive styles for Mobile (320px–767px) */
+@media (max-width: 767px) {
+  .container {
+    max-width: 95%;
+    padding: 20px;
+  }
+
+  .header {
+    flex-direction: column; /* Stack header elements */
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .nameProduct {
+    font-size: 18px;
+  }
+
+  .content {
+    gap: 10px;
+  }
+
+  .mainImage {
+    height: 300px; /* Further reduce image height */
+  }
+
+  .prevBtn, .nextBtn {
+    width: 30px;
+    height: 30px;
+    font-size: 16px;
+    padding: 5px;
+  }
+
+  .thumbnail {
+    width: 40px;
+    height: 40px;
+  }
+
+  .thumbnailGallery {
+    gap: 5px;
+  }
+
+  .rightColumn p {
+    font-size: 17px;
+  }
+
+  .navTabs {
+    flex-direction: column; /* Stack tabs vertically */
+  }
+
+  .navLink1 {
+    padding: 6px 10px;
+    font-size: 15px;
+    width: 100%;
+    text-align: center;
+  }
+
+  .navItem {
+    margin-right: 0;
+    margin-bottom: 5px;
+  }
+
+  .productContent {
+    max-width: 95%;
+    margin: 20px auto;
+    padding: 10px;
+  }
+
+  .addToCart {
+    font-size: 12px;
+    padding: 6px 10px;
+    width: 100%; /* Full-width button */
+    text-align: center;
+  }
+
+  .contact {
+    padding: 6px 10px;
+    font-size: 12px;
+    bottom: 10px;
+    right: 10px;
+  }
+
+  .wristSize,
+  .quantity {
+    flex-wrap: wrap; /* Allow wrapping for small screens */
+    gap: 5px;
+  }
+
+  .wristSize button,
+  .quantity button {
+    width: 30px;
+    height: 25px;
+    font-size: 12px;
+  }
+
+  .wristSizeSpan{
+    width: 57px;
+    font-size: 12px;
+  }
+
+
+  .quantitySpan {
+    width: 20px;
+    font-size: 12px;
+  }
+
+  .select {
+    width: 100%; /* Full-width select */
+  }
+
+  .options label {
+    font-size: 14px;
+  }
 }

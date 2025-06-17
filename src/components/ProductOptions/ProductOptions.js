@@ -1,5 +1,5 @@
 import React from 'react';
-import styles from './ProductOptions.module.css';
+import styles from '../ProductDetail/ProductDetail.module.css';
 
 const ProductOptions = ({ 
   quantity,
@@ -21,8 +21,7 @@ const ProductOptions = ({
   return (
     <div className={styles.options}>
       <div className={styles.stoneSize}>
-        <label>KÍCH THƯỚC VIÊN ĐÁ</label>
-        <span className={styles.stoneSizeSpan}>{stoneSize}</span>
+        <label>KÍCH THƯỚC VIÊN ĐÁ: {stoneSize}</label>
       </div>
       <div className={styles.wristSize}>
         <label>KÍCH THƯỚC CỔ TAY</label>

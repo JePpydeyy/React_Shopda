@@ -1,0 +1,553 @@
+/* Biến CSS cho màu sắc và kích thước */
+:root {
+  --primary-color: #007bff;
+  --secondary-color: #100f27;
+  --background-light: #fff;
+  --text-color: #333;
+  --text-muted: #666;
+  --border-color: #ddd;
+  --status-hired-bg: #e8f5e9;
+  --status-hired-text: #1b5e20;
+  --status-rejected-bg: #ffebee;
+  --status-rejected-text: #b71c1c;
+  --status-new-bg: #e3f2fd;
+  --status-new-text: #0d47a1;
+  --status-interview-bg: #fff8e1;
+  --status-interview-text: #ff6f00;
+  --add-bg: #28a745;
+  --add-text: #fff;
+  --spacing-sm: 8px;
+  --spacing-md: 15px;
+  --spacing-lg: 20px;
+  --border-radius: 5px;
+  --box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Container chính */
+.container {
+  margin-left: 250px;
+  width: calc(100% - 250px);
+  padding: var(--spacing-lg);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  color: var(--text-color);
+  box-sizing: border-box;
+}
+
+/* Bộ lọc */
+.filters {
+  background: var(--background-light);
+  padding: var(--spacing-lg);
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+  margin-bottom: var(--spacing-lg);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-md);
+  align-items: center;
+}
+
+.filters select,
+.filters input,
+.searchBar {
+  padding: var(--spacing-sm) 12px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  font-size: 0.875rem;
+  min-width: 150px;
+  transition: border-color 0.2s ease;
+  box-sizing: border-box;
+}
+
+.filters select:focus,
+.filters input:focus,
+.searchBar:focus {
+  border-color: var(--primary-color);
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+.filters button {
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--secondary-color);
+  color: #fff;
+  border: none;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  font-size: 0.875rem;
+  transition: background-color 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+}
+
+.filters button:hover {
+  background: #1a1a3b;
+}
+
+/* Nút Thêm Công Việc trong filters */
+.filters button.add-job {
+  background: var(--add-bg);
+  color: var(--add-text);
+}
+
+.filters button.add-job:hover {
+  background: #1e7e34;
+}
+
+/* Bảng công việc */
+.jobs {
+  background: var(--background-light);
+  padding: var(--spacing-lg);
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+  margin-bottom: var(--spacing-lg);
+  overflow-x: auto;
+}
+
+.jobs h3 {
+  font-size: 1.125rem;
+  margin-bottom: var(--spacing-md);
+}
+
+.jobs h3 button {
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--add-bg);
+  color: var(--add-text);
+  border: none;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  font-size: 0.875rem;
+  transition: background-color 0.2s ease;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.jobs h3 button:hover {
+  background: #1e7e34;
+}
+
+.jobs table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: auto;
+  min-width: 800px;
+}
+
+.jobs th,
+.jobs td {
+  padding: 12px 10px;
+  text-align: left;
+  font-size: 0.875rem;
+  border-bottom: 1px solid #eee;
+  vertical-align: middle;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.jobs th {
+  background: #f8f9fa;
+  color: var(--text-muted);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* Thiết lập độ rộng tối thiểu cho các cột */
+.jobs th:nth-child(1),
+.jobs td:nth-child(1) {
+  min-width: 50px;   /* STT */
+  text-align: center;
+}
+.jobs th:nth-child(2),
+.jobs td:nth-child(2) {
+  min-width: 180px;  /* Tên Công Việc */
+}
+.jobs th:nth-child(3),
+.jobs td:nth-child(3) {
+  min-width: 100px;  /* Thương Hiệu */
+}
+.jobs th:nth-child(4),
+.jobs td:nth-child(4) {
+  min-width: 90px;   /* Loại Công Việc */
+}
+.jobs th:nth-child(5),
+.jobs td:nth-child(5) {
+  min-width: 120px;  /* Mức Lương */
+}
+.jobs th:nth-child(6),
+.jobs td:nth-child(6) {
+  min-width: 120px;  /* Địa Điểm */
+}
+.jobs th:nth-child(7),
+.jobs td:nth-child(7) {
+  min-width: 90px;   /* Hạn Nộp */
+}
+.jobs th:nth-child(8),
+.jobs td:nth-child(8) {
+  min-width: 90px;   /* Trạng Thái */
+  text-align: center;
+}
+
+/* Ngăn xuống dòng cho các cột ngắn, trừ cột Thương Hiệu */
+.jobs td:nth-child(4),
+.jobs td:nth-child(6),
+.jobs td:nth-child(7),
+.jobs td:nth-child(8) {
+  white-space: nowrap;
+}
+
+/* Cho phép xuống dòng cho cột Thương Hiệu */
+.jobs td:nth-child(3) {
+  white-space: normal;
+  word-break: break-word;
+  line-height: 1.4;
+  max-height: 60px;
+}
+
+/* Status styling */
+.status {
+  padding: 4px 8px;
+  border-radius: var(--border-radius);
+  font-size: 0.875rem;
+  display: inline-block;
+}
+
+.active {
+  background: var(--status-hired-bg);
+  color: var(--status-hired-text);
+}
+
+.inactive {
+  background: var(--status-rejected-bg);
+  color: var(--status-rejected-text);
+}
+
+/* Action buttons */
+.actionButtons {
+  display: flex;
+  gap: 5px;
+  justify-content: flex-start;
+}
+
+.actionButtons button {
+  padding: 6px 10px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.75rem;
+  transition: background-color 0.2s ease;
+}
+
+.actionButtons .view {
+  background: var(--status-new-bg);
+  color: var(--status-new-text);
+}
+
+.edit {
+  background: var(--status-interview-bg);
+  color: var(--status-interview-text);
+}
+
+.delete {
+  background: var(--status-rejected-bg);
+  color: var(--status-rejected-text);
+}
+
+.actionButtons button:hover {
+  opacity: 0.9;
+}
+
+/* Modal */
+.modal {
+  display: flex;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+
+  align-items: center;
+  justify-content: center;
+}
+
+.modalContent {
+  background: var(--background-light);
+  padding: var(--spacing-lg);
+  z-index: 10000;
+  border-radius: var(--border-radius);
+  width: 90%;
+  max-width: 900px;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  animation: modalSlideIn 0.3s ease-out;
+}
+
+@keyframes modalSlideIn {
+  from {
+    transform: translateY(-50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.close {
+  color: #fd0000;
+  font-size: 2rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: color 0.2s ease;
+  float: right;
+  margin-right: 10px
+}
+
+.close:hover {
+    color: #530000;
+
+}
+
+.modalContent h3 {
+  margin-top: 0;
+  margin-bottom: var(--spacing-lg);
+  color: var(--text-color);
+  border-bottom: 2px solid var(--border-color);
+  padding-bottom: 10px;
+}
+
+/* Job details */
+.jobDetails {
+  margin-top: var(--spacing-lg);
+}
+
+.detailRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-lg);
+  margin-bottom: var(--spacing-md);
+}
+
+.detailGroup {
+  flex: 1;
+  min-width: 200px;
+}
+
+.detailGroup.full {
+  flex: 100%;
+  margin-bottom: var(--spacing-md);
+}
+
+.detailGroup label {
+  font-weight: 600;
+  color: var(--text-muted);
+  display: block;
+  margin-bottom: 8px;
+  font-size: 0.9rem;
+}
+
+.detailGroup p {
+  margin: 0;
+  line-height: 1.5;
+  color: var(--text-color);
+}
+
+.detailGroup input,
+.detailGroup select,
+.detailGroup textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  font-size: 0.875rem;
+  font-family: inherit;
+  transition: border-color 0.2s ease;
+  box-sizing: border-box;
+}
+
+.detailGroup input:focus,
+.detailGroup select:focus,
+.detailGroup textarea:focus {
+  border-color: var(--primary-color);
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+.detailGroup textarea {
+  resize: vertical;
+  min-height: 100px;
+  line-height: 1.5;
+}
+
+/* Error styles */
+.errorInput {
+  border-color: #dc3545 !important;
+  box-shadow: 0 0 0 2px rgba(220, 53, 69, 0.25) !important;
+}
+
+.error {
+  color: #dc3545;
+  font-size: 0.75rem;
+  margin-top: 4px;
+  display: block;
+}
+
+/* Form actions */
+.formActions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+  margin-top: 2rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border-color);
+}
+
+.formActions button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  min-width: 100px;
+}
+
+.formActions button[type="submit"] {
+  background-color: #28a745;
+  color: white;
+}
+
+.formActions button[type="submit"]:hover {
+  background-color: #218838;
+}
+
+.formActions button[type="submit"]:disabled {
+  background-color: #6c757d;
+  cursor: not-allowed;
+}
+
+.formActions button[type="button"] {
+  background-color: #6c757d;
+  color: white;
+}
+
+.formActions button[type="button"]:hover {
+  background-color: #5a6268;
+}
+
+/* Status button in modal */
+.statusBtn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.statusBtn.active {
+  background: var(--status-hired-bg);
+  color: var(--status-hired-text);
+}
+
+.statusBtn.inactive {
+  background: var(--status-rejected-bg);
+  color: var(--status-rejected-text);
+}
+
+.statusBtn:hover {
+  opacity: 0.8;
+  transform: translateY(-1px);
+}
+
+/* Loading states */
+.jobs tbody tr td[colspan="8"] {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+/* Pagination */
+.pagination {
+  display: flex;
+  justify-content: center;
+  margin-top: var(--spacing-lg);
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+.pagination button {
+  padding: 8px 12px;
+  border: 1px solid var(--border-color);
+  background: var(--background-light);
+  border-radius: 3px;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+  min-width: 40px;
+}
+
+.pagination button.active,
+.pagination button:hover {
+  background: var(--primary-color);
+  color: #fff;
+  border-color: var(--primary-color);
+}
+
+.pagination button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.pagination span {
+  padding: 8px 4px;
+  display: flex;
+  align-items: center;
+}
+
+/* Thêm style cho hình ảnh trong modal */
+.detailGroup img {
+  max-width: 100%;
+  max-height: 200px;
+  object-fit: contain;
+  margin-top: 10px;
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+}
+
+/* Table wrapper for better mobile experience */
+.tableWrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+:global(.notification) {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  padding: 10px 20px;
+  border-radius: 5px;
+  z-index: 1000;
+  color: #fff;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  transition: opacity 0.5s ease;
+}
+
+:global(.notification.success) {
+  background-color: #4caf50;
+}
+
+:global(.notification.error) {
+  background-color: #f44336;
+}
+
+:global(.notification.info) {
+  background-color: #2196f3;
+}
