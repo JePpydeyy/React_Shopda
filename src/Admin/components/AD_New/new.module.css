@@ -1,22 +1,20 @@
 /* Biến CSS cho màu sắc và kích thước */
 :root {
-  --secondary-color: #1e1e4a; /* Deep navy for sophistication */
-  --primary-color: #4f46e5; /* Vibrant indigo for buttons */
-  --primary-hover: #4338ca; /* Darker indigo for hover */
-  --accent-color: #10b981; /* Green accent for add button */
-  --accent-hover: #059669; /* Darker green for hover */
-  --text-color: #475569; /* Slate gray for text */
+  --secondary-color: #1a1a3d; /* Darker navy for a richer look */
+  --primary-color: #3b82f6; /* Vibrant blue for buttons and accents */
+  --primary-hover: #2563eb; /* Slightly darker blue for hover */
+  --text-color: #64748b; /* Softer gray for text */
   --text-hover-color: #ffffff; /* White for hover states */
-  --background-light: #f9fafb; /* Soft off-white background */
-  --table-header-bg: #e6e8eb; /* Light gray for headers */
-  --border-color: #d4d7db; /* Subtle border color */
-  --shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.08); /* Soft shadow */
-  --shadow-md: 0 6px 12px rgba(0, 0, 0, 0.1); /* Medium shadow */
-  --spacing-lg: 28px; /* Larger spacing for elegance */
-  --spacing-md: 18px;
-  --spacing-sm: 10px;
-  --border-radius: 10px; /* Softer, modern corners */
-  --font-stack: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; /* Premium font */
+  --background-light: #f8fafc; /* Light gray for background */
+  --table-header-bg: #e2e8f0; /* Subtle gray for table headers */
+  --border-color: #e5e7eb; /* Light border color */
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05); /* Subtle shadow */
+  --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.1); /* Medium shadow */
+  --spacing-lg: 24px; /* Increased for better spacing */
+  --spacing-md: 16px;
+  --spacing-sm: 8px;
+  --border-radius: 8px; /* Softer corners */
+  --font-stack: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; /* Modern font */
 }
 
 .container {
@@ -34,12 +32,11 @@
 }
 
 .title {
-  font-size: 2rem;
-  font-weight: 700;
+  font-size: 1.75rem;
+  font-weight: 600;
   margin-bottom: var(--spacing-lg);
   color: var(--secondary-color);
-  letter-spacing: -0.025em;
-  line-height: 1.2;
+  letter-spacing: -0.02em;
 }
 
 .searchFilter {
@@ -47,12 +44,10 @@
   gap: var(--spacing-md);
   margin-bottom: var(--spacing-lg);
   flex-wrap: wrap;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(8px); /* Glassmorphism effect */
+  background: white;
   padding: var(--spacing-md);
   border-radius: var(--border-radius);
   box-shadow: var(--shadow-sm);
-  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .searchInput,
@@ -63,47 +58,44 @@
   font-size: 0.95rem;
   color: var(--text-color);
   background: #ffffff;
-  transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
-}
-
-.searchInput {
-  flex: 1;
-  min-width: 220px;
-}
-
-.filterSelect {
-  min-width: 150px;
-  appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23475569' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 0.75rem center;
-  background-size: 1rem;
-  padding-right: 2rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .searchInput:focus,
 .filterSelect:focus {
   outline: none;
   border-color: var(--primary-color);
-  box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.15);
-  transform: scale(1.01);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.searchInput {
+  flex: 1;
+  min-width: 200px;
+}
+
+.filterSelect {
+  min-width: 150px;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 1rem;
+  padding-right: 2rem;
 }
 
 .addButton {
-  background: linear-gradient(135deg, var(--accent-color) 0%, var(--accent-hover) 100%);
+  background-color: var(--primary-color);
   color: var(--text-hover-color);
   padding: var(--spacing-sm) var(--spacing-md);
   border-radius: var(--border-radius);
   text-decoration: none;
   font-size: 0.95rem;
-  font-weight: 600;
-  box-shadow: var(--shadow-sm);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  font-weight: 500;
+  transition: background-color 0.2s ease;
 }
 
 .addButton:hover {
-  box-shadow: var(--shadow-md);
-  transform: translateY(-2px);
+  background-color: var(--primary-hover);
 }
 
 .tableContainer {
@@ -111,7 +103,6 @@
   background: white;
   border-radius: var(--border-radius);
   box-shadow: var(--shadow-md);
-  margin-bottom: var(--spacing-lg);
 }
 
 .table {
@@ -135,18 +126,16 @@
 }
 
 .table th {
-  font-weight: 600;
+  font-weight: 500;
   color: var(--secondary-color);
-  letter-spacing: 0.02em;
 }
 
 .tableRow {
-  transition: background-color 0.3s ease, transform 0.2s ease;
+  transition: background-color 0.2s ease;
 }
 
 .tableRow:hover {
   background-color: #f1f5f9;
-  transform: translateY(-1px);
 }
 
 .tableRow:last-child td {
@@ -156,29 +145,25 @@
 .actionButton {
   color: var(--primary-color);
   text-decoration: none;
-  margin-right: var(--spacing-md);
-  font-weight: 600;
+  margin-right: var(--spacing-sm);
+  font-weight: 500;
   background: none;
   border: none;
   cursor: pointer;
-  padding: var(--spacing-sm) var(--spacing-md);
-  border-radius: var(--border-radius);
-  transition: color 0.3s ease, background-color 0.3s ease, transform 0.2s ease;
+  transition: color 0.2s ease;
 }
 
 .actionButton:hover {
-  color: var(--text-hover-color);
-  background-color: var(--primary-hover);
-  transform: scale(1.05);
+  color: var(--primary-hover);
+  text-decoration: underline;
 }
 
 .deleteButton {
-  color: #ef4444;
+  color: #dc2626;
 }
 
 .deleteButton:hover {
-  color: var(--text-hover-color);
-  background-color: #b91c1c;
+  color: #b91c1c;
 }
 
 @media (max-width: 768px) {
@@ -196,7 +181,6 @@
   .filterSelect,
   .addButton {
     width: 100%;
-    min-width: auto;
   }
 
   .table th,
@@ -209,11 +193,6 @@
     margin: 0 calc(-1 * var(--spacing-md));
     border-radius: 0;
   }
-
-  .actionButton,
-  .deleteButton {
-    padding: calc(var(--spacing-sm) / 1.5) var(--spacing-sm);
-  }
 }
 
 @media (max-width: 576px) {
@@ -222,7 +201,7 @@
   }
 
   .title {
-    font-size: 1.6rem;
+    font-size: 1.5rem;
   }
 
   .table {
@@ -237,16 +216,5 @@
   .actionButton,
   .deleteButton {
     font-size: 0.85rem;
-    padding: calc(var(--spacing-sm) / 2) var(--spacing-sm);
-  }
-
-  .searchInput,
-  .filterSelect {
-    font-size: 0.9rem;
-  }
-
-  .addButton {
-    font-size: 0.9rem;
-    padding: var(--spacing-sm);
   }
 }

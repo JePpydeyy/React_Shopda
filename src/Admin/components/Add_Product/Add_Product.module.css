@@ -1,0 +1,218 @@
+/* Biến CSS cho màu sắc và kích thước */
+:root {
+  --secondary-color: #1a1a3d;
+  --primary-color: #3b82f6;
+  --primary-hover: #2563eb;
+  --text-color: #64748b;
+  --text-hover-color: #ffffff;
+  --background-light: #f8fafc;
+  --table-header-bg: #e2e8f0;
+  --border-color: #e5e7eb;
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.1);
+  --spacing-lg: 24px;
+  --spacing-md: 16px;
+  --spacing-sm: 8px;
+  --border-radius: 8px;
+  --font-stack: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.container {
+  display: flex;
+  min-height: 100vh;
+  background-color: var(--background-light);
+  font-family: var(--font-stack);
+}
+
+.content {
+  flex: 1;
+  padding: var(--spacing-lg);
+  margin-left: 250px;
+  transition: margin-left 0.3s ease;
+}
+
+.title {
+  font-size: 1.75rem;
+  font-weight: 600;
+  margin-bottom: var(--spacing-lg);
+  color: var(--secondary-color);
+  letter-spacing: -0.02em;
+}
+
+.form {
+  background: white;
+  padding: var(--spacing-lg);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-md);
+  max-width: 800px;
+}
+
+.formGroup {
+  margin-bottom: var(--spacing-md);
+}
+
+.formGroup label {
+  display: block;
+  font-weight: 500;
+  color: var(--secondary-color);
+  margin-bottom: var(--spacing-sm);
+}
+
+.input,
+.select,
+.textarea {
+  width: 100%;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  font-size: 0.95rem;
+  color: var(--text-color);
+  background: #ffffff;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.input:focus,
+.select:focus,
+.textarea:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 1rem;
+  padding-right: 2rem;
+}
+
+.textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.sizeGroup {
+  display: flex;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-sm);
+}
+
+.sizeGroup .input {
+  flex: 1;
+}
+
+.addSizeButton,
+.removeButton {
+  background-color: var(--primary-color);
+  color: var(--text-hover-color);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--border-radius);
+  border: none;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.removeButton {
+  background-color: #dc2626;
+}
+
+.addSizeButton:hover {
+  background-color: var(--primary-hover);
+}
+
+.removeButton:hover {
+  background-color: #b91c1c;
+}
+
+.error {
+  color: #dc2626;
+  font-size: 0.85rem;
+  margin-top: var(--spacing-sm);
+  display: block;
+}
+
+.formActions {
+  display: flex;
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-lg);
+}
+
+.submitButton,
+.cancelButton {
+  background-color: var(--primary-color);
+  color: var(--text-hover-color);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--border-radius);
+  border: none;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background-color 0.2s ease;
+  text-align: center;
+}
+
+.cancelButton {
+  background-color: #6b7280;
+}
+
+.submitButton:hover {
+  background-color: var(--primary-hover);
+}
+
+.cancelButton:hover {
+  background-color: #4b5563;
+}
+
+@media (max-width: 768px) {
+  .content {
+    margin-left: 0;
+    padding: var(--spacing-md);
+  }
+
+  .form {
+    padding: var(--spacing-md);
+  }
+
+  .sizeGroup {
+    flex-direction: column;
+  }
+
+  .sizeGroup .input,
+  .sizeGroup .removeButton {
+    width: 100%;
+  }
+
+  .formActions {
+    flex-direction: column;
+  }
+
+  .submitButton,
+  .cancelButton {
+    width: 100%;
+  }
+}
+
+@media (max-width: 576px) {
+  .content {
+    padding: var(--spacing-sm);
+  }
+
+  .title {
+    font-size: 1.5rem;
+  }
+
+  .input,
+  .select,
+  .textarea,
+  .addSizeButton,
+  .removeButton,
+  .submitButton,
+  .cancelButton {
+    font-size: 0.9rem;
+  }
+}

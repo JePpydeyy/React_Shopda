@@ -107,7 +107,7 @@ const ProductManagement = () => {
               <option key={status} value={status}>{status}</option>
             ))}
           </select>
-          <Link to="/admin/products/add" className={styles.addButton}>
+          <Link to="/admin/add_product" className={styles.addButton}>
             Thêm Sản Phẩm
           </Link>
         </div>

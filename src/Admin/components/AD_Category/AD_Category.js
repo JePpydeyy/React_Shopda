@@ -53,7 +53,7 @@ const CategoryManagement = () => {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
-          <Link to="/admin/categories/add" className={styles.addButton}>
+          <Link to="/admin/add_category" className={styles.addButton}>
             Thêm Danh Mục
           </Link>
         </div>
