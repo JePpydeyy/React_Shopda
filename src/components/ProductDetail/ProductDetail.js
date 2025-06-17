@@ -7,8 +7,7 @@ import styles from './ProductDetail.module.css';
 import 'bootstrap/dist/css/bootstrap.min.css'; // Chỉ import CSS, JS được nạp qua CDN
 
 const DeliveryTab = () => (
-  <div className="tab-pane fade" id="delivery-tab" role="tabpanel">
-    <h5>THÔNG TIN VẬN CHUYỂN VÀ HOÀN TRẢ</h5>
+  <div className="tab-pane fade show active" id="delivery-tab" role="tabpanel">
     <div className={styles.tabGrid}>
       <div className={styles.tabColumn}>
         <p><strong>Giao hàng</strong><br />
@@ -64,35 +63,38 @@ const ProductDetail = () => {
   const { id } = useParams();
   const [product, setProduct] = useState(null);
   const [quantity, setQuantity] = useState(1);
-  const [wristSize, setWristSize] = useState(null); // String từ size_name với stock > 0
+  const [wristSize, setWristSize] = useState(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [activeTab, setActiveTab] = useState('delivery'); // Thêm khai báo state cho tab
+  const [activeTab, setActiveTab] = useState('delivery'); 
   const [error, setError] = useState(null);
   const [toast, setToast] = useState(null);
 
   useEffect(() => {
-    const fetchProduct = async () => {
-      try {
-        const response = await fetch(`https://api-tuyendung-cty.onrender.com/api/product/${id}`);
-        if (!response.ok) {
-          throw new Error('Không thể lấy dữ liệu sản phẩm');
-        }
-        const data = await response.json();
-        setProduct(data);
-        // Lấy kích thước mặc định có stock > 0 và stock cao nhất
-        const availableSizes = data.size?.filter(item => item.stock > 0) || [];
-        const defaultSize = availableSizes.length > 0
-          ? availableSizes.reduce((max, current) => max.stock > current.stock ? max : current).size_name
-          : null;
-        setWristSize(defaultSize);
-      } catch (err) {
-        setError(err.message);
-        setProduct(null);
-        setToast({ message: 'Lỗi khi tải dữ liệu sản phẩm!', type: 'error' });
+  const fetchProduct = async () => {
+    try {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/product/${id}`);
+      if (!response.ok) {
+        throw new Error('Không thể lấy dữ liệu sản phẩm');
       }
-    };
-    fetchProduct();
-  }, [id]);
+      const data = await response.json();
+      setProduct(data);
+      const availableSizes = data.size?.filter(item => item.stock > 0) || [];
+      const defaultSize = availableSizes.length > 0
+        ? availableSizes.reduce((min, current) => {
+            const minSize = parseFloat(min.size_name.replace(/[^0-9.]/g, ''));
+            const currentSize = parseFloat(current.size_name.replace(/[^0-9.]/g, ''));
+            return minSize < currentSize ? min : current;
+          }).size_name
+        : null;
+      setWristSize(defaultSize);
+    } catch (err) {
+      setError(err.message);
+      setProduct(null);
+      setToast({ message: 'Lỗi khi tải dữ liệu sản phẩm!', type: 'error' });
+    }
+  };
+  fetchProduct();
+}, [id]);
 
   if (error) {
     return <div className={styles.error}>Lỗi: {error}</div>;
@@ -103,13 +105,12 @@ const ProductDetail = () => {
   }
 
   const images = product.images && product.images.length > 0
-    ? product.images.map(img => `https://api-tuyendung-cty.onrender.com/${img}`)
+    ? product.images.map(img => `${process.env.REACT_APP_API_BASE}/${img}`)
     : ["https://via.placeholder.com/300"];
 
   const handleIncreaseQuantity = () => setQuantity(quantity + 1);
   const handleDecreaseQuantity = () => quantity > 1 && setQuantity(quantity - 1);
 
-  // Xử lý kích thước dựa trên mảng size object với stock > 0
   const availableSizes = product.size?.filter(item => item.stock > 0).map(item => item.size_name) || [];
   const currentSizeStock = product.size?.find(item => item.size_name === wristSize)?.stock || 0;
   const handleIncreaseWristSize = () => {
@@ -143,11 +144,11 @@ const ProductDetail = () => {
       quantity,
       charm: product.Collection,
       stoneSize: product.weight || '10,5 Li',
-      wristSize: wristSize || '12', // Sử dụng trực tiếp string size_name
+      wristSize: wristSize || '12',
       image: product.images && product.images.length > 0
-        ? `https://api-tuyendung-cty.onrender.com/${product.images[0]}`
+        ? `${process.env.REACT_APP_API_BASE}/${product.images[0]}`
         : 'https://via.placeholder.com/300',
-      stock: currentSizeStock // Sử dụng stock của kích thước hiện tại
+      stock: currentSizeStock 
     };
     const existIndex = cart.findIndex(item => item._id === cartItem._id && item.wristSize === cartItem.wristSize);
     let totalQuantity = quantity;
@@ -178,7 +179,6 @@ const ProductDetail = () => {
       )}
       <div className={styles.header}>
         <h1 className={styles.nameProduct}>{product.name}</h1>
-        <div className={styles.contact}>Liên hệ: 0909 123 456</div>
       </div>
       <div className={styles.content}>
         <ImageGallery
@@ -189,15 +189,14 @@ const ProductDetail = () => {
           onThumbnailClick={handleThumbnailClick}
         />
         <div className={styles.rightColumn}>
-          <p><strong>Mã sản phẩm: {product._id}</strong></p>
-          {product.status === 'sale' && (
+          {product.tag === 'sale' && (
             <span className={styles.sale}><strong>Trạng thái:</strong> SALE</span>
           )}
           <p><strong>NỘI DUNG SẢN PHẨM:</strong></p>
           <p>{product.description || 'Không có mô tả'}</p>
           <p><strong>MẠNG PHÙ HỢP: {product.element || 'Hỏa - Thổ'}</strong></p>
           <div>
-            <b>số lượng sản phẩm còn trong kho:</b> {currentSizeStock} (kích thước {wristSize})
+            <b>số lượng sản phẩm còn trong kho:</b> {currentSizeStock}
           </div>
           <hr />
           <p><strong>Giá: {formatPrice(product.price)} VND</strong></p>
@@ -220,24 +219,24 @@ const ProductDetail = () => {
         <ul className={`${styles.navTabs} nav nav-tabs`} role="tablist">
           <li className={styles.navItem} role="presentation">
             <button
-              className={`${styles.navLink1} nav-link ${activeTab === 'delivery' ? 'active' : ''}`} // Dòng 222
+              className={`${styles.navLink1} nav-link ${activeTab === 'delivery' ? 'active' : ''}`}
               data-bs-toggle="tab"
               data-bs-target="#delivery-tab"
-              onClick={() => setActiveTab('delivery')} // Dòng 225
+              onClick={() => setActiveTab('delivery')}
               role="tab"
-              aria-selected={activeTab === 'delivery'} // Dòng 227
+              aria-selected={activeTab === 'delivery'}
             >
               Thông tin giao hàng
             </button>
           </li>
           <li className={styles.navItem} role="presentation">
             <button
-              className={`${styles.navLink1} nav-link ${activeTab === 'description' ? 'active' : ''}`} // Dòng 234
+              className={`${styles.navLink1} nav-link ${activeTab === 'description' ? 'active' : ''}`}
               data-bs-toggle="tab"
               data-bs-target="#description-tab"
-              onClick={() => setActiveTab('description')} // Dòng 237
+              onClick={() => setActiveTab('description')}
               role="tab"
-              aria-selected={activeTab === 'description'} // Dòng 239
+              aria-selected={activeTab === 'description'}
             >
               Chi tiết sản phẩm
             </button>

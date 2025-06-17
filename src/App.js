@@ -1,26 +1,24 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { AuthProvider } from './Admin/components/AuthContext/AuthContext'; // Sửa lỗi chính tả
 import Home from './pages/Home';
 import About from './pages/About';
 import Contactus from './pages/Contact';
 import ProductSite from './pages/product';
 import Newsite from './pages/New';
-import PostDetail from './pages/Newdetail'; 
+import PostDetail from './pages/Newdetail';
 import Checkout from './pages/Checkout';
 import Cart from './pages/Cart';
-
 import ProductDetail from './pages/ProductDetail';
-import { Tab } from 'bootstrap';
-
+import Adminpage from './Admin/pages/Dashboard';
+import AdminLogin from './Admin/pages/Login';
+import NewAdmin from './Admin/pages/News'; 
 import './App.css';
-
-
-// import { AuthProvider } from './Admin/components/AuthContext/AuthContext';
 
 function App() {
   return (
-    // <AuthProvide>
-      <Router>  
+    <AuthProvider> {/* Thêm AuthProvider */}
+      <Router>
         <div className="App">
           <Routes>
             {/* Public routes */}
@@ -33,11 +31,18 @@ function App() {
             <Route path="/Newdetail/:id" element={<PostDetail />} />
             <Route path="/Cart" element={<Cart />} />
             <Route path="/Checkout" element={<Checkout />} />
+
+            {/* Admin routes */}
+            <Route path="/admin" element={<Adminpage />} />
+            <Route path="/admin/login" element={<AdminLogin />} />
+            <Route path="/admin/news" element={<NewAdmin />} />
+
+            {/* Redirect to home for any unmatched routes */}
           </Routes>
         </div>
       </Router>
-    // </AuthProvide
+    </AuthProvider>
   );
 }
 
-export default App;  
+export default App;

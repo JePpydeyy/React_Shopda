@@ -1,0 +1,285 @@
+/* Biến CSS cho màu sắc và kích thước */
+:root {
+  --secondary-color: #100f27;
+  --spacing-lg: 20px;
+  --spacing-md: 15px;
+  --spacing-sm: 10px;
+  --border-radius: 5px;
+}
+
+/* Thanh bên (hoặc menu trên mobile) */
+.sidebar {
+  width: 250px;
+  background: var(--secondary-color);
+  color: #fff;
+  padding: var(--spacing-lg);
+  position: fixed;
+  height: 100%;
+  top: 0;
+  left: 0;
+  transform: translateX(0);
+  transition: transform 0.3s ease;
+  z-index: 99;
+}
+
+/* Header chứa logo và nút toggle */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-lg);
+}
+
+/* Logo */
+.logo {
+  display: flex;
+  align-items: center;
+}
+
+.logo img {
+  width: 170px;
+  height: auto;
+}
+
+/* Nút toggle trong sidebar (ẩn trên mobile) */
+.toggleButton {
+  display: none;
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: var(--spacing-sm);
+  z-index: 1100;
+}
+
+/* Nút toggle riêng cho mobile (luôn hiển thị) */
+.mobileToggle {
+  display: none;
+}
+
+/* Menu */
+.menu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  visibility: visible;
+}
+
+/* Overlay khi menu mở trên di động */
+.overlay {
+  display: none;
+}
+
+/* Responsive */
+@media (374px <= width <= 768px) {
+  .sidebar {
+    width: 100%; /* Chiếm toàn bộ chiều rộng */
+    height: auto; /* Chiều cao tự động, không cố định 100% */
+    top: 0;
+    left: 0;
+    transform: translateY(-100%); /* Ẩn phía trên */
+    transition: transform 0.3s ease;
+  }
+
+  .sidebar.open {
+    transform: translateY(0); /* Trượt xuống khi mở */
+  }
+
+  .header {
+    display: none; /* Ẩn header trên mobile, chỉ hiển thị menu */
+  }
+
+  .menu {
+    padding: var(--spacing-md) 0;
+  }
+
+  .menu li {
+    margin: var(--spacing-sm) 0;
+    text-align: center; /* Căn giữa trên mobile */
+  }
+
+  .menu li a {
+    font-size: 1rem;
+    justify-content: center; /* Căn giữa icon và text */
+  }
+
+  .toggleButton {
+    display: none; /* Ẩn nút toggle trong sidebar */
+  }
+
+  .mobileToggle {
+    display: block;
+    position: fixed;
+    top: var(--spacing-lg);
+    right: var(--spacing-lg);
+    background: var(--secondary-color);
+    border: none;
+    color: #fff;
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: var(--spacing-sm);
+    z-index: 1100;
+    border-radius: var(--border-radius);
+  }
+
+  .overlay {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 900;
+  }
+}
+
+/* Menu items */
+.menu li {
+  margin: var(--spacing-lg) 0;
+}
+
+.menu li a {
+  color: #b0b7c3;
+  text-decoration: none;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  transition: color 0.2s ease;
+}
+
+.menu li a.active {
+  color: #fff;
+}
+
+.menu li a i {
+  margin-right: 10px;
+}
+
+.menu li a:hover,
+.menu li a:focus {
+  color: #fff;
+  outline: none;
+}
+
+@media (max-width: 576px) {
+  .sidebar {
+    width: 100%; /* Chiếm toàn bộ chiều rộng */
+    height: auto; /* Chiều cao tự động, không cố định 100% */
+    top: 0;
+    left: 0;
+    transform: translateY(-100%); /* Ẩn phía trên */
+    transition: transform 0.3s ease;
+  }
+
+  .sidebar.open {
+    transform: translateY(0); /* Trượt xuống khi mở */
+  }
+
+  .header {
+    display: none; /* Ẩn header trên mobile, chỉ hiển thị menu */
+  }
+
+  .menu {
+    padding: var(--spacing-md) 0;
+  }
+
+  .menu li {
+    margin: var(--spacing-sm) 0;
+    text-align: center; /* Căn giữa trên mobile */
+  }
+
+  .menu li a {
+    font-size: 1rem;
+    justify-content: center; /* Căn giữa icon và text */
+  }
+
+  .toggleButton {
+    display: none; /* Ẩn nút toggle trong sidebar */
+  }
+
+  .mobileToggle {
+    display: block;
+    position: fixed;
+    top: var(--spacing-lg);
+    right: var(--spacing-lg);
+    background: var(--secondary-color);
+    border: none;
+    color: #fff;
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: var(--spacing-sm);
+    z-index: 1100;
+    border-radius: var(--border-radius);
+  }
+
+  .overlay {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #205aa7;
+    z-index: 900;
+  }
+}
+
+/* Menu items */
+.menu li {
+  margin: var(--spacing-lg) 0;
+}
+
+.menu li a {
+  color: #b0b7c3;
+  text-decoration: none;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  transition: color 0.2s ease;
+}
+
+.menu li a.active {
+  color: #fff;
+}
+
+.menu li a i {
+  margin-right: 10px;
+}
+
+.menu li a:hover,
+.menu li a:focus {
+  color: #fff;
+  outline: none;
+}
+
+/* Ngăn cuộn nội dung chính khi menu mở */
+@media (max-width: 576px) {
+  body.sidebar-open {
+    overflow: hidden;
+  }
+}
+.logoutBtn {
+  background: none;
+  border: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  padding: 0;
+  text-align: left;
+  width: 100%;
+}
+
+.logoutBtn {
+  background: none;
+  border: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  padding: 0;
+  text-align: left;
+  width: 100%;
+}

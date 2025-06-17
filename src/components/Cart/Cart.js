@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTimes } from '@fortawesome/free-solid-svg-icons';
+import { faTimes, faPlus, faMinus } from '@fortawesome/free-solid-svg-icons';
 import styles from './Cart.module.css';
 
 const API_BASE_URL = 'https://api-tuyendung-cty.onrender.com/api';
@@ -41,6 +41,18 @@ const Cart = () => {
     }
     setCartItems(newCart);
     localStorage.setItem('cart_da', JSON.stringify(newCart));
+  };
+
+  const increaseQuantity = (index) => {
+    const item = cartItems[index];
+    updateQuantity(item.quantity + 1, index);
+  };
+
+  const decreaseQuantity = (index) => {
+    const item = cartItems[index];
+    if (item.quantity > 1) {
+      updateQuantity(item.quantity - 1, index);
+    }
   };
 
   const removeItem = index => {
@@ -127,56 +139,144 @@ const Cart = () => {
           </div>
         ) : (
           <>
-            <table className={styles.productTable}>
-              <thead>
-                <tr>
-                  <th>SẢN PHẨM</th>
-                  <th>GIÁ</th>
-                  <th>SỐ LƯỢNG</th>
-                  <th>THÀNH TIỀN</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody>
-                {cartItems.map((item, index) => (
-                  <tr key={index}>
-                    <td>
-                      <div className={styles.productInfo}>
-                        <div className={styles.productImage}>
-                          <img src={item.image} alt={item.name} style={{ width: 60, borderRadius: 8 }} />
-                        </div>
-                        <div className={styles.productDetails}>
-                          <h3>{item.name}</h3>
-                          <div className={styles.charmInfo}>Charm: {item.charm}</div>
-                          <div className={styles.sizeInfo}>Size Viên Đá: {item.stoneSize}</div>
-                          <div className={styles.sizeInfo}>Size Tay: {item.wristSize}</div>
-                        </div>
-                      </div>
-                    </td>
-                    <td className={styles.priceCell}>{formatPrice(item.price)}</td>
-                    <td className={styles.quantityCell}>
-                      <input
-                        type="number"
-                        className={styles.quantityInput}
-                        value={item.quantity}
-                        min="1"
-                        onChange={e => updateQuantity(e.target.value, index)}
-                      />
-                    </td>
-                    <td className={styles.totalCell}>{formatPrice(item.price * item.quantity)}</td>
-                    <td>
-                      <button
-                        className={styles.removeBtn}
-                        onClick={() => removeItem(index)}
-                        title="Xóa sản phẩm"
-                      >
-                        <FontAwesomeIcon icon={faTimes} />
-                      </button>
-                    </td>
+            {/* Desktop Table View */}
+            <div className={styles.desktopView}>
+              <table className={styles.productTable}>
+                <thead>
+                  <tr>
+                    <th>SẢN PHẨM</th>
+                    <th>GIÁ</th>
+                    <th>SỐ LƯỢNG</th>
+                    <th>THÀNH TIỀN</th>
+                    <th></th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {cartItems.map((item, index) => (
+                    <tr key={index}>
+                      <td>
+                        <div className={styles.productInfo}>
+                          <div className={styles.productImage}>
+                            <img src={item.image} alt={item.name} style={{ width: 60, borderRadius: 8 }} />
+                          </div>
+                          <div className={styles.productDetails}>
+                            <h3>{item.name}</h3>
+                            <div className={styles.charmInfo}>Charm: {item.charm}</div>
+                            <div className={styles.sizeInfo}>Size Viên Đá: {item.stoneSize}</div>
+                            <div className={styles.sizeInfo}>Size Tay: {item.wristSize}</div>
+                          </div>
+                        </div>
+                      </td>
+                      <td className={styles.priceCell}>{formatPrice(item.price)}</td>
+                      <td className={styles.quantityCell}>
+                        <div className={styles.quantityControls}>
+                          <button
+                            className={styles.quantityBtn}
+                            onClick={() => decreaseQuantity(index)}
+                            disabled={item.quantity <= 1}
+                          >
+                            <FontAwesomeIcon icon={faMinus} />
+                          </button>
+                          <input
+                            type="number"
+                            className={styles.quantityInput}
+                            value={item.quantity}
+                            min="1"
+                            max={item.stock}
+                            onChange={e => updateQuantity(e.target.value, index)}
+                          />
+                          <button
+                            className={styles.quantityBtn}
+                            onClick={() => increaseQuantity(index)}
+                            disabled={item.quantity >= item.stock}
+                          >
+                            <FontAwesomeIcon icon={faPlus} />
+                          </button>
+                        </div>
+                      </td>
+                      <td className={styles.totalCell}>{formatPrice(item.price * item.quantity)}</td>
+                      <td>
+                        <button
+                          className={styles.removeBtn}
+                          onClick={() => removeItem(index)}
+                          title="Xóa sản phẩm"
+                        >
+                          <FontAwesomeIcon icon={faTimes} />
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Mobile Card View */}
+            <div className={styles.mobileView}>
+              {cartItems.map((item, index) => (
+                <div key={index} className={styles.mobileCard}>
+                  <div className={styles.mobileCardHeader}>
+                    <div className={styles.mobileProductInfo}>
+                      <div className={styles.mobileProductImage}>
+                        <img src={item.image} alt={item.name} />
+                      </div>
+                      <div className={styles.mobileProductDetails}>
+                        <h3>{item.name}</h3>
+                        <div className={styles.charmInfo}>Charm: {item.charm}</div>
+                        <div className={styles.sizeInfo}>Size Viên Đá: {item.stoneSize}</div>
+                        <div className={styles.sizeInfo}>Size Tay: {item.wristSize}</div>
+                      </div>
+                    </div>
+                    <button
+                      className={styles.mobileRemoveBtn}
+                      onClick={() => removeItem(index)}
+                      title="Xóa sản phẩm"
+                    >
+                      <FontAwesomeIcon icon={faTimes} />
+                    </button>
+                  </div>
+                  
+                  <div className={styles.mobileCardBody}>
+                    <div className={styles.mobilePriceRow}>
+                      <span>Giá:</span>
+                      <span className={styles.price}>{formatPrice(item.price)}</span>
+                    </div>
+                    
+                    <div className={styles.mobileQuantityRow}>
+                      <span>Số lượng:</span>
+                      <div className={styles.mobileQuantityControls}>
+                        <button
+                          className={styles.quantityBtn}
+                          onClick={() => decreaseQuantity(index)}
+                          disabled={item.quantity <= 1}
+                        >
+                          <FontAwesomeIcon icon={faMinus} />
+                        </button>
+                        <input
+                          type="number"
+                          className={styles.quantityInput}
+                          value={item.quantity}
+                          min="1"
+                          max={item.stock}
+                          onChange={e => updateQuantity(e.target.value, index)}
+                        />
+                        <button
+                          className={styles.quantityBtn}
+                          onClick={() => increaseQuantity(index)}
+                          disabled={item.quantity >= item.stock}
+                        >
+                          <FontAwesomeIcon icon={faPlus} />
+                        </button>
+                      </div>
+                    </div>
+                    
+                    <div className={styles.mobileTotalRow}>
+                      <span>Thành tiền:</span>
+                      <span className={styles.total}>{formatPrice(item.price * item.quantity)}</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
 
             <div className={styles.couponSection}>
               <input
@@ -201,9 +301,7 @@ const Cart = () => {
               <Link to="/product" className={styles.continueShopping}>
                 TIẾP TỤC MUA SẮM
               </Link>
-              <button className={styles.updateCartBtn} onClick={updateCart}>
-                Cập nhật giỏ hàng
-              </button>
+              
             </div>
           </>
         )}
