@@ -56,6 +56,7 @@ const Cart = () => {
   const applyCoupon = () => {
     if (!couponCode.trim()) {
       setErrorMessage('Vui lòng nhập mã giảm giá!');
+      setAppliedDiscount(null); // Reset discount if no code
       return;
     }
 
@@ -64,26 +65,30 @@ const Cart = () => {
 
     if (!coupon) {
       setErrorMessage('Mã giảm giá không tồn tại!');
+      setAppliedDiscount(null); // Reset discount if invalid
       return;
     }
 
     if (!coupon.isActive) {
       setErrorMessage('Mã giảm giá không hoạt động!');
+      setAppliedDiscount(null); // Reset discount if inactive
       return;
     }
 
     if (new Date(coupon.expirationDate) < now) {
       setErrorMessage('Mã giảm giá đã hết hạn!');
+      setAppliedDiscount(null); // Reset discount if expired
       return;
     }
 
     if (coupon.usedCount >= coupon.usageLimit) {
       setErrorMessage('Mã giảm giá đã hết lượt sử dụng!');
+      setAppliedDiscount(null); // Reset discount if usage limit reached
       return;
     }
 
     setAppliedDiscount(coupon);
-    setErrorMessage('');
+    setErrorMessage(''); // Clear error message on successful application
     setCouponCode('');
     alert(`Mã giảm giá "${coupon.code}" đã được áp dụng thành công!`);
   };
