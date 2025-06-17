@@ -434,6 +434,17 @@
 }
 
 /* News Section */
+.newsGrid{
+  margin: 0 auto;
+  
+    width: 1290px;
+    display: flex;
+    }
+
+
+.newsSection h2 {
+  text-align: center;
+}
 .news {
   gap: 42px;
   margin: 0 auto;
@@ -476,7 +487,7 @@
 .postContent {
   position: relative;
   top: -40px;
-  width: 300px;
+  width: 350px;
   margin: 0 auto;
   padding: 1.25rem;
   background-color: #ffffff;
