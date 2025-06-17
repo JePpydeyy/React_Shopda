@@ -14,8 +14,9 @@ const ProductOptions = ({
   // Lấy kích thước viên đá
   const stoneSize = weight ? `${weight}` : '10,5 Li';
 
-  // Lấy khoảng kích thước từ size, mặc định [12, 16] nếu không có
-  const sizeRange = size && size.length === 2 ? [size[0], size[1]] : [12, 22];
+  // Lấy danh sách kích thước có sẵn từ prop size (là mảng size_name đã lọc stock > 0)
+  const availableSizes = size || [];
+  const currentIndex = availableSizes.indexOf(wristSize);
 
   return (
     <div className={styles.options}>
@@ -27,21 +28,20 @@ const ProductOptions = ({
         <label>KÍCH THƯỚC CỔ TAY</label>
         <button 
           onClick={onDecreaseWristSize} 
-          disabled={wristSize <= sizeRange[0]}
+          disabled={currentIndex <= 0}
           aria-label="Giảm kích thước cổ tay"
         >
           -
         </button>
-        <span id="wrist-size" className={styles.wristSizeSpan}>{wristSize.toFixed(1)} cm</span>
+        <span id="wrist-size" className={styles.wristSizeSpan}>{wristSize}</span> {/* Loại bỏ toFixed */}
         <button 
           onClick={onIncreaseWristSize} 
-          disabled={wristSize >= sizeRange[1]}
+          disabled={currentIndex >= availableSizes.length - 1}
           aria-label="Tăng kích thước cổ tay"
         >
           +
         </button>
       </div>
-      <p><a href="#" className={styles.link}>Xem cách đo cổ tay</a></p>
       <div className={styles.quantity}>
         <label>SỐ LƯỢNG</label>
         <button 

@@ -7,6 +7,7 @@
 .mainImage {
   width: 100%;
   max-width: 400px;
+  height: 370px;
   border-radius: 8px;
   margin-bottom: 10px;
   transition: opacity 1.5s ease;
