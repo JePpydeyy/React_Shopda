@@ -19,17 +19,15 @@ const Product = () => {
   
   const location = useLocation();
 
-  // Đọc URL params
   const getURLParams = () => {
     const params = new URLSearchParams(location.search);
     return {
       category: params.get('category'),
       tag: params.get('tag'),
-      search: params.get('search')
+      search: params.get('search'),
     };
   };
 
-  // Lấy sản phẩm từ API
   useEffect(() => {
     fetch(`${API_BASE_URL}/product`)
       .then(res => res.json())
@@ -43,7 +41,6 @@ const Product = () => {
       .catch(() => setProducts([]));
   }, []);
 
-  // Lấy danh mục từ API
   useEffect(() => {
     fetch(`${API_BASE_URL}/category`)
       .then(res => res.json())
@@ -54,20 +51,12 @@ const Product = () => {
       .catch(() => setCategories([]));
   }, []);
 
-  // Đồng bộ search state với URL query
   useEffect(() => {
     const params = getURLParams();
-    if (params.search) {
-      setSearch(params.search);
-    } else {
-      setSearch('');
-    }
-    if (params.category) {
-      setSelectedCategories([params.category]);
-    }
+    setSearch(params.search || '');
+    setSelectedCategories(params.category ? [params.category] : []);
   }, [location.search]);
 
-  // Lọc sản phẩm
   const filteredProducts = products.filter(p => {
     const matchesSearch = p.name.toLowerCase().includes(search.toLowerCase()) ||
       p.category?.name_categories?.toLowerCase().includes(search.toLowerCase());
@@ -86,17 +75,15 @@ const Product = () => {
     return matchesSearch && matchesPrice && matchesLevel && matchesCategory && matchesTag;
   });
 
-  // Sắp xếp sản phẩm
   let sortedProducts = filteredProducts;
   if (sortType === 'price-asc') {
     sortedProducts = [...filteredProducts].sort((a, b) => a.price - b.price);
   } else if (sortType === 'price-desc') {
-    sortedProducts = [...filteredProducts].sort((a, b) => b.price - b.price);
+    sortedProducts = [...filteredProducts].sort((a, b) => b.price - a.price);
   } else if (sortType === 'newest') {
     sortedProducts = [...filteredProducts].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
   }
 
-  // Phân trang
   const totalPages = Math.ceil(sortedProducts.length / PRODUCTS_PER_PAGE);
   const paginatedProducts = sortedProducts.slice(
     (currentPage - 1) * PRODUCTS_PER_PAGE,
@@ -105,7 +92,6 @@ const Product = () => {
 
   const formatPrice = price => new Intl.NumberFormat('vi-VN').format(price);
 
-  // Cập nhật giao diện thanh giá
   useEffect(() => {
     const minPriceValue = document.getElementById('minPriceValue');
     const maxPriceValue = document.getElementById('maxPriceValue');
@@ -129,7 +115,6 @@ const Product = () => {
     }
   };
 
-  // Điều khiển phân trang
   const renderPagination = () => {
     if (totalPages <= 1) return null;
 
@@ -151,9 +136,9 @@ const Product = () => {
             if (currentPage > 1) setCurrentPage(currentPage - 1);
           }}
           className={currentPage === 1 ? styles.disabled : ''}
-          aria-label="Trang trước"
+          aria-label="Previous Page"
         >
-          &lt; {/* Sửa lỗi: sử dụng &lt; thay cho < */}
+          &lt;
         </a>
         {pageNumbers.map(num => (
           <a
@@ -176,9 +161,9 @@ const Product = () => {
             if (currentPage < totalPages) setCurrentPage(currentPage + 1);
           }}
           className={currentPage === totalPages ? styles.disabled : ''}
-          aria-label="Trang sau"
+          aria-label="Next Page"
         >
-          &gt; {/* Sửa lỗi: sử dụng &gt; thay cho > */}
+          &gt;
         </a>
       </div>
     );
@@ -196,33 +181,17 @@ const Product = () => {
     );
   };
 
-  const toggleFilter = () => {
-    setIsFilterOpen(prev => !prev);
-  };
-
-  const closeFilter = () => {
-    setIsFilterOpen(false);
-  };
-
   return (
     <section className={`${styles.productPage} ${styles.shop}`}>
       <div className={styles.container}>
         <div className={styles.row}>
-          <div
-            className={`${styles.colLg3} ${isFilterOpen ? styles.filterOpen : styles.filterClosed}`}
-            onClick={e => {
-              if (e.target === e.currentTarget) closeFilter();
-            }}
-          >
+          <div className={styles.colLg3}>
             <div className={styles.shopSidebar}>
-              <button className={styles.filterCloseBtn} onClick={closeFilter} aria-label="Đóng bộ lọc">
-                <i className="fa fa-times"></i>
-              </button>
               <div className={styles.shopSidebarSearch}>
                 <form onSubmit={e => e.preventDefault()}>
                   <input
                     type="text"
-                    placeholder="Tìm kiếm..."
+                    placeholder="Search..."
                     value={search}
                     onChange={e => setSearch(e.target.value)}
                   />
@@ -233,7 +202,7 @@ const Product = () => {
               </div>
               <div className={styles.filterSection}>
                 <h6>
-                  GIÁ SẢN PHẨM <span style={{ float: 'right' }}>–</span>
+                  Giá sản phẩm <span style={{ float: 'right' }}>–</span>
                 </h6>
                 <div className={styles['price-filter']}>
                   <div className={styles['price-slider-container']}>
@@ -259,12 +228,12 @@ const Product = () => {
                   />
                 </div>
                 <div className={styles['price-values']}>
-                  Giá: <span id="minPriceValue">{formatPrice(minPrice)}</span> VND —{' '}
+                  Giá <span id="minPriceValue">{formatPrice(minPrice)}</span> VND —{' '}
                   <span id="maxPriceValue">{formatPrice(maxPrice)}</span> VND
                 </div>
               </div>
               <div className={styles.filterSection}>
-                <h6>LOẠI SẢN PHẨM</h6>
+                <h6>PDanh mục sản phẩm</h6>
                 <div className={styles.categoryCheckboxGroup}>
                   <label className={styles.categoryCheckboxLabel}>
                     <input
@@ -287,7 +256,7 @@ const Product = () => {
                 </div>
               </div>
               <div className={styles.filterSection}>
-                <h6>DÒNG SẢN PHẨM</h6>
+                <h6>Dòng sản phẩm</h6>
                 <div className={styles.levelCheckboxGroup}>
                   <label>
                     <input
@@ -297,7 +266,7 @@ const Product = () => {
                     />{' '}
                     Tất cả
                   </label>
-                  {['Cao cấp', 'Trung Cấp', 'Phổ thông'].map(level => (
+                  {['Cao Cấp ', 'Trung Cấp', 'Phổ Thông'].map(level => (
                     <label key={level}>
                       <input
                         type="checkbox"
@@ -315,12 +284,9 @@ const Product = () => {
             <div className={styles.shopProductOption}>
               <div className={styles.shopProductOptionLeft}>
                 <p>
-                  Hiển thị {paginatedProducts.length} trong {sortedProducts.length} kết quả
-                  {search && ` cho "${search}"`}
+                  Showing {paginatedProducts.length} of {sortedProducts.length} results
+                  {search && ` for "${search}"`}
                 </p>
-                <button className={styles.filterToggleBtn} onClick={toggleFilter} aria-label={isFilterOpen ? 'Đóng bộ lọc' : 'Mở bộ lọc'}>
-                  <i className={`fa ${isFilterOpen ? 'fa-times' : 'fa-filter'}`}></i> Bộ lọc
-                </button>
               </div>
               <div className={styles.shopProductOptionRight}>
                 <select
@@ -330,14 +296,14 @@ const Product = () => {
                     setCurrentPage(1);
                   }}
                 >
-                  <option value="newest">Sắp xếp theo mới nhất</option>
-                  <option value="price-asc">Sắp xếp theo giá: thấp đến cao</option>
-                  <option value="price-desc">Sắp xếp theo giá: cao đến thấp</option>
+                  <option value="newest">Lọc theo mới nhất </option>
+                  <option value="price-asc">Lọc từ thấp tới cao </option>
+                  <option value="price-desc">Lọc từ cao tới thấp </option>
                 </select>
               </div>
             </div>
             <div className={styles.products}>
-              {paginatedProducts.length === 0 && <p>Không tìm thấy sản phẩm.</p>}
+              {paginatedProducts.length === 0 && <p>Không tìm thấy sản phẩm </p>}
               {paginatedProducts.map(product => (
                 <div className={styles.productItem} key={product._id}>
                   <div className={styles.productItemPic}>
