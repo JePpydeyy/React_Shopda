@@ -8,7 +8,7 @@ import Newsite from './pages/New';
 import PostDetail from './pages/Newdetail'; 
 import Checkout from './pages/Checkout';
 import Cart from './pages/Cart';
-import Newdetails from './pages/Newdetail';
+
 import ProductDetail from './pages/ProductDetail';
 import { Tab } from 'bootstrap';
 

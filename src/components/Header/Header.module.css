@@ -118,6 +118,7 @@
   display: flex;
   list-style: none;
   gap: 30px;
+  margin-bottom: 0;
 }
 
 .navMenu a {
