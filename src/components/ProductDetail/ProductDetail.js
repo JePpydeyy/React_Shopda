@@ -4,13 +4,13 @@ import ImageGallery from '../ImageGallery/ImageGallery';
 import ProductOptions from '../ProductOptions/ProductOptions';
 import ToastNotification from '../ToastNotification/ToastNotification';
 import styles from './ProductDetail.module.css';
-import 'bootstrap/dist/css/bootstrap.min.css';
+import 'bootstrap/dist/css/bootstrap.min.css'; // Chỉ import CSS, JS được nạp qua CDN
 
 const DeliveryTab = () => (
-  <div className="tab-pane">
+  <div className="tab-pane fade" id="delivery-tab" role="tabpanel">
     <h5>THÔNG TIN VẬN CHUYỂN VÀ HOÀN TRẢ</h5>
-    <div className="tab-grid">
-      <div className="tab-column">
+    <div className={styles.tabGrid}>
+      <div className={styles.tabColumn}>
         <p><strong>Giao hàng</strong><br />
           – Nội thành: Giao từ 1 – 3 ngày; Miễn phí giao hàng trong bán kính 10km<br />
           – Tỉnh khác: Giao từ 5 – 7 ngày; 30.000 VNĐ / đơn<br />
@@ -19,7 +19,7 @@ const DeliveryTab = () => (
           Nếu khách hàng có yêu cầu về Giấy Kiểm Định Đá, đơn hàng sẽ cộng thêm 20 ngày để hoàn thành thủ tục.
         </p>
       </div>
-      <div className="tab-column">
+      <div className={styles.tabColumn}>
         <p><strong>Chính sách hoàn trả</strong><br />
           – Chúng tôi chấp nhận đổi / trả sản phẩm ngay lúc khách kiểm tra và xác nhận hàng hóa. Chúng tôi cam kết sẽ hỗ trợ và áp dụng chính sách bảo hành tốt nhất tới Quý khách, đảm bảo mọi quyền lợi Quý khách được đầy đủ.<br />
           – Những trình trạng bể, vỡ do quá trình quý khách sử dụng chúng tôi xin từ chối đổi hàng.<br />
@@ -32,7 +32,7 @@ const DeliveryTab = () => (
 );
 
 const DescriptionTab = ({ product }) => (
-  <div className="tab-pane">
+  <div className="tab-pane fade" id="description-tab" role="tabpanel">
     <p><b>{product.material}</b></p>
     <p><b>Sơ lược:</b> {product.short_description}</p>
     <p><b>Khu vực được khai thác:</b> {product.origin}</p>
@@ -66,7 +66,7 @@ const ProductDetail = () => {
   const [quantity, setQuantity] = useState(1);
   const [wristSize, setWristSize] = useState(null); // String từ size_name với stock > 0
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [activeTab, setActiveTab] = useState('delivery');
+  const [activeTab, setActiveTab] = useState('delivery'); // Thêm khai báo state cho tab
   const [error, setError] = useState(null);
   const [toast, setToast] = useState(null);
 
@@ -135,7 +135,7 @@ const ProductDetail = () => {
   };
 
   const handleAddToCart = () => {
-    const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+    const cart = JSON.parse(localStorage.getItem('cart_da') || '[]');
     const cartItem = {
       _id: product._id,
       name: product.name,
@@ -163,7 +163,7 @@ const ProductDetail = () => {
     } else {
       cart.push(cartItem);
     }
-    localStorage.setItem('cart', JSON.stringify(cart));
+    localStorage.setItem('cart_da', JSON.stringify(cart));
     showToast('Đã thêm vào giỏ hàng!', 'success');
   };
 
@@ -216,36 +216,36 @@ const ProductDetail = () => {
           </button>
         </div>
       </div>
-      <div className="product-content">
-        <ul className="nav nav-tabs" role="tablist">
-          <li className="nav-item" role="presentation">
+      <div className={styles.productContent}>
+        <ul className={`${styles.navTabs} nav nav-tabs`} role="tablist">
+          <li className={styles.navItem} role="presentation">
             <button
-              className={`nav-link1 tab1 ${activeTab === 'delivery' ? 'active' : ''}`}
-              onClick={() => setActiveTab('delivery')}
+              className={`${styles.navLink1} nav-link ${activeTab === 'delivery' ? 'active' : ''}`} // Dòng 222
+              data-bs-toggle="tab"
+              data-bs-target="#delivery-tab"
+              onClick={() => setActiveTab('delivery')} // Dòng 225
               role="tab"
-              aria-selected={activeTab === 'delivery'}
+              aria-selected={activeTab === 'delivery'} // Dòng 227
             >
               Thông tin giao hàng
             </button>
           </li>
-          <li className="nav-item" role="presentation">
+          <li className={styles.navItem} role="presentation">
             <button
-              className={`nav-link1 tab1 ${activeTab === 'description' ? 'active' : ''}`}
-              onClick={() => setActiveTab('description')}
+              className={`${styles.navLink1} nav-link ${activeTab === 'description' ? 'active' : ''}`} // Dòng 234
+              data-bs-toggle="tab"
+              data-bs-target="#description-tab"
+              onClick={() => setActiveTab('description')} // Dòng 237
               role="tab"
-              aria-selected={activeTab === 'description'}
+              aria-selected={activeTab === 'description'} // Dòng 239
             >
               Chi tiết sản phẩm
             </button>
           </li>
         </ul>
-        <div className="tab-content">
-          <div className={`tab-pane ${activeTab === 'delivery' ? 'active' : ''}`} role="tabpanel">
-            <DeliveryTab />
-          </div>
-          <div className={`tab-pane ${activeTab === 'description' ? 'active' : ''}`} role="tabpanel">
-            <DescriptionTab product={product} />
-          </div>
+        <div className={`${styles.tabContent} tab-content`}>
+          <DeliveryTab />
+          <DescriptionTab product={product} />
         </div>
       </div>
     </div>

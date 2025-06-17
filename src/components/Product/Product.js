@@ -1,31 +1,29 @@
 import React, { useState, useEffect } from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Link } from 'react-router-dom';
-import { faStar } from '@fortawesome/free-regular-svg-icons';
-
 import styles from './Product.module.css';
 
-const API_URL = process.env.REACT_APP_API_URL;
+const API_BASE_URL = 'https://api-tuyendung-cty.onrender.com/api';
 const PRODUCTS_PER_PAGE = 9;
 
 const Product = () => {
   const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [selectedCategories, setSelectedCategories] = useState([]);
   const [search, setSearch] = useState('');
   const [minPrice, setMinPrice] = useState(0);
   const [maxPrice, setMaxPrice] = useState(10000000);
-  const [maxPriceLimit, setMaxPriceLimit] = useState(10000000); // Giá trị max thực tế
+  const [maxPriceLimit, setMaxPriceLimit] = useState(10000000);
   const [currentPage, setCurrentPage] = useState(1);
-  const [selectedLevel, setSelectedLevel] = useState('');
+  const [selectedLevels, setSelectedLevels] = useState([]);
   const [sortType, setSortType] = useState('newest');
 
   // Fetch products from API
   useEffect(() => {
-    fetch(`${API_URL}/product`)
+    fetch(`${API_BASE_URL}/product`)
       .then(res => res.json())
       .then(data => {
         setProducts(data);
-        // Tìm giá lớn nhất và làm tròn lên hàng triệu
-        const max = data.reduce((acc, cur) => cur.price > acc ? cur.price : acc, 0);
+        const max = data.reduce((acc, cur) => (cur.price > acc ? cur.price : acc), 0);
         const roundedMax = Math.ceil(max / 1000000) * 1000000;
         setMaxPriceLimit(roundedMax);
         setMaxPrice(roundedMax);
@@ -33,34 +31,48 @@ const Product = () => {
       .catch(() => setProducts([]));
   }, []);
 
+  // Fetch categories from API
+  useEffect(() => {
+    fetch(`${API_BASE_URL}/category`)
+      .then(res => res.json())
+      .then(data => {
+        const showCategories = data.filter(cat => cat.status === 'show');
+        setCategories(showCategories);
+      })
+      .catch(() => setCategories([]));
+  }, []);
+
   // Filtered products
-  let filteredProducts = products.filter((p) => {
+  const filteredProducts = products.filter(p => {
     return (
       p.name.toLowerCase().includes(search.toLowerCase()) &&
       p.price >= minPrice &&
       p.price <= maxPrice &&
-      (selectedLevel === '' || p.level === selectedLevel)
+      (selectedLevels.length === 0 || selectedLevels.map(l => l.toLowerCase()).includes(p.level.toLowerCase())) &&
+      (selectedCategories.length === 0 || selectedCategories.map(c => c.toLowerCase()).includes(p.category?.name_categories?.toLowerCase()))
     );
   });
 
   // Sort products
+  let sortedProducts = filteredProducts;
   if (sortType === 'price-asc') {
-    filteredProducts = filteredProducts.slice().sort((a, b) => a.price - b.price);
+    sortedProducts = [...filteredProducts].sort((a, b) => a.price - b.price);
   } else if (sortType === 'price-desc') {
-    filteredProducts = filteredProducts.slice().sort((a, b) => b.price - a.price);
+    sortedProducts = [...filteredProducts].sort((a, b) => b.price - a.price);
   } else if (sortType === 'newest') {
-    filteredProducts = filteredProducts.slice().sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    sortedProducts = [...filteredProducts].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
   }
 
   // Pagination logic
-  const totalPages = Math.ceil(filteredProducts.length / PRODUCTS_PER_PAGE);
-  const paginatedProducts = filteredProducts.slice(
+  const totalPages = Math.ceil(sortedProducts.length / PRODUCTS_PER_PAGE);
+  const paginatedProducts = sortedProducts.slice(
     (currentPage - 1) * PRODUCTS_PER_PAGE,
     currentPage * PRODUCTS_PER_PAGE
   );
 
-  const formatPrice = (price) => new Intl.NumberFormat('vi-VN').format(price);
+  const formatPrice = price => new Intl.NumberFormat('vi-VN').format(price);
 
+  // Update price slider UI
   useEffect(() => {
     const minPriceValue = document.getElementById('minPriceValue');
     const maxPriceValue = document.getElementById('maxPriceValue');
@@ -78,39 +90,78 @@ const Product = () => {
   const handlePriceChange = (e, type) => {
     const value = parseInt(e.target.value);
     if (type === 'min') {
-      if (value >= maxPrice) {
-        setMinPrice(maxPrice - 100000);
-      } else {
-        setMinPrice(value);
-      }
+      setMinPrice(value >= maxPrice ? maxPrice - 100000 : value);
     } else {
-      if (value <= minPrice) {
-        setMaxPrice(minPrice + 100000);
-      } else {
-        setMaxPrice(value);
-      }
+      setMaxPrice(value <= minPrice ? minPrice + 100000 : value);
     }
   };
 
   // Pagination controls
-  const renderPagination = () => (
-    <div className={styles.productPagination}>
-      {Array.from({ length: totalPages }, (_, i) => (
+  const renderPagination = () => {
+    if (totalPages <= 1) return null;
+
+    let start = Math.max(1, currentPage - 1);
+    let end = Math.min(totalPages, start + 2);
+    if (end - start < 2) start = Math.max(1, end - 2);
+
+    const pageNumbers = [];
+    for (let i = start; i <= end; i++) {
+      pageNumbers.push(i);
+    }
+
+    return (
+      <div className={styles.productPagination}>
         <a
           href="#"
-          key={i + 1}
-          className={currentPage === i + 1 ? styles.active : ''}
-          onClick={(e) => {
+          onClick={e => {
             e.preventDefault();
-            setCurrentPage(i + 1);
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            if (currentPage > 1) setCurrentPage(currentPage - 1);
           }}
+          className={currentPage === 1 ? styles.disabled : ''}
+          aria-label="Previous page"
         >
-          {i + 1}
+          &lt;
         </a>
-      ))}
-    </div>
-  );
+        {pageNumbers.map(num => (
+          <a
+            href="#"
+            key={num}
+            className={currentPage === num ? styles.active : ''}
+            onClick={e => {
+              e.preventDefault();
+              setCurrentPage(num);
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+          >
+            {num}
+          </a>
+        ))}
+        <a
+          href="#"
+          onClick={e => {
+            e.preventDefault();
+            if (currentPage < totalPages) setCurrentPage(currentPage + 1);
+          }}
+          className={currentPage === totalPages ? styles.disabled : ''}
+          aria-label="Next page"
+        >
+          &gt;
+        </a>
+      </div>
+    );
+  };
+
+  const handleLevelChange = level => {
+    setSelectedLevels(prev =>
+      prev.includes(level) ? prev.filter(l => l !== level) : [...prev, level]
+    );
+  };
+
+  const handleCategoryChange = category => {
+    setSelectedCategories(prev =>
+      prev.includes(category) ? prev.filter(c => c !== category) : [...prev, category]
+    );
+  };
 
   return (
     <section className={`${styles.productPage} ${styles.shop}`}>
@@ -119,12 +170,12 @@ const Product = () => {
           <div className={styles.colLg3}>
             <div className={styles.shopSidebar}>
               <div className={styles.shopSidebarSearch}>
-                <form onSubmit={(e) => e.preventDefault()}>
+                <form onSubmit={e => e.preventDefault()}>
                   <input
                     type="text"
                     placeholder="Tìm kiếm..."
                     value={search}
-                    onChange={(e) => setSearch(e.target.value)}
+                    onChange={e => setSearch(e.target.value)}
                   />
                   <button type="submit">
                     <i className="fa fa-search"></i>
@@ -137,10 +188,7 @@ const Product = () => {
                 </h6>
                 <div className={styles['price-filter']}>
                   <div className={styles['price-slider-container']}>
-                    <div
-                      className={styles['price-slider-track']}
-                      id="priceTrack"
-                    ></div>
+                    <div className={styles['price-slider-track']} id="priceTrack"></div>
                   </div>
                   <input
                     type="range"
@@ -162,63 +210,54 @@ const Product = () => {
                   />
                 </div>
                 <div className={styles['price-values']}>
-                  Giá: <span id="minPriceValue">{formatPrice(minPrice)}</span> VND — <span id="maxPriceValue">{formatPrice(maxPrice)}</span> VND
+                  Giá: <span id="minPriceValue">{formatPrice(minPrice)}</span> VND —{' '}
+                  <span id="maxPriceValue">{formatPrice(maxPrice)}</span> VND
                 </div>
               </div>
               <div className={styles.filterSection}>
                 <h6>LOẠI SẢN PHẨM</h6>
-                <div>
-                  <label>
-                    <input type="radio" name="productType" /> Phong thủy
+                <div className={styles.categoryCheckboxGroup}>
+                  <label className={styles.categoryCheckboxLabel}>
+                    <input
+                      type="checkbox"
+                      checked={selectedCategories.length === 0}
+                      onChange={() => setSelectedCategories([])}
+                    />{' '}
+                    Tất cả
                   </label>
-                  <br />
-                  <label>
-                    <input type="radio" name="productType" /> Thời trang
-                  </label>
+                  {categories.map(cat => (
+                    <label key={cat._id} className={styles.categoryCheckboxLabel}>
+                      <input
+                        type="checkbox"
+                        checked={selectedCategories.includes(cat.category)}
+                        onChange={() => handleCategoryChange(cat.category)}
+                      />{' '}
+                      {cat.category}
+                    </label>
+                  ))}
                 </div>
               </div>
               <div className={styles.filterSection}>
                 <h6>DÒNG SẢN PHẨM</h6>
-                <div>
+                <div className={styles.levelCheckboxGroup}>
                   <label>
                     <input
-                      type="radio"
-                      name="productLine"
-                      value=""
-                      checked={selectedLevel === ''}
-                      onChange={() => setSelectedLevel('')}
-                    /> Tất cả
+                      type="checkbox"
+                      checked={selectedLevels.length === 0}
+                      onChange={() => setSelectedLevels([])}
+                    />{' '}
+                    Tất cả
                   </label>
-                  <br />
-                  <label>
-                    <input
-                      type="radio"
-                      name="productLine"
-                      value="Cao cấp"
-                      checked={selectedLevel === 'Cao cấp'}
-                      onChange={() => setSelectedLevel('Cao cấp')}
-                    /> Cao cấp
-                  </label>
-                  <br />
-                  <label>
-                    <input
-                      type="radio"
-                      name="productLine"
-                      value="Trung Cấp"
-                      checked={selectedLevel === 'Trung Cấp'}
-                      onChange={() => setSelectedLevel('Trung Cấp')}
-                    /> Trung Cấp
-                  </label>
-                  <br />
-                  <label>
-                    <input
-                      type="radio"
-                      name="productLine"
-                      value="Phổ thông"
-                      checked={selectedLevel === 'Phổ thông'}
-                      onChange={() => setSelectedLevel('Phổ thông')}
-                    /> Phổ thông
-                  </label>
+                  {['Cao cấp', 'Trung Cấp', 'Phổ thông'].map(level => (
+                    <label key={level}>
+                      <input
+                        type="checkbox"
+                        checked={selectedLevels.includes(level)}
+                        onChange={() => handleLevelChange(level)}
+                      />{' '}
+                      {level}
+                    </label>
+                  ))}
                 </div>
               </div>
             </div>
@@ -227,8 +266,7 @@ const Product = () => {
             <div className={styles.shopProductOption}>
               <div className={styles.shopProductOptionLeft}>
                 <p>
-                  Hiển thị {paginatedProducts.length} trong{' '}
-                  {filteredProducts.length} kết quả
+                  Hiển thị {paginatedProducts.length} trong {sortedProducts.length} kết quả
                 </p>
               </div>
               <div className={styles.shopProductOptionRight}>
@@ -246,15 +284,11 @@ const Product = () => {
               </div>
             </div>
             <div className={styles.products}>
-              {paginatedProducts.length === 0 && (
-                <p>Không tìm thấy sản phẩm.</p>
-              )}
-              {paginatedProducts.map((product, idx) => (
-                <div className={styles.productItem} key={product._id || idx}>
+              {paginatedProducts.length === 0 && <p>Không tìm thấy sản phẩm.</p>}
+              {paginatedProducts.map(product => (
+                <div className={styles.productItem} key={product._id}>
                   <div className={styles.productItemPic}>
-                    {product.status === 'Sale' && (
-                      <span className={styles.newLabel}>SALE</span>
-                    )}
+                    {product.tag === 'sale' && <span className={styles.newLabel}>SALE</span>}
                     <Link to={`/detail/${product._id}`} className={styles.productImgLink}>
                       <img
                         src={
@@ -269,23 +303,10 @@ const Product = () => {
                   <div className={styles.productItemText}>
                     <h6>{product.name}</h6>
                     <h5>{formatPrice(product.price)} VND</h5>
-                    {/* <div className={styles.hoverContent}>
-                      <a href="#" className={styles.viewDetailsBtn}>
-                        Xem chi tiết
-                      </a>
-                      <div className={styles.productRating}>
-                        <div className={styles.stars}>
-                          {[...Array(5)].map((_, i) => (
-                            <FontAwesomeIcon icon={faStar} key={i} />
-                          ))}
-                        </div>
-                      </div>
-                    </div> */}
                   </div>
                 </div>
               ))}
             </div>
-            {/* Pagination luôn ở dưới */}
             {renderPagination()}
           </div>
         </div>
