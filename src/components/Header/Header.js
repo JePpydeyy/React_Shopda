@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import styles from './Header.module.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -11,6 +11,7 @@ const Header = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [suggestions, setSuggestions] = useState([]);
   const navigate = useNavigate();
+  const searchFormRef = useRef(null);
 
   // Lấy gợi ý khi người dùng nhập
   useEffect(() => {
@@ -32,6 +33,21 @@ const Header = () => {
       setSuggestions([]);
     }
   }, [searchQuery]);
+
+  // Xử lý click ngoài để tắt suggestions
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (searchFormRef.current && !searchFormRef.current.contains(event.target)) {
+        setSuggestions([]);
+        setSearchQuery('');
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   // Xử lý khi nhấn tìm kiếm
   const handleSearchSubmit = e => {
@@ -59,7 +75,7 @@ const Header = () => {
         </a>
         <div className={styles.headerRight}>
           <div className={styles.searchCart}>
-            <form onSubmit={handleSearchSubmit} className={styles.searchForm}>
+            <form ref={searchFormRef} onSubmit={handleSearchSubmit} className={styles.searchForm}>
               <input
                 type="text"
                 placeholder="Tìm kiếm sản phẩm..."

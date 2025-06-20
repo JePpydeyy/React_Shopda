@@ -221,10 +221,11 @@
 .productsGrid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 1rem;
+  gap: 2rem;
 }
 
 .productCard {
+  width:300px;
   background: white;
   border-radius: 15px;
   overflow: hidden;
@@ -240,7 +241,7 @@
 .productImageWrapper {
   position: relative;
   width: 100%;
-  height: 200px;
+ 
   overflow: hidden;
 }
 
@@ -288,18 +289,18 @@
 
 .productInfo {
   padding: 0.75rem;
-  text-align: center;
+  
 }
 
 .productName {
-  font-size: 1rem;
+  font-size: 20px;
   font-weight: 600;
   color: #2c3e50;
   margin-bottom: 0.5rem;
 }
 
 .productPrice {
-  font-size: 0.9rem;
+  font-size: 1rem;
   color: #B91C1C;
   font-weight: 500;
   margin-bottom: 0.5rem;
@@ -452,7 +453,7 @@
 
 .postImage {
   width: 100%;
-  height: 250px;
+  height: 400px;
   position: relative;
   background-size: cover;
   background-position: center;
@@ -471,7 +472,7 @@
 
 .postContent {
   position: relative;
-  top: -40px;
+  top: -140px;
   width: 90%;
   margin: 0 auto;
   padding: 1.25rem;
