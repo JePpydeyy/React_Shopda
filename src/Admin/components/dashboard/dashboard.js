@@ -355,18 +355,18 @@ const MainContent = () => {
   useEffect(() => {
     const token = localStorage.getItem('adminToken');
     if (!token) {
-      navigate('/login');
+      navigate('/admin/login');
       return;
     }
 
     try {
       const decodedToken = jwtDecode(token);
       if (decodedToken.role !== 'admin' || decodedToken.exp * 1000 < Date.now()) {
-        navigate('/login');
+        navigate('/admin/login');
         return;
       }
     } catch (err) {
-      navigate('/login');
+      navigate('/admin/login');
       return;
     }
 

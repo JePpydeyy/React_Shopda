@@ -64,7 +64,7 @@ const CandidateManagement = () => {
     const token = localStorage.getItem('adminToken');
     if (!token) {
       showNotification('Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.', 'error');
-      navigate('/login');
+      navigate('/admin/login');
       return null;
     }
     return { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' };
@@ -80,7 +80,7 @@ const CandidateManagement = () => {
       if (response.status === 401) {
         localStorage.removeItem('adminToken');
         showNotification('Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.', 'error');
-        navigate('/login');
+        navigate('/admin/login');
         return [];
       }
       if (!response.ok) {
@@ -151,7 +151,7 @@ const CandidateManagement = () => {
       if (response.status === 401) {
         localStorage.removeItem('adminToken');
         showNotification('Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.', 'error');
-        navigate('/login');
+        navigate('/admin/login');
         return;
       }
       if (!response.ok) {
@@ -209,7 +209,7 @@ const CandidateManagement = () => {
       if (response.status === 401) {
         localStorage.removeItem('adminToken');
         showNotification('Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.', 'error');
-        navigate('/login');
+        navigate('/admin/login');
         return;
       }
       if (!response.ok) {
@@ -240,7 +240,7 @@ const CandidateManagement = () => {
       if (response.status === 401) {
         localStorage.removeItem('adminToken');
         showNotification('Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.', 'error');
-        navigate('/login');
+        navigate('/admin/login');
         return;
       }
       if (!response.ok) {
@@ -312,7 +312,7 @@ const CandidateManagement = () => {
     const token = localStorage.getItem('adminToken');
     if (!token) {
       showNotification('Vui lòng đăng nhập để tiếp tục', 'error');
-      navigate('/login');
+      navigate('/admin/login');
       return;
     }
     displayCandidates(1);

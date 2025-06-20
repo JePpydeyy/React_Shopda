@@ -166,6 +166,232 @@
   color: #b91c1c;
 }
 
+/* Các kiểu hiện tại */
+.detailRow {
+  background-color: #f9f9f9;
+}
+
+.detailContainer {
+  padding: 20px;
+  border-top: 1px solid #ddd;
+}
+
+.detailContainer h3 {
+  margin-top: 0;
+  font-size: 1.2em;
+}
+
+.detailContainer p {
+  margin: 10px 0;
+}
+
+.detailContainer ul {
+  margin: 10px 0;
+  padding-left: 20px;
+}
+
+.imageContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.productImage {
+  max-width: 100px;
+  height: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tableImage {
+  width: 50px;
+  height: auto;
+  border: 1px solid #ddd;
+  border-radius: 3px;
+}
+
+.loading {
+  text-align: center;
+  font-size: 1.2em;
+  padding: 20px;
+}
+
+.error {
+  color: red;
+  text-align: center;
+  font-size: 1em;
+  padding: 5px;
+}
+
+/* Pagination Styles */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.pageButton {
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  background-color: #fff;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.pageButton:disabled {
+  background-color: #f0f0f0;
+  cursor: not-allowed;
+}
+
+.activePage {
+  background-color: #007bff;
+  color: #fff;
+  border-color: #007bff;
+}
+
+/* Modal Styles */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 900px;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.modal h2 {
+  margin-top: 0;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+}
+
+.formGroup label {
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.input, .select, .textarea {
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1em;
+}
+
+.sizeGroup {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.removeButton {
+  padding: 5px 10px;
+  background-color: #dc3545;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.addSizeButton {
+  padding: 8px 12px;
+  background-color: #28a745;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.formActions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.submitButton {
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.cancelButton {
+  padding: 10px 20px;
+  background-color: #6c757d;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+/* Kiểu mới cho ảnh trong modal */
+.imageWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-right: 10px;
+  align-items: center;
+}
+
+.imagePreview {
+  font-size: 0.9em;
+  color: #28a745;
+}
+.imagePreviewWrapper {
+  position: relative;
+  display: inline-block;
+  margin-right: 10px;
+}
+
+.removeImageButton {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  background: red;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+}
+
+.ellipsis {
+  margin: 0 10px;
+  font-size: 16px;
+  color: #333;
+}
 @media (max-width: 768px) {
   .content {
     margin-left: 0;
@@ -218,3 +444,4 @@
     font-size: 0.85rem;
   }
 }
+
