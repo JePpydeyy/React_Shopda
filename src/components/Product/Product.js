@@ -308,7 +308,7 @@ const Product = () => {
                 <div className={styles.productItem} key={product._id}>
                   <div className={styles.productItemPic}>
                     {product.tag === 'sale' && <span className={styles.newLabel}>SALE</span>}
-                    <Link to={`/detail/${product._id}`} className={styles.productImgLink}>
+                    <Link to={`/detail/${product.slug}`} className={styles.productImgLink}>
                       <img
                         src={
                           product.images && product.images.length > 0
