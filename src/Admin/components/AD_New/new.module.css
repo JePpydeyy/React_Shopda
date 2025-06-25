@@ -1,3 +1,15 @@
+/* ... Existing CSS unchanged ... */
+
+/* Add .articleImage class to match .articleContent img styling */
+.articleImage {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  margin: 16px 0;
+  display: block; /* Ensure image behaves like a block element for proper spacing */
+}
+
+/* ... Rest of the existing CSS unchanged ... */
 .container {
   display: flex;
   min-height: 100vh;
@@ -117,7 +129,7 @@
 }
 
 .table th:nth-child(1) {
-  width: 45%;
+  width: 30%;
 }
 
 .table th:nth-child(2) {
@@ -129,6 +141,10 @@
 }
 
 .table th:nth-child(4) {
+  width: 15%;
+}
+
+.table th:nth-child(5) {
   width: 20%;
 }
 
@@ -252,11 +268,11 @@
 }
 
 .statusShow {
-  color: #22c55e; /* Green for Show */
+  color: #22c55e;
 }
 
 .statusHidden {
-  color: #ef4444; /* Red for Hidden */
+  color: #ef4444;
 }
 
 .articleContent {

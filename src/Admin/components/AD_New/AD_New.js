@@ -12,30 +12,58 @@ const NewsManagement = () => {
   const [statuses] = useState(['all', 'Show', 'Hidden']);
   const [selectedArticle, setSelectedArticle] = useState(null);
 
+  const API_BASE_URL = process.env.REACT_APP_API_BASE || 'https://api-tuyendung-cty.onrender.com';
+
   useEffect(() => {
     const fetchNews = async () => {
       try {
         setLoading(true);
-        const response = await fetch('https://api-tuyendung-cty.onrender.com/api/new');
+        const response = await fetch(`${API_BASE_URL}/api/new`, {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('adminToken') || ''}`,
+          },
+        });
+
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
-        const result = await response.json();
-        console.log('API Response:', result);
 
-        const newsData = Array.isArray(result) ? result : result.data || result.news || result.items || [];
-        if (Array.isArray(newsData)) {
-          const transformedData = newsData.map(item => ({
-            id: item._id || item.id,
-            slug: item.slug,
-            title: item.title || 'No title',
-            content: item.htmlContent || 'No content available',
-            publishedAt: item.publishedAt || item.createdAt || new Date().toISOString(),
-            status: item.status === 'show' ? 'Show' : 'Hidden',
-          }));
+        const result = await response.json();
+
+        const newsData = Array.isArray(result.data)
+          ? result.data
+          : Array.isArray(result.news)
+          ? result.news
+          : Array.isArray(result)
+          ? result
+          : [];
+
+        if (newsData.length > 0) {
+          const transformedData = newsData.map(item => {
+            const rawThumbnailUrl = item.thumbnailUrl || '';
+            let imageUrl = '/placeholder-image.jpg';
+
+            if (rawThumbnailUrl) {
+              imageUrl = rawThumbnailUrl.startsWith('http')
+                ? rawThumbnailUrl
+                : `${API_BASE_URL}/${rawThumbnailUrl.replace(/^\/+/, '')}`;
+            }
+
+            return {
+              id: item._id || item.id,
+              slug: item.slug,
+              title: item.title || 'No title',
+              content: item.content || 'No content available',
+              publishedAt: item.publishedAt || item.createdAt || new Date().toISOString(),
+              status: item.status === 'show' ? 'Show' : 'Hidden',
+              views: item.views || 0,
+              image: imageUrl,
+            };
+          });
           setNews(transformedData);
         } else {
-          throw new Error('Invalid data format from API');
+          throw new Error('No news data found in API response');
         }
       } catch (err) {
         setError(err.message);
@@ -54,7 +82,6 @@ const NewsManagement = () => {
   );
 
   const handleEdit = (slug) => {
-    console.log(`Edit news ${slug}`);
     window.location.href = `/admin/news/edit/${slug}`;
   };
 
@@ -65,21 +92,22 @@ const NewsManagement = () => {
     if (!confirmAction) return;
 
     try {
-      const response = await fetch(`https://api-tuyendung-cty.onrender.com/api/new/${slug}/toggle-visibility`, {
+      const response = await fetch(`${API_BASE_URL}/api/new/${slug}/toggle-visibility`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          // Placeholder for authentication token (replace with actual token logic)
           'Authorization': `Bearer ${localStorage.getItem('adminToken') || ''}`,
         },
+        body: JSON.stringify({ status: newStatus.toLowerCase() }),
       });
 
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        const errorText = await response.text();
+        throw new Error(`HTTP error! status: ${response.status}, message: ${errorText || 'No detail provided'}`);
       }
 
       const result = await response.json();
-      const updatedStatus = result.news.status === 'show' ? 'Show' : 'Hidden';
+      const updatedStatus = result.data?.status === 'show' || result.news?.status === 'show' ? 'Show' : 'Hidden';
 
       setNews(prevNews =>
         prevNews.map(article =>
@@ -93,7 +121,7 @@ const NewsManagement = () => {
 
       alert(`Bài viết đã được ${actionText} thành công!`);
     } catch (err) {
-      console.error('Toggle status error:', err);
+      console.error('Toggle status error:', err.message);
       alert(`Lỗi khi ${actionText} bài viết: ${err.message}`);
     }
   };
@@ -107,7 +135,18 @@ const NewsManagement = () => {
   };
 
   const createMarkup = (htmlContent) => {
-    return { __html: htmlContent };
+    if (!htmlContent) return { __html: '' };
+
+    // Tự động thêm base URL cho <img> chưa có http
+    const updatedContent = htmlContent.replace(
+      /<img\s+[^>]*src=["'](?!https?:\/\/)([^"']+)["']/gi,
+      (match, src) => {
+        const cleanSrc = src.replace(/^\/+/, '');
+        return match.replace(src, `${API_BASE_URL}/${cleanSrc}`);
+      }
+    );
+
+    return { __html: updatedContent };
   };
 
   if (loading) return <div className={styles.container}>Đang tải...</div>;
@@ -118,7 +157,7 @@ const NewsManagement = () => {
       <Sidebar />
       <div className={styles.content}>
         <h1 className={styles.title}>Quản Lý Tin Tức</h1>
-        
+
         <div className={styles.searchFilter}>
           <input
             type="text"
@@ -133,7 +172,9 @@ const NewsManagement = () => {
             onChange={(e) => setStatusFilter(e.target.value)}
           >
             {statuses.map(status => (
-              <option key={status} value={status}>{status === 'all' ? 'Tất cả' : status}</option>
+              <option key={status} value={status}>
+                {status === 'all' ? 'Tất cả' : status}
+              </option>
             ))}
           </select>
           <Link to="/admin/news/add" className={styles.addButton}>
@@ -147,6 +188,7 @@ const NewsManagement = () => {
               <tr className={styles.tableHeader}>
                 <th>Tiêu đề</th>
                 <th>Ngày xuất bản</th>
+                <th>Lượt xem</th>
                 <th>Trạng thái</th>
                 <th>Hành động</th>
               </tr>
@@ -161,6 +203,7 @@ const NewsManagement = () => {
                   >
                     <td>{article.title}</td>
                     <td>{new Date(article.publishedAt).toLocaleDateString('vi-VN')}</td>
+                    <td>{article.views}</td>
                     <td>
                       <span className={`${styles.status} ${article.status === 'Show' ? styles.statusShow : styles.statusHidden}`}>
                         {article.status}
@@ -184,7 +227,7 @@ const NewsManagement = () => {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="4" className={styles.noData}>Không có bài viết để hiển thị.</td>
+                  <td colSpan="5" className={styles.noData}>Không có bài viết để hiển thị.</td>
                 </tr>
               )}
             </tbody>
@@ -200,13 +243,25 @@ const NewsManagement = () => {
                   <h3>{selectedArticle.title}</h3>
                   <p className={styles.meta}>
                     Ngày xuất bản: {new Date(selectedArticle.publishedAt).toLocaleDateString('vi-VN')} | 
+                    Lượt xem: {selectedArticle.views} | 
                     Trạng thái: <span className={`${styles.status} ${selectedArticle.status === 'Show' ? styles.statusShow : styles.statusHidden}`}>
                       {selectedArticle.status}
                     </span>
                   </p>
                 </div>
+                <div className={styles.postImage}>
+                  <img
+                    src={selectedArticle.image}
+                    alt={selectedArticle.title}
+                    onError={(e) => {
+                      e.target.src = '/placeholder-image.jpg';
+                      console.error(`Image load failed for URL: ${e.target.src}, falling back to placeholder`);
+                    }}
+                    className={styles.articleImage}
+                  />
+                </div>
                 <div 
-                  className={styles.articleContent} 
+                  className={styles.articleContent}
                   dangerouslySetInnerHTML={createMarkup(selectedArticle.content)}
                 />
               </div>
