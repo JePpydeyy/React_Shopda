@@ -4,54 +4,77 @@ import styles from './New.module.css';
 
 const New = () => {
   const [newsItems, setNewsItems] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [categories, setCategories] = useState([]);
+  const [loadingNews, setLoadingNews] = useState(true);
+  const [loadingCategories, setLoadingCategories] = useState(true);
   const [error, setError] = useState(null);
+  const [selectedCategoryId, setSelectedCategoryId] = useState(null);
 
-  const categories = [
-    { name: 'Phong Thủy', href: 'phong-thuy.html' },
-    { name: 'Thông Tin Đá', href: 'thong-tin-da.html' },
-    { name: 'Tin Khuyến Mãi', href: 'tin-khuyen-mai.html' },
-    { name: 'Giải Trí', href: 'giai-tri.html' },
-  ];
+  const API_BASE_URL = process.env.REACT_APP_API_BASE || 'https://api-tuyendung-cty.onrender.com';
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      setLoadingCategories(true);
+      try {
+        const response = await fetch(`${API_BASE_URL}/api/new-category`);
+        if (!response.ok) throw new Error(`Lỗi tải danh mục: ${response.statusText}`);
+        const data = await response.json();
+
+        const categoryData = Array.isArray(data) ? data : data.data || [];
+        const filtered = categoryData
+          .filter((cat) => cat?.status === 'show')
+          .map((cat) => ({
+            _id: cat._id,
+            name: cat.category, // SỬ DỤNG TRƯỜNG category LÀM TÊN
+          }));
+
+        setCategories(filtered);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoadingCategories(false);
+      }
+    };
+    fetchCategories();
+  }, []);
 
   useEffect(() => {
     const fetchNews = async () => {
+      setLoadingNews(true);
       try {
-        const response = await fetch('https://api-tuyendung-cty.onrender.com/api/new');
-        if (!response.ok) {
-          throw new Error('Failed to fetch news');
-        }
+        const response = await fetch(`${API_BASE_URL}/api/new`);
+        if (!response.ok) throw new Error(`Lỗi tải bài viết: ${response.statusText}`);
         const data = await response.json();
-        const formattedNews = data.map(item => ({
+
+        let items = Array.isArray(data) ? data : data.data || [];
+        items = items.filter((item) => item?.status === 'show');
+
+        if (selectedCategoryId) {
+          items = items.filter((item) => item.category_new === selectedCategoryId);
+        }
+
+        const mapped = items.map((item) => ({
           id: item._id,
+          title: item.title || 'Không có tiêu đề',
           date: new Date(item.publishedAt).toLocaleDateString('vi-VN', {
-            month: 'long',
-            day: 'numeric',
-            year: 'numeric',
+            year: 'numeric', month: 'long', day: 'numeric',
           }),
-          title: item.title,
-          image: item.thumbnailUrl,
+          image: item.thumbnailUrl || '/placeholder-image.jpg',
         }));
-        setNewsItems(formattedNews);
-        setLoading(false);
+
+        setNewsItems(mapped);
       } catch (err) {
         setError(err.message);
-        setLoading(false);
+      } finally {
+        setLoadingNews(false);
       }
     };
-
     fetchNews();
-  }, []);
+  }, [selectedCategoryId]);
 
-  if (loading) {
-    return <div>Loading...</div>;
-  }
-
-  if (error) {
-    return <div>Error: {error}</div>;
-  }
-
-  const API_BASE_URL = process.env.REACT_APP_API_BASE;
+  const handleCategorySelect = (id) => {
+    setSelectedCategoryId(id === selectedCategoryId ? null : id);
+  };
 
   return (
     <main className={styles.newsContainer}>
@@ -59,44 +82,60 @@ const New = () => {
         <nav className={styles.categoryMenu}>
           <h1 className={styles.categoryTitle}>Bài viết</h1>
           <ul className={styles.categoryList}>
-            {categories.map((category, index) => (
-              <li key={index}>
-                <a href={category.href} className={styles.categoryItem}>
-                  {category.name}
-                </a>
-              </li>
-            ))}
+            {loadingCategories ? (
+              <li>Đang tải danh mục...</li>
+            ) : error ? (
+              <li>Lỗi: {error}</li>
+            ) : (
+              [{ _id: null, name: 'Tất cả' }, ...categories].map((cat) => (
+                <li key={cat._id || 'all'}>
+                  <a
+                    href="#"
+                    className={`${styles.categoryItem} ${selectedCategoryId === cat._id ? styles.active : ''}`}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handleCategorySelect(cat._id);
+                    }}
+                  >
+                    {cat.name}
+                  </a>
+                </li>
+              ))
+            )}
           </ul>
         </nav>
+
         <div className={styles.newsSection}>
           <div className={styles.newsGrid}>
-            {newsItems.map((item) => (
-              <div key={item.id} className={styles.newsPost}>
-                <div className={styles.postImage}>
-                  <img src={`${API_BASE_URL}/${item.image}`} alt={item.title} />
-                </div>
-                <div className={styles.postContent}>
-                  <p>
-                    <i className="fa-regular fa-calendar-days"></i> {item.date}
-                  </p>
-                  <h3>{item.title}</h3>
-                  <div className={styles.postLink}>
-                    <Link to={`/newdetail/${item.id}`}>XEM THÊM</Link>
+            {loadingNews ? (
+              <div className={styles.loading}>Đang tải bài viết...</div>
+            ) : error ? (
+              <div className={styles.error}>Lỗi: {error}</div>
+            ) : newsItems.length > 0 ? (
+              newsItems.map((item) => (
+                <div key={item.id} className={styles.newsPost}>
+                  <div className={styles.postImage}>
+                    <img
+                      src={item.image.startsWith('http') ? item.image : `${API_BASE_URL}/${item.image}`}
+                      alt={item.title}
+                      onError={(e) => (e.target.src = '/placeholder-image.jpg')}
+                    />
+                  </div>
+                  <div className={styles.postContent}>
+                    <p>
+                      <i className="fas fa-calendar-alt" style={{ marginRight: 5 }}></i>
+                      {item.date}
+                    </p>
+                    <h3>{item.title}</h3>
+                    <div className={styles.postLink}>
+                      <Link to={`/newdetail/${item.id}`}>XEM THÊM</Link>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
-          <div className={styles.pagination}>
-            <a href="#" className={styles.paginationItem}>
-              <i className="fa-solid fa-arrow-left"></i>
-            </a>
-            <a href="#" className={`${styles.paginationItem} ${styles.active}`}>1</a>
-            <a href="#" className={styles.paginationItem}>2</a>
-            <a href="#" className={styles.paginationItem}>3</a>
-            <a href="#" className={styles.paginationItem}>
-              <i className="fa-solid fa-arrow-right"></i>
-            </a>
+              ))
+            ) : (
+              <div className={styles.noItems}>Không có bài viết nào.</div>
+            )}
           </div>
         </div>
       </div>

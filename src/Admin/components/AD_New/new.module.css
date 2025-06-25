@@ -1,70 +1,51 @@
-/* Biến CSS cho màu sắc và kích thước */
-:root {
-  --secondary-color: #1a1a3d; /* Darker navy for a richer look */
-  --primary-color: #3b82f6; /* Vibrant blue for buttons and accents */
-  --primary-hover: #2563eb; /* Slightly darker blue for hover */
-  --text-color: #64748b; /* Softer gray for text */
-  --text-hover-color: #ffffff; /* White for hover states */
-  --background-light: #f8fafc; /* Light gray for background */
-  --table-header-bg: #e2e8f0; /* Subtle gray for table headers */
-  --border-color: #e5e7eb; /* Light border color */
-  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05); /* Subtle shadow */
-  --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.1); /* Medium shadow */
-  --spacing-lg: 24px; /* Increased for better spacing */
-  --spacing-md: 16px;
-  --spacing-sm: 8px;
-  --border-radius: 8px; /* Softer corners */
-  --font-stack: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; /* Modern font */
-}
-
 .container {
   display: flex;
   min-height: 100vh;
-  background-color: var(--background-light);
-  font-family: var(--font-stack);
+  background-color: #f8fafc;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
 .content {
-  flex: 1;
-  padding: var(--spacing-lg);
+  flex-grow: 1;
+  padding: 24px;
   margin-left: 250px;
-  transition: margin-left 0.3s ease;
+  transition: margin-left 0.3s ease-in-out;
 }
 
 .title {
   font-size: 1.75rem;
-  font-weight: 600;
-  margin-bottom: var(--spacing-lg);
-  color: var(--secondary-color);
+  font-weight: bold;
+  margin-bottom: 24px;
+  color: #1a1a3d;
   letter-spacing: -0.02em;
 }
 
 .searchFilter {
   display: flex;
-  gap: var(--spacing-md);
-  margin-bottom: var(--spacing-lg);
+  gap: 16px;
+  margin-bottom: 24px;
   flex-wrap: wrap;
   background: white;
-  padding: var(--spacing-md);
-  border-radius: var(--border-radius);
-  box-shadow: var(--shadow-sm);
+  padding: 16px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .searchInput,
 .filterSelect {
-  padding: var(--spacing-sm) var(--spacing-md);
-  border: 1px solid var(--border-color);
-  border-radius: var(--border-radius);
+  padding: 8px 16px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
   font-size: 0.95rem;
-  color: var(--text-color);
-  background: #ffffff;
+  color: #64748b;
+  background: white;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .searchInput:focus,
 .filterSelect:focus {
   outline: none;
-  border-color: var(--primary-color);
+  border-color: #3b82f6;
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
@@ -84,25 +65,23 @@
 }
 
 .addButton {
-  background-color: var(--primary-color);
-  color: var(--text-hover-color);
-  padding: var(--spacing-sm) var(--spacing-md);
-  border-radius: var(--border-radius);
+  background-color: #3b82f6;
+  color: #ffffff;
+  padding: 8px 16px;
+  border-radius: 8px;
   text-decoration: none;
   font-size: 0.95rem;
-  font-weight: 500;
+  font-weight: medium;
   transition: background-color 0.2s ease;
 }
 
 .addButton:hover {
-  background-color: var(--primary-hover);
+  background-color: #2563eb;
 }
 
 .tableContainer {
   overflow-x: auto;
-  background: white;
-  border-radius: var(--border-radius);
-  box-shadow: var(--shadow-md);
+  padding: 8px;
 }
 
 .table {
@@ -110,28 +89,52 @@
   background: white;
   border-collapse: separate;
   border-spacing: 0;
+  border-radius: 8px;
+  overflow: hidden;
 }
 
 .tableHeader {
-  background-color: var(--table-header-bg);
+  background-color: #e2e8f0;
+  position: sticky;
+  top: 0;
+  z-index: 1;
 }
 
 .table th,
 .table td {
-  padding: var(--spacing-md);
+  padding: 16px 24px;
   text-align: left;
-  border-bottom: 1px solid var(--border-color);
+  border-bottom: 1px solid #e5e7eb;
   font-size: 0.95rem;
-  color: var(--text-color);
+  color: #64748b;
 }
 
 .table th {
-  font-weight: 500;
-  color: var(--secondary-color);
+  font-weight: bold;
+  color: #1a1a3d;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.table th:nth-child(1) {
+  width: 45%;
+}
+
+.table th:nth-child(2) {
+  width: 20%;
+}
+
+.table th:nth-child(3) {
+  width: 15%;
+}
+
+.table th:nth-child(4) {
+  width: 20%;
 }
 
 .tableRow {
-  transition: background-color 0.2s ease;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  cursor: pointer;
 }
 
 .tableRow:hover {
@@ -143,38 +146,178 @@
 }
 
 .actionButton {
-  color: var(--primary-color);
+  color: #3b82f6;
   text-decoration: none;
-  margin-right: var(--spacing-sm);
-  font-weight: 500;
+  margin-right: 16px;
+  font-weight: medium;
   background: none;
-  border: none;
+  border: 1px solid #3b82f6;
+  border-radius: 4px;
+  padding: 6px 12px;
   cursor: pointer;
-  transition: color 0.2s ease;
+  transition: all 0.2s ease;
 }
 
 .actionButton:hover {
-  color: var(--primary-hover);
+  background-color: #3b82f6;
+  color: #ffffff;
+  text-decoration: none;
+}
+
+.hideButton {
+  color: #ef4444;
+  border: 1px solid #ef4444;
+}
+
+.hideButton:hover {
+  background-color: #ef4444;
+  color: #ffffff;
+}
+
+.showButton {
+  color: #22c55e;
+  border: 1px solid #22c55e;
+}
+
+.showButton:hover {
+  background-color: #22c55e;
+  color: #ffffff;
+}
+
+.noData {
+  text-align: center;
+  padding: 24px;
+  color: #64748b;
+  font-style: italic;
+  font-size: 1rem;
+}
+
+.popupOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.popup {
+  background: white;
+  border-radius: 8px;
+  padding: 24px;
+  max-width: 800px;
+  width: 90%;
+  max-height: 85vh;
+  overflow-y: auto;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  position: relative;
+}
+
+.popupTitle {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #1a1a3d;
+  margin-bottom: 16px;
+}
+
+.popupContent {
+  font-size: 0.95rem;
+  color: #64748b;
+  margin-bottom: 24px;
+}
+
+.articleHeader {
+  margin-bottom: 20px;
+  border-bottom: 1px solid #e5e7eb;
+  padding-bottom: 16px;
+}
+
+.articleHeader h3 {
+  font-size: 1.25rem;
+  color: #1a1a3d;
+  margin-bottom: 8px;
+}
+
+.meta {
+  font-size: 0.9rem;
+  color: #64748b;
+}
+
+.status {
+  font-weight: medium;
+}
+
+.statusShow {
+  color: #22c55e; /* Green for Show */
+}
+
+.statusHidden {
+  color: #ef4444; /* Red for Hidden */
+}
+
+.articleContent {
+  line-height: 1.6;
+  color: #334155;
+}
+
+.articleContent p {
+  margin-bottom: 16px;
+}
+
+.articleContent img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  margin: 16px 0;
+}
+
+.articleContent ul,
+.articleContent ol {
+  margin: 16px 0;
+  padding-left: 24px;
+}
+
+.articleContent li {
+  margin-bottom: 8px;
+}
+
+.articleContent a {
+  color: #3b82f6;
   text-decoration: underline;
 }
 
-.deleteButton {
-  color: #dc2626;
+.articleContent a:hover {
+  color: #2563eb;
 }
 
-.deleteButton:hover {
-  color: #b91c1c;
+.closeButton {
+  background-color: #3b82f6;
+  color: #ffffff;
+  padding: 8px 16px;
+  border-radius: 4px;
+  border: none;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.closeButton:hover {
+  background-color: #2563eb;
 }
 
 @media (max-width: 768px) {
   .content {
     margin-left: 0;
-    padding: var(--spacing-md);
+    padding: 16px;
   }
 
   .searchFilter {
     flex-direction: column;
-    padding: var(--spacing-sm);
+    padding: 8px;
   }
 
   .searchInput,
@@ -183,21 +326,26 @@
     width: 100%;
   }
 
+  .tableContainer {
+    margin: 0 calc(-1 * 16px);
+    border-radius: 0;
+  }
+
   .table th,
   .table td {
-    padding: var(--spacing-sm);
+    padding: 8px 16px;
     font-size: 0.9rem;
   }
 
-  .tableContainer {
-    margin: 0 calc(-1 * var(--spacing-md));
-    border-radius: 0;
+  .popup {
+    width: 95%;
+    padding: 16px;
   }
 }
 
 @media (max-width: 576px) {
   .content {
-    padding: var(--spacing-sm);
+    padding: 8px;
   }
 
   .title {
@@ -210,11 +358,25 @@
 
   .table th,
   .table td {
-    padding: calc(var(--spacing-sm) / 1.5);
+    padding: calc(8px / 1.5) 8px;
   }
 
   .actionButton,
-  .deleteButton {
+  .hideButton,
+  .showButton {
     font-size: 0.85rem;
+    padding: 4px 8px;
+  }
+
+  .popupTitle {
+    font-size: 1.25rem;
+  }
+
+  .popupContent {
+    font-size: 0.9rem;
+  }
+
+  .articleHeader h3 {
+    font-size: 1.1rem;
   }
 }
