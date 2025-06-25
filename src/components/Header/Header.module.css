@@ -1,6 +1,5 @@
 .header {
   background: linear-gradient(135deg, #f4c430 0%, #e6b800 100%);
-  
   width: 100%;
   position: relative;
 }
@@ -103,7 +102,7 @@
 }
 
 .navbar {
-  margin-top:10px;
+  margin-top: 10px;
   background: linear-gradient(135deg, #8b4513 0%, #a0522d 100%);
   padding: 0.75rem 0;
   width: 100%;
@@ -152,8 +151,7 @@
   margin-left: 0.3125rem;
   font-size: 0.625rem;
 }
-/* Header.module.css */
-/* Header.module.css */
+
 .searchForm {
   position: relative;
   display: flex;

@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes, faPlus, faMinus } from '@fortawesome/free-solid-svg-icons';
 import styles from './Cart.module.css';
+import ToastNotification from '../ToastNotification/ToastNotification';
 
 const API_BASE_URL = 'https://api-tuyendung-cty.onrender.com/api';
 
@@ -12,11 +13,22 @@ const Cart = () => {
   const [discounts, setDiscounts] = useState([]);
   const [appliedDiscount, setAppliedDiscount] = useState(null);
   const [errorMessage, setErrorMessage] = useState('');
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
+  const [toastType, setToastType] = useState('success');
+  const [showPopup, setShowPopup] = useState(false); // State cho popup
+  const [itemToRemove, setItemToRemove] = useState(null); // Lưu index sản phẩm cần xóa
+  const navigate = useNavigate();
 
   // Fetch cart items from localStorage
   useEffect(() => {
     const cart = JSON.parse(localStorage.getItem('cart_da')) || [];
     setCartItems(cart);
+
+    // Xóa mã giảm giá khi tải lại trang
+    setAppliedDiscount(null);
+    localStorage.removeItem('applied_discount');
+    setErrorMessage('');
   }, []);
 
   // Fetch discount codes from API
@@ -34,7 +46,9 @@ const Cart = () => {
     const item = newCart[index];
     const newQuantity = Math.max(1, parseInt(quantity));
     if (newQuantity > item.stock) {
-      alert(`Chỉ còn tối đa ${item.stock} sản phẩm trong kho!`);
+      setToastMessage(`Chỉ còn tối đa ${item.stock} sản phẩm trong kho!`);
+      setToastType('error');
+      setShowToast(true);
       item.quantity = item.stock;
     } else {
       item.quantity = newQuantity;
@@ -55,20 +69,38 @@ const Cart = () => {
     }
   };
 
-  const removeItem = index => {
-    if (window.confirm('Bạn có chắc chắn muốn xóa sản phẩm này khỏi giỏ hàng?')) {
-      const newCart = cartItems.filter((_, i) => i !== index);
+  const openPopup = (index) => {
+    setItemToRemove(index);
+    setShowPopup(true);
+  };
+
+  const closePopup = () => {
+    setShowPopup(false);
+    setItemToRemove(null);
+  };
+
+  const confirmRemove = () => {
+    if (itemToRemove !== null) {
+      const newCart = cartItems.filter((_, i) => i !== itemToRemove);
       setCartItems(newCart);
       localStorage.setItem('cart_da', JSON.stringify(newCart));
-      setAppliedDiscount(null); // Reset discount if cart changes
+      setAppliedDiscount(null);
+      localStorage.removeItem('applied_discount');
       setErrorMessage('');
+      setToastMessage('Sản phẩm đã được xóa khỏi giỏ hàng!');
+      setToastType('success');
+      setShowToast(true);
     }
+    closePopup();
   };
 
   const applyCoupon = () => {
     if (!couponCode.trim()) {
       setErrorMessage('Vui lòng nhập mã giảm giá!');
-      setAppliedDiscount(null); // Reset discount if no code
+      setAppliedDiscount(null);
+      setToastMessage('Vui lòng nhập mã giảm giá!');
+      setToastType('error');
+      setShowToast(true);
       return;
     }
 
@@ -77,47 +109,72 @@ const Cart = () => {
 
     if (!coupon) {
       setErrorMessage('Mã giảm giá không tồn tại!');
-      setAppliedDiscount(null); // Reset discount if invalid
+      setAppliedDiscount(null);
+      setToastMessage('Mã giảm giá không tồn tại!');
+      setToastType('error');
+      setShowToast(true);
       return;
     }
 
     if (!coupon.isActive) {
       setErrorMessage('Mã giảm giá không hoạt động!');
-      setAppliedDiscount(null); // Reset discount if inactive
+      setAppliedDiscount(null);
+      setToastMessage('Mã giảm giá không hoạt động!');
+      setToastType('error');
+      setShowToast(true);
       return;
     }
 
     if (new Date(coupon.expirationDate) < now) {
       setErrorMessage('Mã giảm giá đã hết hạn!');
-      setAppliedDiscount(null); // Reset discount if expired
+      setAppliedDiscount(null);
+      setToastMessage('Mã giảm giá đã hết hạn!');
+      setToastType('error');
+      setShowToast(true);
       return;
     }
 
     if (coupon.usedCount >= coupon.usageLimit) {
       setErrorMessage('Mã giảm giá đã hết lượt sử dụng!');
-      setAppliedDiscount(null); // Reset discount if usage limit reached
+      setAppliedDiscount(null);
+      setToastMessage('Mã giảm giá đã hết lượt sử dụng!');
+      setToastType('error');
+      setShowToast(true);
       return;
     }
 
     setAppliedDiscount(coupon);
-    setErrorMessage(''); // Clear error message on successful application
+    setErrorMessage('');
     setCouponCode('');
-    alert(`Mã giảm giá "${coupon.code}" đã được áp dụng thành công!`);
+    setToastMessage(`Mã giảm giá đã áp dụng thành công!`);
+    setToastType('success');
+    setShowToast(true);
   };
 
   const checkout = () => {
     if (cartItems.length > 0) {
-      // Placeholder for checkout logic
-      alert('Tiến hành thanh toán...');
+      if (appliedDiscount) {
+        localStorage.setItem('applied_discount', JSON.stringify(appliedDiscount));
+      }
+      navigate('/checkout');
     } else {
-      alert('Giỏ hàng trống!');
+      setToastMessage('Giỏ hàng trống!');
+      setToastType('error');
+      setShowToast(true);
     }
   };
 
   const updateCart = () => {
-    alert('Giỏ hàng đã được cập nhật!');
-    setAppliedDiscount(null); // Reset discount if cart is updated
+    setToastMessage('Giỏ hàng đã được cập nhật!');
+    setToastType('success');
+    setShowToast(true);
+    setAppliedDiscount(null);
+    localStorage.removeItem('applied_discount');
     setErrorMessage('');
+  };
+
+  const handleToastClose = () => {
+    setShowToast(false);
   };
 
   const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
@@ -198,7 +255,7 @@ const Cart = () => {
                       <td>
                         <button
                           className={styles.removeBtn}
-                          onClick={() => removeItem(index)}
+                          onClick={() => openPopup(index)}
                           title="Xóa sản phẩm"
                         >
                           <FontAwesomeIcon icon={faTimes} />
@@ -228,7 +285,7 @@ const Cart = () => {
                     </div>
                     <button
                       className={styles.mobileRemoveBtn}
-                      onClick={() => removeItem(index)}
+                      onClick={() => openPopup(index)}
                       title="Xóa sản phẩm"
                     >
                       <FontAwesomeIcon icon={faTimes} />
@@ -289,19 +346,12 @@ const Cart = () => {
               <button className={styles.applyBtn} onClick={applyCoupon}>
                 Áp dụng
               </button>
-              {errorMessage && <p className={styles.errorMessage}>{errorMessage}</p>}
-              {appliedDiscount && (
-                <p className={styles.successMessage}>
-                  Đã áp dụng mã "{appliedDiscount.code}" ({appliedDiscount.discountPercentage}% off)
-                </p>
-              )}
             </div>
 
             <div className={styles.bottomActions}>
               <Link to="/product" className={styles.continueShopping}>
                 TIẾP TỤC MUA SẮM
               </Link>
-              
             </div>
           </>
         )}
@@ -333,6 +383,26 @@ const Cart = () => {
           MUA HÀNG
         </button>
       </div>
+
+      {showToast && (
+        <ToastNotification
+          message={toastMessage}
+          type={toastType}
+          onClose={handleToastClose}
+        />
+      )}
+
+      {showPopup && (
+        <div className={styles.popupOverlay} onClick={closePopup}>
+          <div className={styles.popupContent} onClick={e => e.stopPropagation()}>
+            <h3>Bạn có chắc chắn muốn xóa sản phẩm này khỏi giỏ hàng?</h3>
+            <div className={styles.popupButtons}>
+              <button className={styles.okBtn} onClick={confirmRemove}>OK</button>
+              <button className={styles.cancelBtn} onClick={closePopup}>Hủy</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
