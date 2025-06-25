@@ -4,7 +4,7 @@ import ImageGallery from '../ImageGallery/ImageGallery';
 import ProductOptions from '../ProductOptions/ProductOptions';
 import ToastNotification from '../ToastNotification/ToastNotification';
 import styles from './ProductDetail.module.css';
-import 'bootstrap/dist/css/bootstrap.min.css'; // Chỉ import CSS, JS được nạp qua CDN
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 const DeliveryTab = () => (
   <div className="tab-pane fade show active" id="delivery-tab" role="tabpanel">
@@ -32,69 +32,46 @@ const DeliveryTab = () => (
 
 const DescriptionTab = ({ product }) => (
   <div className="tab-pane fade" id="description-tab" role="tabpanel">
-    <p><b>{product.material}</b></p>
-    <p><b>Sơ lược:</b> {product.short_description}</p>
-    <p><b>Khu vực được khai thác:</b> {product.origin}</p>
-    <p><b>Thành phần:</b> {product.material}</p>
-    <p><b>Độ cứng thang Mohs:</b> {product.hardness}</p>
-    <p><b>Mạng phù hợp:</b> {product.element}</p>
-    <p><b>Tác dụng tinh thần:</b></p>
-    <ul>
-      {product.spiritual_benefits.map((benefit, index) => (
-        <li key={index}>{benefit}</li>
-      ))}
-    </ul>
-    <p><b>Tác dụng sức khỏe:</b></p>
-    <ul>
-      {product.health_benefits.map((benefit, index) => (
-        <li key={index}>{benefit}</li>
-      ))}
-    </ul>
-    <p><b>Cách bảo quản:</b></p>
-    <ul>
-      {product.care_instructions.map((instruction, index) => (
-        <li key={index}>{instruction}</li>
-      ))}
-    </ul>
+    <p dangerouslySetInnerHTML={{ __html: product.description }} />
   </div>
 );
 
 const ProductDetail = () => {
-  const { id } = useParams();
+  const { slug } = useParams();
   const [product, setProduct] = useState(null);
   const [quantity, setQuantity] = useState(1);
   const [wristSize, setWristSize] = useState(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [activeTab, setActiveTab] = useState('delivery'); 
+  const [activeTab, setActiveTab] = useState('delivery');
   const [error, setError] = useState(null);
   const [toast, setToast] = useState(null);
 
   useEffect(() => {
-  const fetchProduct = async () => {
-    try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/product/${id}`);
-      if (!response.ok) {
-        throw new Error('Không thể lấy dữ liệu sản phẩm');
+    const fetchProduct = async () => {
+      try {
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/product/slug/${slug}`);
+        if (!response.ok) {
+          throw new Error('Không thể lấy dữ liệu sản phẩm');
+        }
+        const data = await response.json();
+        setProduct(data);
+        const availableSizes = data.size?.filter(item => item.stock > 0) || [];
+        const defaultSize = availableSizes.length > 0
+          ? availableSizes.reduce((min, current) => {
+              const minSize = parseFloat(min.size_name.replace(/[^0-9.]/g, ''));
+              const currentSize = parseFloat(current.size_name.replace(/[^0-9.]/g, ''));
+              return minSize < currentSize ? min : current;
+            }).size_name
+          : null;
+        setWristSize(defaultSize);
+      } catch (err) {
+        setError(err.message);
+        setProduct(null);
+        setToast({ message: 'Lỗi khi tải dữ liệu sản phẩm!', type: 'error' });
       }
-      const data = await response.json();
-      setProduct(data);
-      const availableSizes = data.size?.filter(item => item.stock > 0) || [];
-      const defaultSize = availableSizes.length > 0
-        ? availableSizes.reduce((min, current) => {
-            const minSize = parseFloat(min.size_name.replace(/[^0-9.]/g, ''));
-            const currentSize = parseFloat(current.size_name.replace(/[^0-9.]/g, ''));
-            return minSize < currentSize ? min : current;
-          }).size_name
-        : null;
-      setWristSize(defaultSize);
-    } catch (err) {
-      setError(err.message);
-      setProduct(null);
-      setToast({ message: 'Lỗi khi tải dữ liệu sản phẩm!', type: 'error' });
-    }
-  };
-  fetchProduct();
-}, [id]);
+    };
+    fetchProduct();
+  }, [slug]);
 
   if (error) {
     return <div className={styles.error}>Lỗi: {error}</div>;
@@ -142,13 +119,13 @@ const ProductDetail = () => {
       name: product.name,
       price: product.price,
       quantity,
-      charm: product.Collection,
+      charm: product.Collection || 'Phong thủy',
       stoneSize: product.weight || '10,5 Li',
       wristSize: wristSize || '12',
       image: product.images && product.images.length > 0
         ? `${process.env.REACT_APP_API_BASE}/${product.images[0]}`
         : 'https://via.placeholder.com/300',
-      stock: currentSizeStock 
+      stock: currentSizeStock,
     };
     const existIndex = cart.findIndex(item => item._id === cartItem._id && item.wristSize === cartItem.wristSize);
     let totalQuantity = quantity;
@@ -193,7 +170,7 @@ const ProductDetail = () => {
             <span className={styles.sale}><strong>Trạng thái:</strong> SALE</span>
           )}
           <p><strong>NỘI DUNG SẢN PHẨM:</strong></p>
-          <p>{product.description || 'Không có mô tả'}</p>
+          <p>{product.short_description || 'Không có mô tả'}</p>
           <p><strong>MẠNG PHÙ HỢP: {product.element || 'Hỏa - Thổ'}</strong></p>
           <div>
             <b>số lượng sản phẩm còn trong kho:</b> {currentSizeStock}

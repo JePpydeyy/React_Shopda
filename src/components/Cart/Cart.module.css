@@ -12,7 +12,7 @@ body {
 
 .container {
   max-width: 1200px;
-  margin: 0 auto;
+  margin: 70px auto;
   display: grid;
   grid-template-columns: 1fr 350px;
   gap: 40px;
@@ -469,7 +469,7 @@ body {
 }
 
 .checkoutBtn:hover {
-  background: linear-gradient(135deg, #7A3F5C 0%, #6B364F 100%);
+  background: #4b381d;
   transform: translateY(-1px);
 }
 
@@ -589,4 +589,67 @@ body {
     margin: 20px;
     width: calc(100% - 40px);
   }
+}
+
+
+.popupOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); /* Nền tối */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.popupContent {
+  background-color: rgba(0, 0, 0, 0.5); /* Nền popup */
+  padding: 20px;
+  border-radius: 8px;
+  text-align: center;
+  color: white;
+  width: 300px;
+}
+
+.popupContent h3 {
+  margin: 0 0 20px;
+  font-size: 16px;
+}
+
+.popupButtons {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.okBtn {
+  width: 70px;
+
+  background-color: #a87922; /* Màu xanh cho nút OK */
+  color: white;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.okBtn:hover {
+  background-color: #6e4f16;
+}
+
+.cancelBtn {
+  padding: 10px 20px;
+  background-color: #6d6d6d; /* Màu xám cho nút Hủy */
+  color: white;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.cancelBtn:hover {
+  background-color: #555;
 }

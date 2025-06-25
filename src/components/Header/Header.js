@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import styles from './Header.module.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faMagnifyingGlass, faCartShopping, faCaretDown, faBars, faTimes } from '@fortawesome/free-solid-svg-icons';
+import { faMagnifyingGlass, faCartShopping, faCaretDown, faBars, faTimes, faBell } from '@fortawesome/free-solid-svg-icons';
 
 const API_BASE_URL = 'https://api-tuyendung-cty.onrender.com/api';
 
@@ -10,6 +10,7 @@ const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [suggestions, setSuggestions] = useState([]);
+  const [hasPendingPayment, setHasPendingPayment] = useState(false);
   const navigate = useNavigate();
   const searchFormRef = useRef(null);
 
@@ -34,7 +35,8 @@ const Header = () => {
     }
   }, [searchQuery]);
 
-  // Xử lý click ngoài để tắt suggestions
+
+  // Xử lý click ngoài để tắt suggestions và popup
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (searchFormRef.current && !searchFormRef.current.contains(event.target)) {
@@ -67,9 +69,9 @@ const Header = () => {
     <header className={styles.header}>
       <div className={styles.container}>
         <a href="/" className={styles.logo}>
-          <div className={styles.logoIcon}>TL</div>
+          <div className={styles.logoIcon}>LOGO</div>
           <div>
-            <div className={styles.logoText}>TINH LÂM</div>
+            <div className={styles.logoText}>Tên công ty </div>
             <div className={styles.logoSubtitle}>TRANG SỨC PHONG THỦY</div>
           </div>
         </a>

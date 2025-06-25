@@ -2,30 +2,111 @@
   position: fixed;
   top: 20px;
   right: 20px;
-  padding: 15px 20px;
-  background-color: #a00000; 
-  color: #333;
-  font-weight: bold;
-  border-radius: 5px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  padding: 15px 25px;
+  background-color: #ffffff;
+  color: #1a1a1a;
+  font-weight: 500;
+  border-radius: 10px; 
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   z-index: 1000;
-  transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
-}
-
-.show {
-  transform: translateX(0);
-  opacity: 1;
-}
-
-.hide {
-  transform: translateX(100%);
+  transition: all 0.5s ease-out; 
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-width: 300px;
+  max-width: 400px;
+  transform: translateX(110%) scale(0.8) skewX(0deg); 
   opacity: 0;
 }
 
+.toast.show {
+  transform: translateX(0) scale(1.1) skewX(-5deg);
+  opacity: 1;
+}
+
+.toast.hide {
+  transform: translateX(110%) scale(0.8) skewX(0deg);
+  opacity: 0;
+}
+
+.toast .message {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.toast .close-btn {
+  background: none;
+  border: none;
+  font-size: 18px;
+  color: #666;
+  cursor: pointer;
+  padding: 0 5px;
+  transition: color 0.3s ease;
+}
+
+.toast .close-btn:hover {
+  color: #333;
+}
+
 .error {
-  background-color: #ff4848; 
+  border-left: 4px solid #ff4444;
+  background-color: #fff5f5;
 }
 
 .success {
-  background-color: #259716; 
+  border-left: 4px solid #28a745;
+  background-color: #f0fff0;
+}
+
+@keyframes waterDropIn {
+  0% {
+    transform: translateX(110%) scale(0.8) skewX(0deg);
+    opacity: 0;
+  }
+  50% {
+    transform: translateX(-10%) scale(1.2) skewX(-10deg); 
+    opacity: 0.8;
+  }
+  70% {
+    transform: translateX(5%) scale(1.05) skewX(-5deg); 
+  }
+  90% {
+    transform: translateX(0) scale(1.02) skewX(-2deg); 
+  }
+  100% {
+    transform: translateX(0) scale(1) skewX(0deg);
+    opacity: 1;
+  }
+}
+
+@keyframes waterDropOut {
+  0% {
+    transform: translateX(0) scale(1) skewX(0deg);
+    opacity: 1;
+  }
+  30% {
+    transform: translateX(5%) scale(1.05) skewX(2deg);
+  }
+  70% {
+    transform: translateX(-10%) scale(0.9) skewX(5deg); 
+  }
+  100% {
+    transform: translateX(110%) scale(0.8) skewX(0deg);
+    opacity: 0;
+  }
+}
+
+.toast.show {
+  animation: waterDropIn 0.6s ease-out forwards;
+}
+
+.toast.hide {
+  animation: waterDropOut 0.6s ease-out forwards;
+}
+
+.toast.show:hover {
+  transform: translateX(0) scale(1.05) skewX(-3deg);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }

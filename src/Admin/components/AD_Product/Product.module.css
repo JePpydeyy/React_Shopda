@@ -1,22 +1,25 @@
-/* Biến CSS cho màu sắc và kích thước */
-:root {
-  --secondary-color: #1a1a3d; /* Darker navy for a richer look */
-  --primary-color: #3b82f6; /* Vibrant blue for buttons and accents */
-  --primary-hover: #2563eb; /* Slightly darker blue for hover */
-  --text-color: #64748b; /* Softer gray for text */
-  --text-hover-color: #ffffff; /* White for hover states */
-  --background-light: #f8fafc; /* Light gray for background */
-  --table-header-bg: #e2e8f0; /* Subtle gray for table headers */
-  --border-color: #e5e7eb; /* Light border color */
-  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05); /* Subtle shadow */
-  --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.1); /* Medium shadow */
-  --spacing-lg: 24px; /* Increased for better spacing */
+/* Product.module.css */
+
+/* Reuse root variables */
+:global(:root) {
+  --secondary-color: #1a1a3d;
+  --primary-color: #3b82f6;
+  --primary-hover: #2563eb;
+  --text-color: #64748b;
+  --text-hover-color: #ffffff;
+  --background-light: #f8fafc;
+  --table-header-bg: #e2e8f0;
+  --border-color: #e5e7eb;
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.1);
+  --spacing-lg: 24px;
   --spacing-md: 16px;
   --spacing-sm: 8px;
-  --border-radius: 8px; /* Softer corners */
-  --font-stack: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; /* Modern font */
+  --border-radius: 8px;
+  --font-stack: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
+/* Container */
 .container {
   display: flex;
   min-height: 100vh;
@@ -24,6 +27,7 @@
   font-family: var(--font-stack);
 }
 
+/* Content */
 .content {
   flex: 1;
   padding: var(--spacing-lg);
@@ -31,14 +35,16 @@
   transition: margin-left 0.3s ease;
 }
 
+/* Title */
 .title {
-  font-size: 1.75rem; /* Slightly larger */
+  font-size: 1.75rem;
   font-weight: 600;
   margin-bottom: var(--spacing-lg);
   color: var(--secondary-color);
   letter-spacing: -0.02em;
 }
 
+/* Search Filter */
 .searchFilter {
   display: flex;
   gap: var(--spacing-md);
@@ -50,8 +56,8 @@
   box-shadow: var(--shadow-sm);
 }
 
-.searchInput,
-.filterSelect {
+/* Search Input */
+.searchInput {
   padding: var(--spacing-sm) var(--spacing-md);
   border: 1px solid var(--border-color);
   border-radius: var(--border-radius);
@@ -59,30 +65,34 @@
   color: var(--text-color);
   background: #ffffff;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  flex: 1;
+  min-width: 200px;
 }
 
-.searchInput:focus,
-.filterSelect:focus {
+.searchInput:focus {
   outline: none;
   border-color: var(--primary-color);
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
-.searchInput {
-  flex: 1;
-  min-width: 200px;
-}
-
+/* Filter Select */
 .filterSelect {
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  font-size: 0.95rem;
+  color: var(--text-color);
+  background: #ffffff;
+  transition: border-color 0.2s ease;
   min-width: 150px;
-  appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 0.75rem center;
-  background-size: 1rem;
-  padding-right: 2rem;
 }
 
+.filterSelect:focus {
+  outline: none;
+  border-color: var(--primary-color);
+}
+
+/* Add Button */
 .addButton {
   background-color: var(--primary-color);
   color: var(--text-hover-color);
@@ -92,12 +102,14 @@
   font-size: 0.95rem;
   font-weight: 500;
   transition: background-color 0.2s ease;
+  text-align: center;
 }
 
 .addButton:hover {
   background-color: var(--primary-hover);
 }
 
+/* Table Container */
 .tableContainer {
   overflow-x: auto;
   background: white;
@@ -105,6 +117,7 @@
   box-shadow: var(--shadow-md);
 }
 
+/* Table */
 .table {
   width: 100%;
   background: white;
@@ -112,10 +125,12 @@
   border-spacing: 0;
 }
 
+/* Table Header */
 .tableHeader {
   background-color: var(--table-header-bg);
 }
 
+/* Table Cells */
 .table th,
 .table td {
   padding: var(--spacing-md);
@@ -130,6 +145,7 @@
   color: var(--secondary-color);
 }
 
+/* Table Row */
 .tableRow {
   transition: background-color 0.2s ease;
 }
@@ -142,6 +158,15 @@
   border-bottom: none;
 }
 
+/* Table Image */
+.tableImage {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  border-radius: var(--border-radius);
+}
+
+/* Action Buttons */
 .actionButton {
   color: var(--primary-color);
   text-decoration: none;
@@ -166,92 +191,87 @@
   color: #b91c1c;
 }
 
-/* Các kiểu hiện tại */
+/* Detail Row */
 .detailRow {
-  background-color: #f9f9f9;
+  background-color: #f8fafc;
 }
 
 .detailContainer {
-  padding: 20px;
-  border-top: 1px solid #ddd;
+  padding: var(--spacing-md);
 }
 
 .detailContainer h3 {
   margin-top: 0;
-  font-size: 1.2em;
+  color: var(--secondary-color);
 }
 
-.detailContainer p {
-  margin: 10px 0;
+.detailContainer p,
+.detailContainer ul {
+  margin: var(--spacing-sm) 0;
+  color: var(--text-color);
 }
 
 .detailContainer ul {
-  margin: 10px 0;
-  padding-left: 20px;
+  padding-left: var(--spacing-md);
 }
 
+/* Image Container */
 .imageContainer {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: var(--spacing-sm);
 }
 
+/* Product Image */
 .productImage {
-  max-width: 100px;
-  height: auto;
-  border: 1px solid #ddd;
-  border-radius: 4px;
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: var(--border-radius);
 }
 
-.tableImage {
-  width: 50px;
-  height: auto;
-  border: 1px solid #ddd;
-  border-radius: 3px;
-}
-
-.loading {
-  text-align: center;
-  font-size: 1.2em;
-  padding: 20px;
-}
-
-.error {
-  color: red;
-  text-align: center;
-  font-size: 1em;
-  padding: 5px;
-}
-
-/* Pagination Styles */
+/* Pagination */
 .pagination {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 10px;
-  margin-top: 20px;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-lg);
 }
 
 .pageButton {
-  padding: 8px 12px;
-  border: 1px solid #ddd;
-  background-color: #fff;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  background: white;
+  color: var(--text-color);
   cursor: pointer;
-  border-radius: 4px;
+  font-size: 0.95rem;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.pageButton:hover:not(:disabled) {
+  background-color: var(--primary-color);
+  color: var(--text-hover-color);
 }
 
 .pageButton:disabled {
-  background-color: #f0f0f0;
   cursor: not-allowed;
+  opacity: 0.5;
 }
 
 .activePage {
-  background-color: #007bff;
-  color: #fff;
-  border-color: #007bff;
+  background-color: var(--primary-color);
+  color: var(--text-hover-color);
+  border-color: var(--primary-color);
 }
 
-/* Modal Styles */
+.ellipsis {
+  padding: var(--spacing-sm);
+  color: var(--text-color);
+}
+
+/* Modal Overlay */
 .modalOverlay {
   position: fixed;
   top: 0;
@@ -265,26 +285,32 @@
   z-index: 1000;
 }
 
+/* Modal */
 .modal {
-  background-color: #fff;
+  background-color: white;
   padding: 20px;
   border-radius: 8px;
-  width: 90%;
-  max-width: 900px;
-  max-height: 80vh;
+  width: 1240px;
+  /* max-width: 500px; */
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  max-height: 90vh;
   overflow-y: auto;
 }
 
 .modal h2 {
   margin-top: 0;
+  margin-bottom: 20px;
+  color: var(--secondary-color);
 }
 
+/* Form */
 .form {
   display: flex;
   flex-direction: column;
   gap: 15px;
 }
 
+/* Form Group */
 .formGroup {
   display: flex;
   flex-direction: column;
@@ -293,105 +319,283 @@
 .formGroup label {
   margin-bottom: 5px;
   font-weight: bold;
+  color: var(--text-color);
 }
 
-.input, .select, .textarea {
+/* Input */
+.input,
+.select,
+.textarea {
   padding: 8px;
-  border: 1px solid #ddd;
+  border: 1px solid var(--border-color);
   border-radius: 4px;
-  font-size: 1em;
+  font-size: 0.95rem;
+  color: var(--text-color);
+  transition: border-color 0.2s ease;
 }
 
-.sizeGroup {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-  margin-bottom: 10px;
+.input:focus,
+.select:focus,
+.textarea:focus {
+  outline: none;
+  border-color: var(--primary-color);
 }
 
-.removeButton {
-  padding: 5px 10px;
-  background-color: #dc3545;
-  color: #fff;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
+/* Textarea */
+.textarea {
+  min-height: 100px;
+  resize: vertical;
 }
 
-.addSizeButton {
-  padding: 8px 12px;
-  background-color: #28a745;
-  color: #fff;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
+/* Form Actions */
 .formActions {
   display: flex;
   gap: 10px;
   justify-content: flex-end;
 }
 
+/* Submit and Cancel Buttons */
 .submitButton {
-  padding: 10px 20px;
-  background-color: #007bff;
-  color: #fff;
+  padding: 8px 16px;
+  background-color: #28a745;
+  color: white;
   border: none;
   border-radius: 4px;
   cursor: pointer;
+  font-size: 0.95rem;
+  transition: background-color 0.2s ease;
+}
+
+.submitButton:hover {
+  background-color: #218838;
 }
 
 .cancelButton {
-  padding: 10px 20px;
+  padding: 8px 16px;
   background-color: #6c757d;
-  color: #fff;
+  color: white;
   border: none;
   border-radius: 4px;
   cursor: pointer;
+  font-size: 0.95rem;
+  transition: background-color 0.2s ease;
 }
 
-/* Kiểu mới cho ảnh trong modal */
-.imageWrapper {
+.cancelButton:hover {
+  background-color: #5a6268;
+}
+
+/* Error Message */
+.error {
+  color: #dc2626;
+  font-size: 0.85rem;
+  margin-top: 5px;
+}
+
+/* Warning Message */
+.warning {
+  color: #d97706;
+  font-size: 0.85rem;
+  margin-top: 5px;
+}
+
+/* Size Group */
+.sizeGroup {
   display: flex;
-  flex-direction: column;
-  gap: 5px;
-  margin-right: 10px;
+  gap: var(--spacing-sm);
   align-items: center;
+  flex-wrap: wrap;
 }
 
-.imagePreview {
-  font-size: 0.9em;
-  color: #28a745;
+.sizeGroup .input {
+  flex: 1;
+  min-width: 120px;
 }
+
+/* Remove Button */
+.removeButton {
+  padding: var(--spacing-sm);
+  background-color: #dc2626;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.removeButton:hover {
+  background-color: #b91c1c;
+}
+
+/* Add Size Button */
+.addSizeButton {
+  padding: var(--spacing-sm) var(--spacing-md);
+  background-color: var(--primary-color);
+  color: var(--text-hover-color);
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  margin-top: var(--spacing-sm);
+}
+
+.addSizeButton:hover {
+  background-color: var(--primary-hover);
+}
+
+/* Existing Image Wrapper */
+.existingImageWrapper,
 .imagePreviewWrapper {
   position: relative;
   display: inline-block;
-  margin-right: 10px;
 }
 
+/* Delete Existing Image Button */
+.deleteExistingImageButton,
 .removeImageButton {
   position: absolute;
   top: 5px;
   right: 5px;
-  background: red;
+  background-color: #dc2626;
   color: white;
   border: none;
-  border-radius: 50%;
-  width: 24px;
-  height: 24px;
+  border-radius: 4px;
+  padding: 4px 8px;
   cursor: pointer;
+  font-size: 0.85rem;
+}
+
+.deleteExistingImageButton:hover,
+.removeImageButton:hover {
+  background-color: #b91c1c;
+}
+
+/* Tooltip */
+.fieldWithTooltip {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.labelContainer {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.tooltipButton {
+  background-color: var(--primary-color);
+  color: var(--text-hover-color);
+  border: none;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 12px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: background-color 0.2s ease;
 }
 
-.ellipsis {
-  margin: 0 10px;
-  font-size: 16px;
-  color: #333;
+.tooltipButton:hover {
+  background-color: var(--primary-hover);
 }
+
+.tooltip {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 10;
+  background-color: black;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  padding: var(--spacing-sm);
+  box-shadow: var(--shadow-sm);
+  font-size: 0.85rem;
+  color: var(--text-color);
+  max-width: 250px;
+}
+
+.tooltipContent {
+  white-space: pre-wrap;
+  background-color: black;
+  color: white;
+}
+
+/* Editor and Toolbar */
+.toolbar {
+  display: flex;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-sm);
+  flex-wrap: wrap;
+}
+
+.toolbarGroup {
+  display: flex;
+  gap: 4px;
+}
+
+.toolbarSelect {
+  padding: 4px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  font-size: 0.9rem;
+  color: var(--text-color);
+}
+
+.toolbarBtn {
+  padding: 4px 8px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  background: white;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: var(--text-color);
+  transition: background-color 0.2s ease;
+}
+
+.toolbarBtn:hover {
+  background-color: #f1f5f9;
+}
+
+.toolbarBtn.selected {
+  background-color: var(--primary-color);
+  color: var(--text-hover-color);
+}
+
+.editor {
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  padding: var(--spacing-sm);
+  min-height: 150px;
+  font-size: 0.95rem;
+  color: var(--text-color);
+  background: white;
+  outline: none;
+}
+
+.editor:empty:before {
+  content: attr(data-placeholder);
+  color: var(--text-color);
+  opacity: 0.5;
+}
+
+/* Loading and Error States */
+.loading,
+.error {
+  text-align: center;
+  padding: var(--spacing-lg);
+  color: var(--text-color);
+  font-size: 1rem;
+}
+
+.error {
+  color: #dc2626;
+}
+
+/* Responsive Styles */
 @media (max-width: 768px) {
   .content {
     margin-left: 0;
@@ -409,15 +613,21 @@
     width: 100%;
   }
 
+  .tableContainer {
+    margin: 0 calc(-1 * var(--spacing-md));
+    border-radius: 0;
+  }
+
   .table th,
   .table td {
     padding: var(--spacing-sm);
     font-size: 0.9rem;
   }
 
-  .tableContainer {
-    margin: 0 calc(-1 * var(--spacing-md));
-    border-radius: 0;
+  .productImage,
+  .tableImage {
+    width: 80px;
+    height: 80px;
   }
 }
 
@@ -443,5 +653,10 @@
   .deleteButton {
     font-size: 0.85rem;
   }
-}
 
+  .productImage,
+  .tableImage {
+    width: 60px;
+    height: 60px;
+  }
+}

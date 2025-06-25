@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import styles from './Checkout.module.css';
 import ToastNotification from '../ToastNotification/ToastNotification';
 
-
 const Checkout = () => {
   const [formData, setFormData] = useState({
     fullName: '',
@@ -11,8 +10,8 @@ const Checkout = () => {
     email: '',
     country: 'vietnam',
     province: 'hanoi',
-    district: 'quan1',
-    ward: 'phuong1',
+    district: '',
+    ward: '',
     addressDetail: '',
     note: '',
   });
@@ -90,8 +89,8 @@ const Checkout = () => {
         email: '',
         country: 'vietnam',
         province: 'hanoi',
-        district: 'quan1',
-        ward: 'phuong1',
+        district: '',
+        ward: '',
         addressDetail: '',
         note: '',
       });
@@ -165,7 +164,6 @@ const Checkout = () => {
                         <option key={year} value={year}>{year}</option>
                       ))}
                     </select>
-                    <button onClick={setToday} className={styles.calendarHeader + ' button'}>Hôm nay</button>
                     <button onClick={() => setShowCalendar(false)} className={styles.calendarHeader + ' button'}>Đóng</button>
                   </div>
                   <div className={styles.calendarDays}>
@@ -230,27 +228,25 @@ const Checkout = () => {
           <div className={styles.formGroup + ' ' + styles.mergeForms}>
             <div className={styles.districtWard}>
               <label htmlFor="district" className={styles.formGroup + ' label'}>Quận/Huyện *</label>
-              <select
+              <input
+                type="text"
                 id="district"
                 value={formData.district}
                 onChange={(e) => setFormData({ ...formData, district: e.target.value })}
-                className={styles.formGroup + ' select'}
-              >
-                <option value="quan1">Quận 1</option>
-                <option value="quan2">Quận 2</option>
-              </select>
+                placeholder="Nhập quận/huyện"
+                className={styles.formGroup + ' input'}
+              />
             </div>
             <div className={styles.ward}>
               <label htmlFor="ward" className={styles.formGroup + ' label'}>Xã/Phường *</label>
-              <select
+              <input
+                type="text"
                 id="ward"
                 value={formData.ward}
                 onChange={(e) => setFormData({ ...formData, ward: e.target.value })}
-                className={styles.formGroup + ' select'}
-              >
-                <option value="phuong1">Phường 1</option>
-                <option value="phuong2">Phường 2</option>
-              </select>
+                placeholder="Nhập xã/phường"
+                className={styles.formGroup + ' input'}
+              />
             </div>
           </div>
           <div className={styles.formGroup}>
