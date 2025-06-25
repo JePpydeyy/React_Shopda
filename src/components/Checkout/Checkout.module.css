@@ -19,27 +19,30 @@
 
 .customerInfo, .orderInfo {
   flex: 1;
-  width: 300px;
   padding: 20px;
   background-color: #f9f9f9;
   border-radius: 8px;
 }
 
 .orderInfo {
-  width: 100%;
-  margin: 0 auto;
+  max-width: 500px;
+  margin: 0;
 }
 
 .orderInfo .order {
-  border: 2px solid #cacaca;
-  border-radius: 10px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 15px;
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .customerInfo h2, .orderInfo h2 {
   font-size: 18px;
   margin-bottom: 15px;
-  color: #555;
+  color: #333;
   text-align: center;
+  font-weight: 600;
 }
 
 .formGroup {
@@ -135,7 +138,7 @@
 
 .calendarHeader button {
   padding: 5px 10px;
-  background-color: #8b4513;
+  background-color: #3457a0;
   color: white;
   border: none;
   width: 120px;
@@ -177,7 +180,7 @@
 }
 
 .selectedDate {
-  background-color: #8b4513;
+  background-color: #3457a0;
   color: white;
   border-radius: 50%;
 }
@@ -196,53 +199,79 @@
 
 .order {
   margin: 0 auto;
-  width: 450px;
+  width: 100%;
 }
 
 .orderItem {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 10px;
+  align-items: flex-start;
+  padding: 12px 20px;
   font-size: 14px;
-  color: #666;
-  margin: 0px 50px 0px 50px;
+  color: #444;
+  border-bottom: 1px solid #e8e8e8;
+}
+
+.orderItem:last-child {
+  border-bottom: none;
 }
 
 .orderItem p:first-child {
-  width: 70%; /* Left side takes 70% */
+  width: 65%;
   text-align: left;
+  font-weight: 500;
 }
 
 .orderItem p:last-child {
-  width: 30%; /* Right side takes 30% */
+  width: 35%;
   text-align: right;
+  font-weight: 600;
+  color: #333;
 }
 
 .orderItem.total {
-  font-weight: bold;
+  background-color: #f5f5f5;
+  padding: 15px 20px;
+  font-size: 16px;
+  font-weight: 700;
+  color: #3457a0;
+  border-radius: 6px;
+  margin-top: 10px;
+}
+
+.orderItem.total p:last-child {
+  color: #3457a0;
+}
+
+.orderItem:not(.total) p:first-child {
+  color: #555;
+}
+
+.orderItem:not(.total) p:last-child:not(:empty) {
   color: #333;
 }
 
 .orderBtn {
   width: 100%;
-  margin-top: 30px;
+  margin-top: 20px;
   text-align: center;
 }
 
 .orderBtn button {
-  padding: 10px;
-  background-color: #8a3e00;
+  padding: 12px;
+  background-color: #3457a0;
   color: white;
   border: none;
-  border-radius: 10px;
-  width: 350px;
-  height: 50px;
+  border-radius: 6px;
+  width: 100%;
+  max-width: 400px;
+  height: 48px;
   font-size: 16px;
+  font-weight: 600;
   cursor: pointer;
-  margin: 0 auto;
-  display: inline-block;
+  transition: background-color 0.3s ease;
 }
 
 .orderBtn button:hover {
-  background-color: #552600;
+  background-color: #7a3a0f;
 }

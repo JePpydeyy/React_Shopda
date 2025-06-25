@@ -24,17 +24,15 @@ const getStatusInfo = (status) => {
     case 'Đã từ chối':
       return { text: status, class: styles.statusTuChoi };
     default:
-      return { text: status || 'Không xác định', class: '' };
+      return { text: status || 'Không xác định', class: styles.statusDefault };
   }
 };
 
 // Hàm chuyển đổi chuỗi ngày thành đối tượng Date
 const parseDate = (dateStr) => {
   if (!dateStr) return null;
-  // Thử parse định dạng ISO (YYYY-MM-DDTHH:mm:ssZ)
   const isoDate = new Date(dateStr);
   if (!isNaN(isoDate.getTime())) return isoDate;
-  // Thử parse định dạng DD/MM/YYYY
   const [day, month, year] = dateStr.split('/');
   if (!day || !month || !year) return null;
   const customDate = new Date(`${year}-${month}-${day}`);
@@ -188,9 +186,9 @@ const ColumnChart = ({ allProfiles }) => {
     <div className={styles.chartWrapper}>
       <div className={styles.chartContainer}>
         {chartError ? (
-          <div style={{ color: 'red', marginTop: '20px' }}>{chartError}</div>
+          <div className={styles.chartError}>{chartError}</div>
         ) : (
-          <div id="columnchart" style={{ width: '100%', height: '400px', marginTop: '20px' }}></div>
+          <div id="columnchart" className={styles.chart}></div>
         )}
       </div>
       {tooltipData && (
@@ -328,9 +326,9 @@ const StatusChart = ({ allProfiles }) => {
     <div className={styles.chartWrapper}>
       <div className={styles.chartContainer}>
         {chartError ? (
-          <div style={{ color: 'red', marginTop: '20px' }}>{chartError}</div>
+          <div className={styles.chartError}>{chartError}</div>
         ) : (
-          <div id="piechart" style={{ width: '100%', height: '400px', marginTop: '20px' }}></div>
+          <div id="piechart" className={styles.chart}></div>
         )}
       </div>
       {tooltipData && (
@@ -381,19 +379,16 @@ const MainContent = () => {
           throw new Error(`Lỗi API: ${profileResponse.status} - ${await profileResponse.text()}`);
         }
         const profileData = await profileResponse.json();
-        console.log('Profile Data:', profileData); // Kiểm tra định dạng appliedAt
 
-        // Lọc và sắp xếp hồ sơ
         const validProfiles = profileData.filter(profile => {
-          const date = new Date(profile.appliedAt); // Thử parse trực tiếp
-          return !isNaN(date.getTime()); // Chỉ giữ các hồ sơ có ngày hợp lệ
+          const date = new Date(profile.appliedAt);
+          return !isNaN(date.getTime());
         });
 
         setAllProfiles(validProfiles);
 
-        // Sắp xếp theo ngày và giờ mới nhất, lấy 5 hồ sơ đầu
         const sortedProfiles = [...validProfiles]
-          .sort((a, b) => new Date(b.appliedAt) - new Date(a.appliedAt)) // Sử dụng Date trực tiếp
+          .sort((a, b) => new Date(b.appliedAt) - new Date(a.appliedAt))
           .slice(0, 5);
 
         setDisplayProfiles(sortedProfiles);
@@ -420,49 +415,49 @@ const MainContent = () => {
 
   return (
     <div className={styles.mainContent}>
-      <h1 className={styles.heading}>Chào mừng quản trị viên<br /></h1>
+      <h1 className={styles.heading}>Chào mừng quản trị viên</h1>
       <div className={styles.metrics}>
         <div className={styles.card}>
-          <h3>Tổng bài đăng tin tức <i className="fa-solid fa-newspaper"></i></h3>
+          <h3 className={styles.cardTitle}>Tổng bài đăng tin tức <i className="fa-solid fa-newspaper"></i></h3>
           <div className={styles.value}>{allJobs.length}</div>
         </div>
         <div className={styles.card}>
-          <h3>Tổng hồ sơ ứng tuyển <i className="fa-solid fa-file-pen" style={{ color: '#FFFF00' }}></i></h3>
+          <h3 className={styles.cardTitle}>Tổng hồ sơ ứng tuyển <i className="fa-solid fa-file-pen"></i></h3>
           <div className={styles.value}>{allProfiles.length}</div>
         </div>
         <div className={styles.card}>
-          <h3>Tổng hồ sơ đã tuyển dụng <i className="fa-regular fa-paste" style={{ color: '#008000' }}></i></h3>
+          <h3 className={styles.cardTitle}>Tổng hồ sơ đã tuyển dụng <i className="fa-regular fa-paste"></i></h3>
           <div className={styles.value}>
             {allProfiles.filter(p => getStatusInfo(p.status).text === 'Đã tuyển dụng').length}
           </div>
         </div>
         <div className={styles.card}>
-          <h3>Tổng hồ sơ đang chờ xét duyệt <i className="fa-solid fa-clock" style={{ color: '#3895ff' }}></i></h3>
+          <h3 className={styles.cardTitle}>Tổng hồ sơ đang chờ xét duyệt <i className="fa-solid fa-clock"></i></h3>
           <div className={styles.value}>
             {allProfiles.filter(p => getStatusInfo(p.status).text === 'Đang chờ xét duyệt').length}
           </div>
         </div>
         <div className={styles.card}>
-          <h3>Tổng hồ sơ đã phỏng vấn <i className="fa-solid fa-user-check" style={{ color: '#FFA500' }}></i></h3>
+          <h3 className={styles.cardTitle}>Tổng hồ sơ đã phỏng vấn <i className="fa-solid fa-user-check"></i></h3>
           <div className={styles.value}>
             {allProfiles.filter(p => getStatusInfo(p.status).text === 'Đã phỏng vấn').length}
           </div>
         </div>
         <div className={styles.card}>
-          <h3>Tổng hồ sơ đã từ chối <i className="fa-solid fa-ban" style={{ color: '#FF0000' }}></i></h3>
+          <h3 className={styles.cardTitle}>Tổng hồ sơ đã từ chối <i className="fa-solid fa-ban"></i></h3>
           <div className={styles.value}>
             {allProfiles.filter(p => getStatusInfo(p.status).text === 'Đã từ chối').length}
           </div>
         </div>
       </div>
       <div className={styles.recentOrders}>
-        <h3>Hồ sơ ứng tuyển gần đây</h3>
+        <h3 className={styles.sectionTitle}>Hồ sơ ứng tuyển gần đây</h3>
         {displayProfiles.length === 0 ? (
-          <p>Không có hồ sơ nào để hiển thị.</p>
+          <p className={styles.noData}>Không có hồ sơ nào để hiển thị.</p>
         ) : (
-          <table>
+          <table className={styles.table}>
             <thead>
-              <tr>
+              <tr className={styles.tableHeader}>
                 <th>ID</th>
                 <th>Họ Và Tên</th>
                 <th>Email</th>
@@ -476,7 +471,7 @@ const MainContent = () => {
               {displayProfiles.map((profile, index) => {
                 const statusInfo = getStatusInfo(profile.status);
                 return (
-                  <tr key={profile._id}>
+                  <tr key={profile._id} className={styles.tableRow}>
                     <td>{index + 1}</td>
                     <td>{profile.form?.fullName || 'Không có dữ liệu'}</td>
                     <td>{profile.form?.email || 'Không có dữ liệu'}</td>
@@ -502,11 +497,11 @@ const MainContent = () => {
             </tbody>
           </table>
         )}
-        <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '20px' }}>
-          <div style={{ width: '48%' }}>
+        <div className={styles.chartsContainer}>
+          <div className={styles.chartColumn}>
             <ColumnChart allProfiles={memoizedProfiles} />
           </div>
-          <div style={{ width: '48%' }}>
+          <div className={styles.chartColumn}>
             <StatusChart allProfiles={memoizedProfiles} />
           </div>
         </div>

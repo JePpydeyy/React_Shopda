@@ -9,10 +9,10 @@ const Footer = () => {
       <div className={styles.footerContainer}>
         <div className={styles.footerSection}>
           <div className={styles.footerLogo}>
-            <div className={styles.logoIcon}>TL</div>
+            <div className={styles.logoIcon}>LOGO</div>
             <div>
-              <div className={styles.logoText}>TINH LÂM</div>
-              <div className={styles.logoSubtext}>THẲNG SỨC PHONG THỦY</div>
+              <div className={styles.logoText}>Tên công ty</div>
+              <div className={styles.logoSubtext}>TRANG SỨC PHONG THỦY</div>
             </div>
           </div>
         </div>

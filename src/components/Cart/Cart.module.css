@@ -86,7 +86,7 @@ body {
 .productImage {
   width: 80px;
   height: 80px;
-  background: linear-gradient(135deg, #F2C94C 0%, #F2994A 100%);
+  background: #3457a0;
   border-radius: 8px;
   display: flex;
   align-items: center;
@@ -104,7 +104,7 @@ body {
 
 .productDetails .charmInfo {
   font-size: 14px;
-  color: #8B6F47;
+  color: #3457a0;
   margin-bottom: 4px;
 }
 
@@ -136,9 +136,9 @@ body {
 .quantityBtn {
   width: 30px;
   height: 30px;
-  border: 1px solid #ddd;
-  background: #f8f8f8;
-  color: #666;
+
+  background: #3457a0;
+  color: #fff;
   border-radius: 4px;
   cursor: pointer;
   display: flex;
@@ -149,12 +149,16 @@ body {
 }
 
 .quantityBtn:hover:not(:disabled) {
-  background: #e8e8e8;
-  border-color: #ccc;
+  border: 1px solid #3457a0;
+  background: #fff;
+  border-color: #3457a0;
 }
 
 .quantityBtn:disabled {
   opacity: 0.5;
+  border: 1px solid #3457a0;
+  background: #fff;
+  border-color: #3457a0;
   cursor: not-allowed;
 }
 
@@ -244,7 +248,7 @@ body {
 
 .mobileProductDetails .charmInfo {
   font-size: 12px;
-  color: #8B6F47;
+  color: #3457a0;
   margin-bottom: 3px;
 }
 
@@ -338,8 +342,8 @@ body {
 
 .applyBtn {
   padding: 10px 20px;
-  background: #f5f5f5;
-  color: #666;
+  background: #3457a0;
+  color: #fff;
   border: 1px solid #ddd;
   border-radius: 4px;
   font-size: 14px;
@@ -376,13 +380,13 @@ body {
 }
 
 .continueShopping {
-  color: #8B6F47;
+  color: #3457a0;
   text-decoration: none;
   font-size: 14px;
   text-transform: uppercase;
   font-weight: 500;
   letter-spacing: 0.5px;
-  border: 1px solid #8B6F47;
+  border: 1px solid #3457a0;
   padding: 12px 24px;
   border-radius: 4px;
   transition: all 0.2s;
@@ -390,7 +394,7 @@ body {
 }
 
 .continueShopping:hover {
-  background: #8B6F47;
+  background: #3457a0;
   color: white;
 }
 
@@ -404,11 +408,11 @@ body {
 }
 
 .summaryTitle {
-  background: #f0f0f0;
+  background:#3457a0;
   padding: 20px 24px;
   font-size: 16px;
   font-weight: 600;
-  color: #333;
+  color: #fff;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   margin: 0;
@@ -454,7 +458,7 @@ body {
 
 .checkoutBtn {
   width: calc(100% - 48px);
-  background: #8B6F47;
+  background: #3457a0;
   color: white;
   border: none;
   padding: 15px 20px;
@@ -469,7 +473,9 @@ body {
 }
 
 .checkoutBtn:hover {
-  background: #4b381d;
+  color :#3457a0;
+  background: #fff ;
+  border: 1px solid #3457a0;
   transform: translateY(-1px);
 }
 

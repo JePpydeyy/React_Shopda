@@ -1,5 +1,5 @@
 .footer {
-  background: linear-gradient(135deg, #8B1538 0%, #A91B47 50%, #8B1538 100%);
+  background: linear-gradient(135deg, #3457a0 0%, #294480 50%, #3457a0 100%);
   color: white;
   padding: 40px 0;
   position: relative;
@@ -38,26 +38,25 @@
 }
 
 .logoIcon {
-  width: 50px;
-  height: 50px;
-  background: linear-gradient(45deg, #FFD700, #FFA500);
-  border-radius: 50%;
+  width: 4rem;
+  height: 4REM;
+
   display: flex;
   align-items: center;
   justify-content: center;
   margin-right: 15px;
   font-weight: bold;
   font-size: 24px;
-  color: #8B1538;
-  box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+  color: #fff ;
+  
 }
 
 .logoText {
   font-size: 28px;
   font-weight: bold;
   letter-spacing: 2px;
-  color: #FFD700;
-  text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+  color: #fff;
+  text-shadow: 2px 2px 4px rgba(255, 255, 255, 0.3);
 }
 
 .logoSubtext {
@@ -70,7 +69,7 @@
 .footerSection h3 {
   font-size: 18px;
   margin-bottom: 20px;
-  color: #FFD700;
+  color: #fff;
   text-transform: uppercase;
   letter-spacing: 1px;
   border-bottom: 2px solid rgba(255, 215, 0, 0.3);
@@ -100,7 +99,7 @@
 }
 
 .footerSection ul li a:hover {
-  color: #FFD700;
+  color: #fff;
   text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
 }
 

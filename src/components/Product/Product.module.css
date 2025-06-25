@@ -203,7 +203,7 @@
 
 .shopSidebarSearch form input:focus {
   color: #111111;
-  border-color: #8B6F47;
+  border-color: #3457a0;
 }
 
 .shopSidebarSearch form input::placeholder {
@@ -272,7 +272,7 @@
   height: 1.125rem;
   position: relative;
   appearance: none;
-  border: 2px solid #8B6F47;
+  border: 2px solid #3457a0;
   border-radius: 0.25rem;
   background: #fff;
   transition: all 0.3s ease;
@@ -281,7 +281,7 @@
 
 .checkboxGroup label input[type="checkbox"]:checked {
   background: #fff;
-  border-color: #8B6F47;
+  border-color: #3457a0;
 }
 
 .checkboxGroup label input[type="checkbox"]:checked::after {
@@ -290,19 +290,19 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  color: #8B6F47;
+  color: #3457a0;
   font-size: 0.75rem;
   font-weight: bold;
 }
 
 .checkboxGroup label input[type="checkbox"]:hover {
-  border-color: #8B6F47;
+  border-color: #3457a0;
   box-shadow: 0 0 0 2px rgba(139, 111, 71, 0.1);
 }
 
 .checkboxGroup label input[type="checkbox"]:focus {
   outline: none;
-  border-color: #8B6F47;
+  border-color: #3457a0;
   box-shadow: 0 0 0 3px rgba(139, 111, 71, 0.2);
 }
 
@@ -404,7 +404,7 @@
 .price-values {
   text-align: center;
   margin-top: 1.5rem;
-  color: #8B6F47;
+  color: #3457a0;
   font-size: clamp(0.875rem, 2vw, 1rem);
   font-family: 'Nunito Sans', Arial, sans-serif;
 }
@@ -496,12 +496,13 @@
 }
 
 .productItemText {
+ 
   text-align: center;
   padding: 0.5rem 0;
 }
 
 .productItemText h6 {
-  color: #111;
+  color: #3457a0;
   font-size: clamp(0.875rem, 2vw, 1rem);
   font-weight: 600;
   margin-bottom: 0.3125rem;
@@ -693,7 +694,7 @@
 
 .cart-popup-total {
   margin-left: 1rem;
-  color: #8B6F47;
+  color: #3457a0;
   font-weight: bold;
   font-size: clamp(0.875rem, 2vw, 1rem);
 }
@@ -735,7 +736,7 @@
   font-size: clamp(0.875rem, 2vw, 0.9375rem);
   font-weight: 600;
   background: #fff;
-  color: #8B6F47;
+  color: #3457a0;
   cursor: pointer;
   transition: 0.2s;
 }
@@ -746,7 +747,7 @@
 }
 
 .cart-popup-actions .primary {
-  background: linear-gradient(90deg, #bfa16b 0%, #8B6F47 100%);
+  background: linear-gradient(90deg, #bfa16b 0%, #3457a0 100%);
   color: #fff;
   border: none;
 }
@@ -757,9 +758,9 @@
   border-radius: 0.25rem;
   font-size: clamp(0.875rem, 2vw, 0.9375rem);
   font-weight: 600;
-  border: 1px solid #8B6F47;
+  border: 1px solid #3457a0;
   background: #fff;
-  color: #8B6F47;
+  color: #3457a0;
   cursor: pointer;
   margin-top: 0.25rem;
 }
