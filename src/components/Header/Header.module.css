@@ -1,5 +1,5 @@
 .header {
-  background: linear-gradient(135deg, #f4c430 0%, #e6b800 100%);
+  background: #ffff;
   
   width: 100%;
   position: relative;
@@ -18,19 +18,19 @@
 .logo {
   display: flex;
   align-items: center;
-  color: #8b4513;
+  color: #3457a0;
   text-decoration: none;
 }
 
 .logoIcon {
-  width: 2.5rem;
-  height: 2.5rem;
-  background: #8b4513;
-  border-radius: 50%;
+  width: 4rem;
+  height: 4rem;
+  background: #3457a0;
+  /* border-radius: 50%; */
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #f4c430;
+  color: #fff;
   font-weight: bold;
   font-size: 1.125rem;
   margin-right: 0.625rem;
@@ -43,7 +43,7 @@
 
 .logoSubtitle {
   font-size: 0.75rem;
-  color: #8b4513;
+  color: #3457a0;
   opacity: 0.8;
 }
 
@@ -63,7 +63,7 @@
 .cartIcon {
   font-size: 1.5rem;
   cursor: pointer;
-  color: #8b4513;
+  color: #3457a0;
 }
 
 .cartContainer {
@@ -87,7 +87,7 @@
 }
 
 .languageSelector {
-  color: #8b4513;
+  color: #3457a0;
   font-size: 0.875rem;
   cursor: pointer;
   display: flex;
@@ -98,13 +98,13 @@
 .hamburger {
   display: none;
   font-size: 1.5rem;
-  color: #8b4513;
+  color: #3457a0;
   cursor: pointer;
 }
 
 .navbar {
   margin-top:10px;
-  background: linear-gradient(135deg, #8b4513 0%, #a0522d 100%);
+  background: linear-gradient(135deg, #3457a0 0%, #4680ff 100%);
   padding: 0.75rem 0;
   width: 100%;
 }
@@ -119,13 +119,13 @@
 }
 
 .navHighlight {
-  color: #f4c430;
+  color: #fff;
   font-size: 0.875rem;
   font-weight: 500;
 }
 
 .navDivider {
-  color: #f4c430;
+  color: #fff ;
   font-size: 1.125rem;
 }
 

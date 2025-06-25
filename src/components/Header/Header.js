@@ -67,9 +67,9 @@ const Header = () => {
     <header className={styles.header}>
       <div className={styles.container}>
         <a href="/" className={styles.logo}>
-          <div className={styles.logoIcon}>TL</div>
+          <div className={styles.logoIcon}>LOGO</div>
           <div>
-            <div className={styles.logoText}>TINH LÂM</div>
+            <div className={styles.logoText}>Tên công ty </div>
             <div className={styles.logoSubtitle}>TRANG SỨC PHONG THỦY</div>
           </div>
         </a>

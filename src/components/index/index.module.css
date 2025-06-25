@@ -28,7 +28,7 @@
   text-align: center;
   font-size: 2rem;
   font-weight: 600;
-  color: #2c3e50;
+  color: #3457a0;
   margin-bottom: 2.5rem;
   letter-spacing: -0.5px;
 }
@@ -120,8 +120,8 @@
 }
 
 .shopNowBtn {
-  background: white;
-  color: #2c3e50;
+  background: #3457a0;
+  color: #fff;
   border: none;
   padding: 0.75rem 1.5rem;
   border-radius: 25px;
@@ -141,6 +141,7 @@
 }
 
 .shopNowBtn:hover {
+  color:#3457a0;
   background: #f8f9fa;
   transform: translateY(-2px);
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
@@ -163,7 +164,7 @@
 
 .newProductLeft {
   padding: 1.5rem;
-  background: linear-gradient(135deg, #B91C1C 0%, #DC2626 100%);
+  background: #3457a0;
   border-radius: 15px;
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
   color: white;
@@ -194,7 +195,7 @@
 
 .viewAllBtn {
   background: white;
-  color: #2c3e50;
+  color: #3457a0;
   border: none;
   padding: 0.75rem 1.5rem;
   border-radius: 25px;
@@ -271,7 +272,7 @@
 
 .quickViewBtn {
   background: white;
-  color: #2c3e50;
+  color: #3457a0;
   border: none;
   padding: 0.5rem 1rem;
   border-radius: 25px;
@@ -295,7 +296,7 @@
 .productName {
   font-size: 20px;
   font-weight: 600;
-  color: #2c3e50;
+  color: #3457a0;
   margin-bottom: 0.5rem;
 }
 
@@ -403,7 +404,7 @@
 }
 
 .nguHanhTitle {
-  color: #2c3e50;
+  color: #3457a0;
   font-size: 2rem;
   font-weight: 700;
   margin-bottom: 1.25rem;
@@ -419,7 +420,7 @@
 }
 
 .nguHanhHighlight {
-  color: #8B4513;
+  color: #3457a0;
   font-weight: 600;
 }
 
