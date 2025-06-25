@@ -164,7 +164,7 @@ const Index = () => {
                     />
                     <div className={styles.productOverlay}>
                       <Link 
-                        to={`/detail/${product.id || product._id}`} 
+                        to={`/detail/${product.slug}`} 
                         className={styles.quickViewBtn}
                       >
                         Xem Nhanh
