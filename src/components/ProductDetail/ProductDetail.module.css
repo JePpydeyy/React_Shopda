@@ -37,7 +37,7 @@
 }
 
 .sale {
-  color: #9b6013;
+  color: #3457a0;
 }
 
 .sale strong {
@@ -129,7 +129,7 @@
 }
 
 .addToCart {
-  background-color: #9b6013;
+  background-color: #3457a0;
   color: white;
   padding: 10px 20px;
   border: none;
@@ -179,7 +179,7 @@
 
 .wristSize button {
   padding: 5px 10px;
-  background-color: #9b6013;
+  background-color: #3457a0;
   color: white;
   border: none;
   border-radius: 4px;
@@ -200,7 +200,7 @@
 }
 
 .link {
-  color: #9b6013;
+  color: #3457a0;
   text-decoration: none;
 }
 
@@ -215,7 +215,7 @@
   padding: 5px 10px;
   width: 30px;
   height: 25px;
-  background-color: #9b6013;
+  background-color: #3457a0;
   color: white;
   border: none;
   border-radius: 4px;

@@ -90,34 +90,34 @@ const Header = () => {
               </button>
               {suggestions.length > 0 && (
                 <ul className={styles.suggestionsDropdown}>
-                  {suggestions.map(product => (
-                    <li key={product._id} className={styles.suggestionItem}>
-                      <Link
-                        to={`/detail/${product._id}`}
-                        onClick={() => {
-                          setSearchQuery('');
-                          setSuggestions([]);
-                        }}
-                        className={styles.suggestionLink}
-                      >
-                        <img
-                          src={
-                            product.images && product.images.length > 0
-                              ? `${process.env.REACT_APP_API_BASE}/${product.images[0]}`
-                              : 'https://via.placeholder.com/50'
-                          }
-                          alt={product.name}
-                          className={styles.suggestionImage}
-                        />
-                        <div className={styles.suggestionInfo}>
-                          <span className={styles.suggestionName}>{product.name}</span>
-                          <span className={styles.suggestionPrice}>
-                            {new Intl.NumberFormat('vi-VN').format(product.price)} VND
-                          </span>
-                        </div>
-                      </Link>
-                    </li>
-                  ))}
+                 {suggestions.map(product => (
+  <li key={product._id} className={styles.suggestionItem}>
+    <Link
+      to={`/detail/${product.slug}`} // <-- ĐỔI _id thành slug
+      onClick={() => {
+        setSearchQuery('');
+        setSuggestions([]);
+      }}
+      className={styles.suggestionLink}
+    >
+      <img
+        src={
+          product.images && product.images.length > 0
+            ? `${process.env.REACT_APP_API_BASE}/${product.images[0]}`
+            : 'https://via.placeholder.com/50'
+        }
+        alt={product.name}
+        className={styles.suggestionImage}
+      />
+      <div className={styles.suggestionInfo}>
+        <span className={styles.suggestionName}>{product.name}</span>
+        <span className={styles.suggestionPrice}>
+          {new Intl.NumberFormat('vi-VN').format(product.price)} VND
+        </span>
+      </div>
+    </Link>
+  </li>
+))}
                 </ul>
               )}
             </form>

@@ -65,20 +65,21 @@ const Index = () => {
         const latestProducts = productsData.slice(0, 4);
         const latestNews = newsData.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 3);
         
-        // Format news data to match the structure (similar to New component)
+        // Format news data to include slug
         const formattedNews = latestNews.map(item => ({
           _id: item._id,
-          id: item._id, // Backup for compatibility
+          id: item._id,
+          slug: item.slug, // Đảm bảo có slug
           title: item.title,
           createdAt: item.createdAt,
           publishedAt: item.publishedAt,
           thumbnailUrl: item.thumbnailUrl,
           contentBlocks: item.contentBlocks
         }));
-        
+
         setProducts(latestProducts);
         setNews(formattedNews);
-        
+
       } catch (error) {
         console.error('Error fetching data:', error);
         // Fallback to dummy data if API fails
@@ -89,9 +90,9 @@ const Index = () => {
           { id: 4, name: 'Sản phẩm 4', image: '/images/product4.jpg', price: '800000' }
         ]);
         setNews([
-          { _id: 1, id: 1, title: 'Tin tức 1', content: 'Nội dung tin tức 1', createdAt: '2025-05-23', thumbnailUrl: '/images/news1.jpg' },
-          { _id: 2, id: 2, title: 'Tin tức 2', content: 'Nội dung tin tức 2', createdAt: '2025-05-22', thumbnailUrl: '/images/news2.jpg' },
-          { _id: 3, id: 3, title: 'Tin tức 3', content: 'Nội dung tin tức 3', createdAt: '2025-05-21', thumbnailUrl: '/images/news3.jpg' }
+          { _id: 1, id: 1, slug: 'tin-tuc-1', title: 'Tin tức 1', content: 'Nội dung tin tức 1', createdAt: '2025-05-23', thumbnailUrl: '/images/news1.jpg' },
+          { _id: 2, id: 2, slug: 'tin-tuc-2', title: 'Tin tức 2', content: 'Nội dung tin tức 2', createdAt: '2025-05-22', thumbnailUrl: '/images/news2.jpg' },
+          { _id: 3, id: 3, slug: 'tin-tuc-3', title: 'Tin tức 3', content: 'Nội dung tin tức 3', createdAt: '2025-05-21', thumbnailUrl: '/images/news3.jpg' }
         ]);
       } finally {
         setLoading(false);
@@ -119,7 +120,7 @@ const Index = () => {
   // Get full image URL
   const getImageUrl = (imagePath) => {
     if (!imagePath) return '/images/placeholder.jpg';
-    if (Array.isArray(imagePath)) imagePath = imagePath[0]; // Handle array of images (e.g., product.images)
+    if (Array.isArray(imagePath)) imagePath = imagePath[0];
     if (imagePath.startsWith('http')) return imagePath;
     return `${API_BASE}/${imagePath}`;
   };
@@ -155,7 +156,7 @@ const Index = () => {
                 <div key={product.id || product._id} className={styles.productCard}>
                   <div className={styles.productImageWrapper}>
                     <img 
-                      src={getImageUrl(product.images)} // Use product.images array
+                      src={getImageUrl(product.images)} 
                       alt={product.name}
                       className={styles.productCardImage}
                       onError={(e) => {
@@ -174,7 +175,6 @@ const Index = () => {
                   <div className={styles.productInfo}>
                     <h3 className={styles.productName}>{product.name}</h3>
                     <p className={styles.productPrice}>{formatPrice(product.price)}</p>
-                   
                   </div>
                 </div>
               ))}
@@ -287,7 +287,7 @@ const Index = () => {
       <div className={styles.newsSection}>
         <h2 className={styles.newsTitle}>Tin Tức Mới Nhất</h2>
         <div className={styles.newsGrid}>
-          {news.map((article, index) => (
+          {news.filter(article => article.slug).map((article, index) => (
             <div key={article._id} className={styles.newsPost}>
               <div className={styles.postImage}>
                 <img 
@@ -305,11 +305,11 @@ const Index = () => {
                   {formatDate(article.createdAt)}
                 </p>
                 <h3 className={styles.postTitle}>{article.title}</h3>
-                <p className={styles.postExcerpt}>
+                {/* <p className={styles.postExcerpt}>
                   {article.contentBlocks?.find(block => block.type === 'text')?.content.substring(0, 100) + '...' || 'Đọc thêm để biết chi tiết...'}
-                </p>
+                </p> */}
                 <div className={styles.postLink}>
-                  <Link to={`/newdetail/${article._id}`} className={styles.postLinkA}>
+                  <Link to={`/newdetail/${article.slug}`} className={styles.postLinkA}>
                     XEM THÊM
                   </Link>
                 </div>

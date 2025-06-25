@@ -1,11 +1,10 @@
-
 .heading {
   font-size: 27px;
   font-weight: bold;
   color: #070049;
   text-align: left;
   margin-top: 0;
-  padding: 0 !important;
+  padding: 0;
 }
 
 .mainContent {
@@ -32,26 +31,29 @@
   cursor: pointer;
 }
 
-.card h3 {
+.card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+.cardTitle {
   font-size: 18px;
   color: #666;
   margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.cardTitle i {
+  font-size: 16px;
 }
 
 .value {
   font-size: 28px;
   font-weight: bold;
   color: #000000;
-}
-
-.card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-}
-
-.card .change {
-  font-size: 10px;
-  margin-left: 8px;
 }
 
 .recentOrders {
@@ -62,31 +64,37 @@
   margin-bottom: 15px;
 }
 
-.recentOrders h3 {
+.sectionTitle {
   font-size: 16px;
   margin-bottom: 10px;
+  color: #333;
 }
 
-table {
+.noData {
+  font-size: 14px;
+  color: #666;
+  text-align: center;
+  padding: 20px;
+}
+
+.table {
   width: 100%;
   border-collapse: collapse;
 }
 
-th,
-td {
+.tableHeader th {
   padding: 8px;
   text-align: left;
   font-size: 15px;
-}
-
-th {
   background: #969696;
-  color: #666;
+  color: #fff;
 }
 
-td img {
-  width: 30px;
-  height: 30px;
+.tableRow td {
+  padding: 8px;
+  text-align: left;
+  font-size: 15px;
+  border-bottom: 1px solid #ddd;
 }
 
 .status {
@@ -94,6 +102,12 @@ td img {
   border-radius: 3px;
   font-size: 12px;
   font-weight: 500;
+}
+
+.statusDefault {
+  background-color: #f0f0f0;
+  border: 1px solid #ccc;
+  color: #666;
 }
 
 .statusDangChoXetDuyet {
@@ -119,6 +133,18 @@ td img {
   border: 1px solid #F5A3A3;
   color: #D32F2F;
 }
+
+.chartsContainer {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+  gap: 20px;
+}
+
+.chartColumn {
+  width: 48%;
+}
+
 .chartWrapper {
   position: relative;
   width: 100%;
@@ -132,13 +158,19 @@ td img {
   width: 100%;
   height: 400px;
   overflow: visible;
-  text-align: center; /* Ensure the container supports centered content */
+  text-align: center;
 }
 
-#piechart {
-  position: relative;
+.chart {
   width: 100% !important;
   height: 400px !important;
+}
+
+.chartError {
+  color: red;
+  font-size: 14px;
+  text-align: center;
+  margin-top: 20px;
 }
 
 .customTooltip {
@@ -170,6 +202,23 @@ td img {
 }
 
 @media (max-width: 768px) {
+  .mainContent {
+    margin-left: 0;
+    width: 100%;
+  }
+
+  .metrics {
+    grid-template-columns: 1fr;
+  }
+
+  .chartsContainer {
+    flex-direction: column;
+  }
+
+  .chartColumn {
+    width: 100%;
+  }
+
   .customTooltip {
     bottom: -50px;
     font-size: 0.75rem;

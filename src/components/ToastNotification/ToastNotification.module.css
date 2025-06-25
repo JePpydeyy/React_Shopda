@@ -3,8 +3,8 @@
   top: 20px;
   right: 20px;
   padding: 15px 25px;
-  background-color: #ffffff;
-  color: #1a1a1a;
+  background-color: #3457a0;
+  color: #fff;
   font-weight: 500;
   border-radius: 10px; 
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
@@ -50,14 +50,11 @@
 }
 
 .error {
-  border-left: 4px solid #ff4444;
-  background-color: #fff5f5;
+  border-left: 4px solid #fff;
+  background-color: #ff4444;
 }
 
-.success {
-  border-left: 4px solid #28a745;
-  background-color: #f0fff0;
-}
+
 
 @keyframes waterDropIn {
   0% {
