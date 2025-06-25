@@ -3,14 +3,13 @@ import { useParams } from 'react-router-dom';
 import './postdetails.module.css';
 
 const PostDetail = () => {
-  const { id } = useParams();
+  const { slug } = useParams();
   const [article, setArticle] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   const API_BASE_URL = 'https://api-tuyendung-cty.onrender.com';
 
-  // Thay thế các src tương đối trong content thành đầy đủ đường dẫn
   const transformImageSrc = (html) => {
     if (!html) return '';
     return html.replace(
@@ -28,10 +27,16 @@ const PostDetail = () => {
         const response = await fetch(`${API_BASE_URL}/api/new`);
         if (!response.ok) throw new Error(`Lỗi: ${response.statusText}`);
         const data = await response.json();
-        const found = Array.isArray(data)
-          ? data.find((item) => item._id === id)
-          : data.data?.find((item) => item._id === id);
+
+        const list = Array.isArray(data)
+          ? data
+          : Array.isArray(data.data)
+          ? data.data
+          : [];
+
+        const found = list.find((item) => item.slug === slug);
         if (!found) throw new Error('Không tìm thấy bài viết');
+
         setArticle(found);
       } catch (err) {
         setError(err.message);
@@ -40,13 +45,13 @@ const PostDetail = () => {
       }
     };
 
-    if (id) {
+    if (slug) {
       fetchArticle();
     } else {
-      setError('Không có ID bài viết');
+      setError('Không có slug bài viết');
       setLoading(false);
     }
-  }, [id]);
+  }, [slug]);
 
   const getShareUrls = () => {
     if (!article) return {};

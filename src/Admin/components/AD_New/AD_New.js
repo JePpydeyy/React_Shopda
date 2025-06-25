@@ -137,7 +137,6 @@ const NewsManagement = () => {
   const createMarkup = (htmlContent) => {
     if (!htmlContent) return { __html: '' };
 
-    // Tự động thêm base URL cho <img> chưa có http
     const updatedContent = htmlContent.replace(
       /<img\s+[^>]*src=["'](?!https?:\/\/)([^"']+)["']/gi,
       (match, src) => {

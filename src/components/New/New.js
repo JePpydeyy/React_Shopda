@@ -25,7 +25,7 @@ const New = () => {
           .filter((cat) => cat?.status === 'show')
           .map((cat) => ({
             _id: cat._id,
-            name: cat.category, // SỬ DỤNG TRƯỜNG category LÀM TÊN
+            name: cat.category,
           }));
 
         setCategories(filtered);
@@ -55,6 +55,7 @@ const New = () => {
 
         const mapped = items.map((item) => ({
           id: item._id,
+          slug: item.slug,
           title: item.title || 'Không có tiêu đề',
           date: new Date(item.publishedAt).toLocaleDateString('vi-VN', {
             year: 'numeric', month: 'long', day: 'numeric',
@@ -128,7 +129,7 @@ const New = () => {
                     </p>
                     <h3>{item.title}</h3>
                     <div className={styles.postLink}>
-                      <Link to={`/newdetail/${item.id}`}>XEM THÊM</Link>
+                      <Link to={`/newdetail/${item.slug}`}>XEM THÊM</Link>
                     </div>
                   </div>
                 </div>
