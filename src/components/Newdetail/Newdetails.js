@@ -22,22 +22,15 @@ const PostDetail = () => {
   };
 
   useEffect(() => {
-    const fetchArticle = async () => {
+    const fetchData = async () => {
       try {
-        const response = await fetch(`${API_BASE_URL}/api/new`);
-        if (!response.ok) throw new Error(`Lỗi: ${response.statusText}`);
-        const data = await response.json();
+        setLoading(true);
 
-        const list = Array.isArray(data)
-          ? data
-          : Array.isArray(data.data)
-          ? data.data
-          : [];
-
-        const found = list.find((item) => item.slug === slug);
-        if (!found) throw new Error('Không tìm thấy bài viết');
-
-        setArticle(found);
+        // Chỉ fetch bài viết, không tăng views
+        const res = await fetch(`${API_BASE_URL}/api/new/${slug}`);
+        if (!res.ok) throw new Error('Không thể tải bài viết');
+        const data = await res.json();
+        setArticle(data);
       } catch (err) {
         setError(err.message);
       } finally {
@@ -45,96 +38,29 @@ const PostDetail = () => {
       }
     };
 
-    if (slug) {
-      fetchArticle();
-    } else {
-      setError('Không có slug bài viết');
-      setLoading(false);
-    }
+    if (slug) fetchData();
   }, [slug]);
-
-  const getShareUrls = () => {
-    if (!article) return {};
-    const url = `https://tinhlamjw.com/${article.slug || ''}`;
-    const title = encodeURIComponent(article.title || '');
-    const thumb = article.thumbnailUrl
-      ? `${API_BASE_URL}/${article.thumbnailUrl.replace(/^\/+/, '')}`
-      : 'https://tinhlamjw.com/wp-content/uploads/2025/05/banner-website.jpg';
-
-    return {
-      facebook: `https://www.facebook.com/share.php?u=${encodeURIComponent(url)}`,
-      twitter: `https://twitter.com/intent/tweet?text=${title}%20-%20${encodeURIComponent(url)}`,
-      pinterest: `https://www.pinterest.com/pin/create/button/?url=${encodeURIComponent(url)}&media=${encodeURIComponent(thumb)}&description=${title}`,
-      linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`
-    };
-  };
-
-  const shareUrls = getShareUrls();
 
   if (loading) return <div>Đang tải bài viết...</div>;
   if (error) return <div className="error">Lỗi: {error}</div>;
-  if (!article) return <div>Không có dữ liệu bài viết</div>;
+  if (!article) return <div>Không có bài viết nào.</div>;
 
   return (
     <div className="container">
-      {/* Chia sẻ mạng xã hội */}
-      <div className="socialShare">
-        <a href={shareUrls.facebook} target="_blank" rel="noopener noreferrer" className="facebook" title="Chia sẻ lên Facebook">
-          <i className="fab fa-facebook-f"></i>
-        </a>
-        <a href={shareUrls.twitter} target="_blank" rel="noopener noreferrer" className="twitter" title="Chia sẻ lên Twitter">
-          <i className="fab fa-twitter"></i>
-        </a>
-        <a href={shareUrls.pinterest} target="_blank" rel="noopener noreferrer" className="pinterest" title="Chia sẻ lên Pinterest">
-          <i className="fab fa-pinterest"></i>
-        </a>
-        <a href={shareUrls.linkedin} target="_blank" rel="noopener noreferrer" className="linkedin" title="Chia sẻ lên LinkedIn">
-          <i className="fab fa-linkedin-in"></i>
-        </a>
-      </div>
-
-      {/* Nội dung bài viết */}
       <div className="postContent">
         <h1 className="postTitle">{article.title}</h1>
-        <p><em>{new Date(article.publishedAt).toLocaleDateString('vi-VN')}</em></p>
+        <p>
+          <em>
+            Ngày đăng: {new Date(article.publishedAt).toLocaleDateString('vi-VN')} | Lượt xem: {article.views}
+          </em>
+        </p>
 
-        {article.content ? (
-          <div
-            className="post-html"
-            dangerouslySetInnerHTML={{ __html: transformImageSrc(article.content) }}
-          />
-        ) : (
-          <div>Không có nội dung để hiển thị.</div>
-        )}
-
-        {/* Hình ảnh đính kèm */}
-        {article.images && article.images.length > 0 && (
-          <div className="article-images">
-            <h3>Hình ảnh liên quan</h3>
-            <div className="image-gallery">
-              {article.images.map((img, index) => {
-                const fullSrc = img.startsWith('http')
-                  ? img
-                  : `${API_BASE_URL}/${img.replace(/^\/+/, '')}`;
-                return (
-                  <img
-                    key={index}
-                    src={fullSrc}
-                    alt={`Hình ${index + 1}`}
-                    style={{ maxWidth: '100%', marginBottom: '1rem' }}
-                    onError={(e) => {
-                      e.target.onerror = null;
-                      e.target.src = '/placeholder-image.jpg';
-                    }}
-                  />
-                );
-              })}
-            </div>
-          </div>
-        )}
+        <div
+          className="post-html"
+          dangerouslySetInnerHTML={{ __html: transformImageSrc(article.content) }}
+        />
       </div>
 
-      {/* Nút quay lại */}
       <div className="navigation">
         <button onClick={() => window.history.back()}>← Quay lại</button>
       </div>
@@ -143,3 +69,4 @@ const PostDetail = () => {
 };
 
 export default PostDetail;
+// Note: Ensure that the API_BASE_URL is correctly set to your backend server URL.

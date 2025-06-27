@@ -72,13 +72,20 @@ const Sidebar = ({ isAlwaysVisible = false }) => {
               <i className="fa-regular fa-newspaper"></i> đơn hàng
             </Link>
           </li>
-           <li>
+          <li>
             <Link to="/admin/new">
               <i className="fa-regular fa-newspaper"></i> tin tức
             </Link>
           </li>
-         
-         
+        <li>
+            <Link to="/admin/categorynew">
+              <i className="fa-regular fa-newspaper"></i> danh mục tin tức
+            </Link>
+          </li>
+        <li>
+          <Link to="/admin/contact">Liên hệ</Link>
+        </li>
+
           <li>
             <button onClick={handleLogout} className={styles.logoutBtn}>
               <i className="fa-solid fa-right-from-bracket"></i> Đăng Xuất

@@ -1,6 +1,66 @@
 import styles from './contact.module.css';
-import React from 'react';
+import React, { useState } from 'react';
+
 function Contact() {
+  const [formData, setFormData] = useState({
+    fullName: '',
+    email: '',
+    phone: '',
+    message: '',
+  });
+  const [errors, setErrors] = useState({});
+  const [submitStatus, setSubmitStatus] = useState(null);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+    setErrors({ ...errors, [name]: '' }); // Clear error on change
+  };
+
+  const validateForm = () => {
+    const newErrors = {};
+    if (!formData.fullName.trim()) newErrors.fullName = 'Vui lòng nhập tên';
+    if (!formData.email.match(/^\S+@\S+\.\S+$/)) newErrors.email = 'Vui lòng nhập email hợp lệ';
+    if (!formData.message.trim()) newErrors.message = 'Vui lòng nhập tin nhắn';
+    // Phone is optional, but if provided, validate format (basic check)
+    if (formData.phone && !formData.phone.match(/^\d{10,11}$/)) {
+      newErrors.phone = 'Số điện thoại phải có 10-11 chữ số';
+    }
+    return newErrors;
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const validationErrors = validateForm();
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      return;
+    }
+
+    try {
+      const response = await fetch('https://api-tuyendung-cty.onrender.com/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (response.ok) {
+        setSubmitStatus('success');
+        setFormData({ fullName: '', email: '', phone: '', message: '' });
+        setErrors({});
+      } else {
+        const errorData = await response.json();
+        setSubmitStatus('error');
+        setErrors({ api: errorData.error || 'Đã có lỗi xảy ra khi gửi tin nhắn' });
+      }
+    } catch (error) {
+      setSubmitStatus('error');
+      setErrors({ api: 'Không thể kết nối đến server' });
+    }
+  };
+
   return (
     <div>
       <section className={styles.section} role="region" aria-labelledby="map-heading">
@@ -35,7 +95,7 @@ function Contact() {
             </div>
             <div className={styles.showroomItem}>
               <i className={`fas fa-map-marker-alt ${styles.locationIcon}`} aria-hidden="true"></i>
-              <span>Showroom 3: Tầng 2, chung cư 42 Nguyễn Huệ, P. Bến Nghé, Q.1, TP HCM (có chỗ đậu ô tô trên đường Mạc Thị Bưởi)</span>
+              <span>Showroom 3: Tầng 2, chung cư 42 Nguyễn Huệ, P. Bến Nghé, Q.1, TP HCM (có chỗ đậu ô tô trên đường Mạc ThịISBN Bưởi)</span>
             </div>
             <div className={styles.showroomItem}>
               <i className={`fas fa-map-marker-alt ${styles.locationIcon}`} aria-hidden="true"></i>
@@ -61,19 +121,31 @@ function Contact() {
 
         <section className={styles.formSection} role="region" aria-labelledby="form-heading">
           <h1 className={styles.sectionHeader} id="form-heading">Gửi Tin Nhắn</h1>
-          <form action="/submit" method="post">
+          {submitStatus === 'success' && (
+            <div className={styles.successMessage}>
+              Cảm ơn bạn đã gửi thông tin! Chúng tôi sẽ liên hệ lại sớm.
+            </div>
+          )}
+          {submitStatus === 'error' && (
+            <div className={styles.errorMessage}>{errors.api || 'Đã có lỗi xảy ra'}</div>
+          )}
+          <form onSubmit={handleSubmit}>
             <div className={styles.formRow}>
               <div className={styles.formGroup}>
                 <input
                   type="text"
-                  id="name"
-                  name="name"
+                  id="fullName"
+                  name="fullName"
                   placeholder="Nhập tên của bạn"
+                  value={formData.fullName}
+                  onChange={handleChange}
                   required
                   aria-describedby="name-error"
                   className={styles.input}
                 />
-                <div className={styles.errorMessage} id="name-error">Vui lòng nhập tên</div>
+                {errors.fullName && (
+                  <div className={styles.errorMessage} id="name-error">{errors.fullName}</div>
+                )}
               </div>
               <div className={styles.formGroup}>
                 <input
@@ -81,26 +153,47 @@ function Contact() {
                   id="email"
                   name="email"
                   placeholder="Nhập email của bạn"
+                  value={formData.email}
+                  onChange={handleChange}
                   required
                   aria-describedby="email-error"
                   className={styles.input}
                 />
-                <div className={styles.errorMessage} id="email-error">Vui lòng nhập email hợp lệ</div>
+                {errors.email && (
+                  <div className={styles.errorMessage} id="email-error">{errors.email}</div>
+                )}
               </div>
             </div>
-            
+            <div className={styles.formGroup}>
+              <input
+                type="tel"
+                id="phone"
+                name="phone"
+                placeholder="Nhập số điện thoại của bạn"
+                value={formData.phone}
+                onChange={handleChange}
+                aria-describedby="phone-error"
+                className={styles.input}
+              />
+              {errors.phone && (
+                <div className={styles.errorMessage} id="phone-error">{errors.phone}</div>
+              )}
+            </div>
             <div className={styles.formGroup}>
               <textarea
                 id="message"
                 name="message"
                 placeholder="Nhập tin nhắn của bạn"
+                value={formData.message}
+                onChange={handleChange}
                 required
                 aria-describedby="message-error"
                 className={styles.textarea}
               ></textarea>
-              <div className={styles.errorMessage} id="message-error">Vui lòng nhập tin nhắn</div>
+              {errors.message && (
+                <div className={styles.errorMessage} id="message-error">{errors.message}</div>
+              )}
             </div>
-            
             <button type="submit" className={styles.sendButton}>Gửi Tin Nhắn</button>
           </form>
         </section>
