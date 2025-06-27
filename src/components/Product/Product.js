@@ -29,7 +29,7 @@ const Product = () => {
   };
 
   useEffect(() => {
-    fetch(`${API_BASE_URL}/product`)
+    fetch(`${API_BASE_URL}/product/show`)
       .then(res => res.json())
       .then(data => {
         setProducts(data);

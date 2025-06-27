@@ -49,7 +49,7 @@ const ProductDetail = () => {
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const response = await fetch(`${process.env.REACT_APP_API_URL}/product/slug/${slug}`);
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/product/show/slug/${slug}`);
         if (!response.ok) {
           throw new Error('Không thể lấy dữ liệu sản phẩm');
         }

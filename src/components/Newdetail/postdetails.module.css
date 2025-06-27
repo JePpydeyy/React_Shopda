@@ -111,3 +111,112 @@
   transform: scale(0.97);
   background-color: #0b5ed7;
 }
+
+/* Responsive cho ảnh trong bài viết và gallery */
+.postContent img,
+.image-gallery img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  display: block;
+}
+
+.image-gallery {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+}
+
+.image-gallery img {
+  width: 100%;
+  max-width: 320px;
+  object-fit: cover;
+}
+
+@media (max-width: 600px) {
+  .image-gallery img {
+    max-width: 100%;
+  }
+}
+
+/* Responsive styles */
+@media (max-width: 600px) {
+  .container {
+    max-width: 100%;
+    padding: 0 8px;
+  }
+
+  .postTitle {
+    font-size: 1.3rem;
+    margin-bottom: 14px;
+  }
+
+  .postContent {
+    font-size: 0.95rem;
+    line-height: 1.5;
+  }
+
+  .postContent h2 {
+    font-size: 1.1rem;
+    margin-top: 18px;
+    margin-bottom: 10px;
+  }
+
+  .postContent h4 {
+    font-size: 1rem;
+    margin-top: 12px;
+    margin-bottom: 6px;
+  }
+
+  .socialShare {
+    justify-content: center;
+    gap: 6px;
+    margin-bottom: 14px;
+  }
+
+  .socialShare a {
+    width: 32px;
+    height: 32px;
+    line-height: 32px;
+    font-size: 1rem;
+  }
+
+  .navigation button {
+    font-size: 0.95rem;
+    padding: 10px 16px;
+  }
+  .postContent img {
+    max-width: 100%;
+    height: auto;
+  }
+}
+
+@media (max-width: 400px) {
+  .postTitle {
+    font-size: 1.05rem;
+  }
+  .navigation button {
+    font-size: 0.85rem;
+    padding: 8px 10px;
+  }
+}
+.gallery-img {
+  width: 100%;
+  max-width: 320px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  display: block;
+}
+
+@media (max-width: 600px) {
+  .gallery-img {
+    max-width: 100%;
+  }
+}
+img{
+  margin :0 auto;
+  width :80%
+}

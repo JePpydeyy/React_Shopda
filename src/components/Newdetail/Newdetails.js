@@ -121,7 +121,7 @@ const PostDetail = () => {
                     key={index}
                     src={fullSrc}
                     alt={`Hình ${index + 1}`}
-                    style={{ maxWidth: '100%', marginBottom: '1rem' }}
+                    style={{ maxWidth: '80%', marginBottom: '1rem' }}
                     onError={(e) => {
                       e.target.onerror = null;
                       e.target.src = '/placeholder-image.jpg';

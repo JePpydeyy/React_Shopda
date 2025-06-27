@@ -321,6 +321,7 @@
 }
 
 .nguHanhGrid {
+  margin:0 auto ;
   grid-area: ngu-hanh-grid;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
