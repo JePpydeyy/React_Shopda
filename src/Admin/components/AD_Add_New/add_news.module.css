@@ -33,30 +33,66 @@
 }
 
 .title {
-  font-size: 1.75rem;
-  font-weight: bold;
-  margin-bottom: 24px;
+  font-size: 1.875rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
   color: #1a1a3d;
   letter-spacing: -0.02em;
 }
 
-.mainImageSection {
-  margin-bottom: 24px;
+.formContainer {
+  background-color: #ffffff;
+  padding: 2rem;
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  max-width: 800px;
+  margin: 0 auto;
 }
 
-.mainImageLabel {
+.formGroup {
+  margin-bottom: 1.5rem;
+}
+
+.formLabel {
   display: block;
   font-weight: 600;
-  margin-bottom: 8px;
+  margin-bottom: 0.5rem;
   color: #64748b;
   font-size: 0.95rem;
 }
 
+.formInput,
+.formSelect {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.375rem;
+  font-size: 0.95rem;
+  color: #374151;
+  background-color: #f8fafc;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.formInput:focus,
+.formSelect:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.formSelect option {
+  color: #374151;
+}
+
+.formSelect option:disabled {
+  color: #9ca3af;
+}
+
 .mainImageInput {
   width: 100%;
-  padding: 8px 12px;
+  padding: 0.75rem 1rem;
   border: 1px solid #e5e7eb;
-  border-radius: 6px;
+  border-radius: 0.375rem;
   font-size: 0.95rem;
   color: #374151;
   background-color: #ffffff;
@@ -69,80 +105,59 @@
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
-.detailSection {
-  margin-bottom: 20px;
-}
-
-.detailLabel {
-  display: block;
-  font-weight: 600;
-  margin-bottom: 8px;
-  color: #64748b;
-  font-size: 0.95rem;
-}
-
 .wpEditor {
   border: 1px solid #e5e7eb;
-  border-radius: 6px;
-  margin-bottom: 24px;
+  border-radius: 0.375rem;
   background-color: #fff;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   font-size: 0.95rem;
   line-height: 1.6;
 }
 
-.wpEditor:focus {
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-  outline: none;
+.wpEditor .ql-toolbar {
+  border-bottom: 1px solid #e5e7eb;
+  background-color: #f8fafc;
+  padding: 0.75rem;
 }
 
-.wpEditorContainer {
-  min-height: 200px;
-  padding: 12px;
+.wpEditor .ql-container {
+  min-height: 250px;
+  padding: 1rem;
 }
 
-.imageUpload {
-  margin-top: 12px;
-}
-
-.imageUploadLabel {
-  display: block;
-  font-weight: 600;
-  margin-bottom: 8px;
-  color: #64748b;
-  font-size: 0.95rem;
-}
-
-.imageUploadInput {
-  width: 100%;
-  padding: 8px 12px;
-  border: 1px solid #e5e7eb;
-  border-radius: 6px;
-  font-size: 0.95rem;
+.wpEditor .ql-editor {
   color: #374151;
-  background-color: #ffffff;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-.imageUploadInput:focus {
-  outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+.wpEditor .ql-editor.ql-blank::before {
+  color: #9ca3af;
+  content: 'Write something awesome...';
+  font-style: italic;
+}
+
+.imagePreview {
+  margin-top: 0.75rem;
+}
+
+.imagePreview img {
+  max-width: 250px;
+  max-height: 250px;
+  border-radius: 0.375rem;
+  object-fit: cover;
 }
 
 .formButtons {
   display: flex;
-  gap: 12px;
-  margin-top: 20px;
+  gap: 1rem;
+  margin-top: 1.5rem;
 }
 
 .submitButton {
   background-color: #3b82f6;
   color: #ffffff;
-  padding: 8px 16px;
+  padding: 0.75rem 1.5rem;
   border: none;
-  border-radius: 6px;
+  border-radius: 0.375rem;
   font-size: 0.95rem;
   font-weight: 500;
   cursor: pointer;
@@ -156,9 +171,9 @@
 .cancelButton {
   background-color: #64748b;
   color: #ffffff;
-  padding: 8px 16px;
+  padding: 0.75rem 1.5rem;
   border: none;
-  border-radius: 6px;
+  border-radius: 0.375rem;
   font-size: 0.95rem;
   font-weight: 500;
   cursor: pointer;
@@ -175,12 +190,16 @@
     padding: 16px;
   }
 
+  .formContainer {
+    padding: 1.5rem;
+    max-width: 100%;
+  }
+
   .formInput,
   .formSelect,
   .submitButton,
   .cancelButton,
-  .mainImageInput,
-  .imageUploadInput {
+  .mainImageInput {
     width: 100%;
   }
 
