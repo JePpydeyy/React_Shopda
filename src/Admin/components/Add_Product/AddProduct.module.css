@@ -24,6 +24,7 @@
 }
 
 .container {
+  margin: 0 auto;
   min-height: 100vh;
   background-color: var(--background-light);
   font-family: var(--font-stack);
@@ -31,6 +32,7 @@
 }
 
 .content {
+  margin-left: 120px;
   width: 100%;
   max-width: 1200px;
   margin: 0 auto;
