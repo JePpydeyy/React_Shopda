@@ -52,7 +52,7 @@ const NewsManagement = () => {
 
             return {
               id: item._id || item.id,
-              slug: item.slug,
+              slug: item.slug, // dùng slug cho xử lý logic nhưng không hiển thị
               title: item.title || 'No title',
               content: item.content || 'No content available',
               publishedAt: item.publishedAt || item.createdAt || new Date().toISOString(),
@@ -77,7 +77,8 @@ const NewsManagement = () => {
   }, []);
 
   const filteredNews = news.filter(article =>
-    article.title.toLowerCase().includes(searchTerm.toLowerCase()) &&
+    (article.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+     article.slug.toLowerCase().includes(searchTerm.toLowerCase())) &&
     (statusFilter === 'all' || article.status === statusFilter)
   );
 
@@ -160,7 +161,7 @@ const NewsManagement = () => {
         <div className={styles.searchFilter}>
           <input
             type="text"
-            placeholder="Tìm kiếm tin tức..."
+            placeholder="Tìm kiếm theo tiêu đề hoặc slug..."
             className={styles.searchInput}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}

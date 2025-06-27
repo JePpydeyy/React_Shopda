@@ -20,9 +20,9 @@ const ProductOptions = ({
 
   return (
     <div className={styles.options}>
-      <div className={styles.stoneSize}>
+      {/* <div className={styles.stoneSize}>
         <label>KÍCH THƯỚC VIÊN ĐÁ: {stoneSize}</label>
-      </div>
+      </div> */}
       <div className={styles.wristSize}>
         <label>KÍCH THƯỚC CỔ TAY</label>
         <button 
