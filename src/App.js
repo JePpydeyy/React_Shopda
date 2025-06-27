@@ -19,6 +19,13 @@ import AD_New from './Admin/pages/New';
 import AddProductSite from './Admin/pages/Add_Product'; 
 import AddCategorySite from './Admin/pages/Add_Category'; 
 import AD_CategoryNew from './Admin/pages/Categorynew';
+import AD_Add_New from './Admin/pages/AD_Add_New';
+import AD_Contact from './Admin/pages/AD_Contact'; // Thêm dòng này
+
+
+
+
+
 
 
 
@@ -51,7 +58,8 @@ function App() {
             <Route path="/admin/add_product" element={<AddProductSite />} />
             <Route path="/admin/add_category" element={<AddCategorySite />} />
             <Route path="/admin/categorynew" element={<AD_CategoryNew />} />
-
+            <Route path="/admin/add_news" element={<AD_Add_New />} />
+            <Route path="/admin/contact" element={<AD_Contact />} />
 
             {/* Redirect to home for any unmatched routes */}
           </Routes>

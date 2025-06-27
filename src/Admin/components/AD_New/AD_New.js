@@ -180,7 +180,10 @@ const NewsManagement = () => {
               <option key={c._id} value={c.category}>{c.category}</option>
             ))}
           </select>
-          <Link to="/admin/news/add" className={styles.addButton}>Thêm bài mới</Link>
+          <button onClick={() => navigate('/admin/add_news')}>
+            + Thêm Tin Tức
+            </button>
+
         </div>
 
         {/* Table */}
