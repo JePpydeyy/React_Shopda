@@ -1,0 +1,470 @@
+/* Discount.module.css */
+
+/* Sử dụng lại các biến root từ Product.module.css */
+:global(:root) {
+  --secondary-color: #1a1a3d;
+  --primary-color: #3b82f6;
+  --primary-hover: #2563eb;
+  --text-color: #64748b;
+  --text-hover-color: #ffffff;
+  --background-light: #f8fafc;
+  --table-header-bg: #e2e8f0;
+  --border-color: #e5e7eb;
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.1);
+  --spacing-lg: 24px;
+  --spacing-md: 16px;
+  --spacing-sm: 8px;
+  --border-radius: 8px;
+  --font-stack: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Container */
+.container {
+  display: flex;
+  min-height: 100vh;
+  background-color: var(--background-light);
+  font-family: var(--font-stack);
+}
+
+/* Content */
+.content {
+  flex: 1;
+  padding: var(--spacing-lg);
+  margin-left: 250px;
+  transition: margin-left 0.3s ease;
+}
+
+/* Title */
+.title {
+  font-size: 1.75rem;
+  font-weight: 600;
+  margin-bottom: var(--spacing-lg);
+  color: var(--secondary-color);
+  letter-spacing: -0.02em;
+}
+
+/* Add Button */
+.addButton {
+  background-color: var(--primary-color);
+  color: var(--text-hover-color);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--border-radius);
+  border: none;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.addButton:hover {
+  background-color: var(--primary-hover);
+}
+
+/* Table Container */
+.tableContainer {
+  overflow-x: auto;
+  background: white;
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-md);
+  margin-top: var(--spacing-lg);
+}
+
+/* Table */
+.table {
+  width: 100%;
+  background: white;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+/* Table Header */
+.tableHeader {
+  background-color: var(--table-header-bg);
+}
+
+/* Table Cells */
+.table th,
+.table td {
+  padding: var(--spacing-md);
+  text-align: left;
+  border-bottom: 1px solid var(--border-color);
+  font-size: 0.95rem;
+  color: var(--text-color);
+}
+
+.table th {
+  font-weight: 500;
+  color: var(--secondary-color);
+}
+
+/* Table Row */
+.tableRow {
+  transition: background-color 0.2s ease;
+}
+
+.tableRow:hover {
+  background-color: #f1f5f9;
+}
+
+.tableRow:last-child td {
+  border-bottom: none;
+}
+
+/* Status */
+.statusActive {
+  color: #28a745;
+  font-weight: 500;
+}
+
+.statusInactive {
+  color: #dc2626;
+  font-weight: 500;
+}
+
+/* Action Buttons */
+.actionButton {
+  color: var(--primary-color);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 500;
+  margin-right: var(--spacing-sm);
+  transition: color 0.2s ease;
+}
+
+.actionButton:hover {
+  color: var(--primary-hover);
+  text-decoration: underline;
+}
+
+.deleteButton {
+  color: #dc2626;
+}
+
+.deleteButton:hover {
+  color: #b91c1c;
+}
+
+.toggleButton {
+  color: var(--primary-color);
+}
+
+.toggleButton:hover {
+  color: var(--primary-hover);
+}
+
+/* Modal Overlay */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+/* Modal */
+.modal {
+  background-color: white;
+  padding: var(--spacing-lg);
+  border-radius: var(--border-radius);
+  width: 90%;
+  max-width: 500px;
+  box-shadow: var(--shadow-md);
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+/* Modal Title */
+.modal h2 {
+  margin-top: 0;
+  margin-bottom: var(--spacing-md);
+  color: var(--secondary-color);
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+/* Form */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+/* Form Group */
+.formGroup {
+  display: flex;
+  flex-direction: column;
+}
+
+.formGroup label {
+  margin-bottom: var(--spacing-sm);
+  font-weight: 500;
+  color: var(--text-color);
+}
+
+/* Input */
+.input {
+  padding: var(--spacing-sm);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  font-size: 0.95rem;
+  color: var(--text-color);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.input:disabled {
+  background-color: #f1f5f9;
+  cursor: not-allowed;
+}
+
+/* Checkbox */
+.checkbox {
+  width: 18px;
+  height: 18px;
+  margin-top: var(--spacing-sm);
+}
+
+/* Form Actions */
+.formActions {
+  display: flex;
+  gap: var(--spacing-sm);
+  justify-content: flex-end;
+  margin-top: var(--spacing-md);
+}
+
+/* Submit and Cancel Buttons */
+.submitButton {
+  padding: var(--spacing-sm) var(--spacing-md);
+  background-color: #28a745;
+  color: var(--text-hover-color);
+  border: none;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 500;
+  transition: background-color 0.2s ease;
+}
+
+.submitButton:hover {
+  background-color: #218838;
+}
+
+.submitButton:disabled {
+  background-color: #6c757d;
+  cursor: not-allowed;
+}
+
+.cancelButton {
+  padding: var(--spacing-sm) var(--spacing-md);
+  background-color: #6c757d;
+  color: var(--text-hover-color);
+  border: none;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 500;
+  transition: background-color 0.2s ease;
+}
+
+.cancelButton:hover {
+  background-color: #5a6268;
+}
+
+/* Error Message */
+.error {
+  color: #dc2626;
+  font-size: 0.85rem;
+  margin-bottom: var(--spacing-sm);
+}
+
+/* Loading */
+.loading {
+  text-align: center;
+  padding: var(--spacing-lg);
+  color: var(--text-color);
+  font-size: 1rem;
+}
+
+/* ...existing code... */
+
+/* Search & Filter */
+.searchFilter {
+  display: flex;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+  flex-wrap: wrap;
+  background: white;
+  padding: var(--spacing-md);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-sm);
+  align-items: center;
+}
+
+.searchInput {
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  font-size: 0.95rem;
+  color: var(--text-color);
+  background: #ffffff;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  min-width: 200px;
+}
+
+.searchInput:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.filterSelect {
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  font-size: 0.95rem;
+  color: var(--text-color);
+  background: #ffffff;
+  transition: border-color 0.2s ease;
+  min-width: 150px;
+}
+
+.filterSelect:focus {
+  outline: none;
+  border-color: var(--primary-color);
+}
+
+/* Pagination */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-lg);
+}
+
+.pageButton {
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  background: white;
+  color: var(--text-color);
+  cursor: pointer;
+  font-size: 0.95rem;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.pageButton:hover:not(:disabled) {
+  background-color: var(--primary-color);
+  color: var(--text-hover-color);
+}
+
+.pageButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.activePage {
+  background-color: var(--primary-color);
+  color: var(--text-hover-color);
+  border-color: var(--primary-color);
+}   
+.modalOverlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+.modal {
+  background: #fff;
+  padding: 24px;
+  border-radius: 8px;
+  min-width: 350px;
+  max-width: 90vw;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+.detailTable {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 12px;
+}
+.detailTable th, .detailTable td {
+  border: 1px solid #ddd;
+  padding: 6px 10px;
+  text-align: left;
+}
+.cancelButton {
+  background: #ccc;
+  color: #222;
+  border: none;
+  padding: 8px 18px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+.cancelButton:hover {
+  background: #bbb;
+}
+/* ...existing code... */
+/* Responsive Styles */
+@media (max-width: 768px) {
+  .content {
+    margin-left: 0;
+    padding: var(--spacing-md);
+  }
+
+  .tableContainer {
+    margin: 0 calc(-1 * var(--spacing-md));
+    border-radius: 0;
+  }
+
+  .table th,
+  .table td {
+    padding: var(--spacing-sm);
+    font-size: 0.9rem;
+  }
+
+  .modal {
+    width: 95%;
+    padding: var(--spacing-md);
+  }
+}
+
+@media (max-width: 576px) {
+  .content {
+    padding: var(--spacing-sm);
+  }
+
+  .title {
+    font-size: 1.5rem;
+  }
+
+  .table th,
+  .table td {
+    padding: calc(var(--spacing-sm) / 1.5);
+    font-size: 0.85rem;
+  }
+
+  .actionButton,
+  .deleteButton,
+  .toggleButton {
+    font-size: 0.85rem;
+    margin-right: calc(var(--spacing-sm) / 2);
+  }
+}

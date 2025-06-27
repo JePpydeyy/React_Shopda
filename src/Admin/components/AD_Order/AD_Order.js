@@ -1,72 +1,168 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import Sidebar from '../Sidebar/Sidebar'; // Assuming Sidebar is in the same directory
+import Sidebar from '../Sidebar/Sidebar';
 import styles from './Order.module.css';
+import axios from 'axios';
+
+const ORDERS_PER_PAGE = 10;
 
 const OrderManagement = () => {
   const [orders, setOrders] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [detailLoading, setDetailLoading] = useState(false);
 
-  // Sample data (replace with API call in production)
-  const initialOrders = [
-    {
-      _id: 'ORD001',
-      customerName: 'Nguyễn Văn A',
-      email: 'vana@example.com',
-      totalAmount: 7500000,
-      status: 'Đang xử lý',
-      orderDate: '2025-06-16T10:30:00.000Z',
-      items: [
-        { productName: 'VÒNG TAY JACK', quantity: 1, price: 5000000 },
-        { productName: 'VÒNG MOONSTONE', quantity: 1, price: 2240000 },
-      ],
-    },
-    {
-      _id: 'ORD002',
-      customerName: 'Trần Thị B',
-      email: 'thib@example.com',
-      totalAmount: 2340000,
-      status: 'Đã giao',
-      orderDate: '2025-06-15T14:45:00.000Z',
-      items: [
-        { productName: 'VÒNG CẨM THẠCH XANH', quantity: 1, price: 2340000 },
-      ],
-    },
-    {
-      _id: 'ORD003',
-      customerName: 'Lê Văn C',
-      email: 'vanc@example.com',
-      totalAmount: 4010000,
-      status: 'Đã hủy',
-      orderDate: '2025-06-14T09:15:00.000Z',
-      items: [
-        { productName: 'VÒNG GARNET LỰU ĐỎ', quantity: 1, price: 4010000 },
-      ],
-    },
-  ];
-
+  // Lấy danh sách đơn hàng từ API
   useEffect(() => {
-    // Simulate API call
-    setOrders(initialOrders);
+    const fetchOrders = async () => {
+      setLoading(true);
+      setError('');
+      try {
+        const token = localStorage.getItem('adminToken');
+        const res = await axios.get('https://api-tuyendung-cty.onrender.com/api/order', {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setOrders(res.data);
+      } catch (err) {
+        setError('Không thể tải danh sách đơn hàng');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchOrders();
   }, []);
 
-  const filteredOrders = orders.filter(order => 
-    (order.customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-     order._id.toLowerCase().includes(searchTerm.toLowerCase())) &&
-    (statusFilter === 'all' || order.status === statusFilter)
+  // Lọc đơn hàng theo tìm kiếm và trạng thái
+  const filteredOrders = orders.filter(
+    (order) =>
+      (order.fullName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        order._id?.toLowerCase().includes(searchTerm.toLowerCase())) &&
+      (statusFilter === 'all' || order.status === statusFilter)
   );
 
-  const statuses = [...new Set(orders.map(o => o.status))];
+  // Phân trang
+  const totalPages = Math.ceil(filteredOrders.length / ORDERS_PER_PAGE);
+  const paginatedOrders = filteredOrders.slice(
+    (currentPage - 1) * ORDERS_PER_PAGE,
+    currentPage * ORDERS_PER_PAGE
+  );
 
-  const handleView = (id) => {
-    // Implement view details functionality
-    console.log(`View order ${id}`);
+  // Lấy danh sách trạng thái duy nhất
+  const statuses = Array.from(new Set(orders.map((o) => o.status)));
+
+  // Đổi trạng thái đơn hàng
+  const handleUpdateStatus = async (id, newStatus) => {
+    try {
+      const token = localStorage.getItem('adminToken');
+      await axios.put(
+        `https://api-tuyendung-cty.onrender.com/api/order/${id}/toggle-status`,
+        { status: newStatus },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setOrders((prev) =>
+        prev.map((o) => (o._id === id ? { ...o, status: newStatus } : o))
+      );
+      if (selectedOrder && selectedOrder._id === id) {
+        setSelectedOrder({ ...selectedOrder, status: newStatus });
+      }
+    } catch {
+      alert('Không thể cập nhật trạng thái đơn hàng');
+    }
   };
 
-  const handleUpdateStatus = (id, newStatus) => {
-    // Implement status update functionality
-    console.log(`Update order ${id} to status ${newStatus}`);
+  // Xem chi tiết đơn hàng
+  const handleView = async (id) => {
+    if (selectedOrder?._id === id) {
+      setSelectedOrder(null); // Toggle ẩn nếu đã chọn
+      return;
+    }
+    setDetailLoading(true);
+    try {
+      const token = localStorage.getItem('adminToken');
+      const res = await axios.get(`https://api-tuyendung-cty.onrender.com/api/order/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setSelectedOrder(res.data);
+    } catch {
+      alert('Không thể tải chi tiết đơn hàng');
+    } finally {
+      setDetailLoading(false);
+    }
+  };
+
+  // In đơn hàng
+  const handlePrint = (order) => {
+    const printContent = `
+      <div>
+        <h2>Chi tiết đơn hàng</h2>
+        <p><strong>Mã đơn:</strong> ${order._id}</p>
+        <p><strong>Khách hàng:</strong> ${order.fullName}</p>
+        <p><strong>Ngày sinh:</strong> ${new Date(order.dateOfBirth).toLocaleDateString('vi-VN')}</p>
+        <p><strong>SĐT:</strong> ${order.phoneNumber}</p>
+        <p><strong>Email:</strong> ${order.email}</p>
+        <p><strong>Địa chỉ:</strong> ${order.address}, ${order.ward}, ${order.district}, ${order.city}, ${order.country}</p>
+        <p><strong>Ghi chú:</strong> ${order.orderNote || 'Không có'}</p>
+        <p><strong>Trạng thái:</strong> ${order.status}</p>
+        <p><strong>Ngày đặt:</strong> ${new Date(order.createdAt).toLocaleDateString('vi-VN')}</p>
+        <h3>Sản phẩm:</h3>
+        <table style="width: 100%; border-collapse: collapse;">
+          <thead>
+            <tr style="border-bottom: 1px solid #ccc;">
+              <th style="text-align: left; padding: 8px;">Tên sản phẩm</th>
+              <th style="text-align: left; padding: 8px;">Số lượng</th>
+              <th style="text-align: left; padding: 8px;">Đơn giá</th>
+              <th style="text-align: left; padding: 8px;">Thành tiền</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${order.products
+              .map(
+                (item) => `
+              <tr style="border-bottom: 1px solid #ccc;">
+                <td style="padding: 8px;">${item.productName}</td>
+                <td style="padding: 8px;">${item.quantity}</td>
+                <td style="padding: 8px;">${item.price.toLocaleString()} VNĐ</td>
+                <td style="padding: 8px;">${(item.price * item.quantity).toLocaleString()} VNĐ</td>
+              </tr>
+            `
+              )
+              .join('')}
+          </tbody>
+        </table>
+        <p><strong>Tổng tiền:</strong> ${order.totalAmount.toLocaleString()} VNĐ</p>
+        <p><strong>Thành tiền cuối:</strong> ${order.grandTotal.toLocaleString()} VNĐ</p>
+      </div>
+    `;
+    const printWindow = window.open('', '_blank');
+    printWindow.document.write(`
+      <html>
+        <head>
+          <title>In đơn hàng - ${order._id}</title>
+          <style>
+            body { font-family: 'Inter', sans-serif; padding: 20px; }
+            h2 { color: #1a1a3d; }
+            p { margin: 10px 0; font-size: 16px; }
+            strong { color: #1a1a3d; font-weight: bold; }
+            table { width: 100%; border-collapse: collapse; margin: 10px 0; }
+            th, td { padding: 8px; text-align: left; border-bottom: 1px solid #ccc; }
+          </style>
+        </head>
+        <body onload="window.print(); window.close();">
+          ${printContent}
+        </body>
+      </html>
+    `);
+    printWindow.document.close();
+  };
+
+  // Xử lý chuyển trang
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+    setSelectedOrder(null); // Reset selected order when changing page
   };
 
   return (
@@ -74,7 +170,7 @@ const OrderManagement = () => {
       <Sidebar />
       <div className={styles.content}>
         <h1 className={styles.title}>Quản Lý Đơn Hàng</h1>
-        
+
         {/* Search and Filters */}
         <div className={styles.searchFilter}>
           <input
@@ -90,56 +186,134 @@ const OrderManagement = () => {
             onChange={(e) => setStatusFilter(e.target.value)}
           >
             <option value="all">Tất cả trạng thái</option>
-            {statuses.map(status => (
-              <option key={status} value={status}>{status}</option>
+            {statuses.map((status) => (
+              <option key={status} value={status}>
+                {status}
+              </option>
             ))}
           </select>
         </div>
 
         {/* Order Table */}
         <div className={styles.tableContainer}>
-          <table className={styles.table}>
-            <thead>
-              <tr className={styles.tableHeader}>
-                <th>Mã đơn</th>
-                <th>Khách hàng</th>
-                <th>Tổng tiền</th>
-                <th>Trạng thái</th>
-                <th>Ngày đặt</th>
-                <th>Hành động</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredOrders.map(order => (
-                <tr key={order._id} className={styles.tableRow}>
-                  <td>{order._id}</td>
-                  <td>{order.customerName}</td>
-                  <td>{order.totalAmount.toLocaleString()} VNĐ</td>
-                  <td>{order.status}</td>
-                  <td>{new Date(order.orderDate).toLocaleDateString('vi-VN')}</td>
-                  <td>
-                    <Link
-                      to={`/admin/orders/${order._id}`}
-                      className={styles.actionButton}
+          {loading ? (
+            <div className={styles.loading}>Đang tải...</div>
+          ) : error ? (
+            <div className={styles.error}>{error}</div>
+          ) : (
+            <table className={styles.table}>
+              <thead>
+                <tr className={styles.tableHeader}>
+                  <th>STT</th>
+                  <th>Mã đơn</th>
+                  <th>Khách hàng</th>
+                  <th>Tổng tiền</th>
+                  <th>Trạng thái</th>
+                  <th>Ngày đặt</th>
+                  <th>Hành động</th>
+                </tr>
+              </thead>
+              <tbody>
+                {paginatedOrders.map((order, idx) => (
+                  <React.Fragment key={order._id}>
+                    <tr
+                      className={`${styles.tableRow} ${selectedOrder?._id === order._id ? styles.activeRow : ''}`}
                       onClick={() => handleView(order._id)}
                     >
-                      Xem
-                    </Link>
-                    <select
-                      className={styles.statusSelect}
-                      value={order.status}
-                      onChange={(e) => handleUpdateStatus(order._id, e.target.value)}
-                    >
-                      <option value="Đang xử lý">Đang xử lý</option>
-                      <option value="Đã giao">Đã giao</option>
-                      <option value="Đã hủy">Đã hủy</option>
-                    </select>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                      <td>{(currentPage - 1) * ORDERS_PER_PAGE + idx + 1}</td>
+                      <td>{order._id}</td>
+                      <td>{order.fullName}</td>
+                      <td>{order.grandTotal?.toLocaleString() || order.totalAmount?.toLocaleString()} VNĐ</td>
+                      <td>{order.status}</td>
+                      <td>{new Date(order.createdAt).toLocaleDateString('vi-VN')}</td>
+                      <td>
+                        <select
+                          className={styles.statusSelect}
+                          value={order.status}
+                          onChange={(e) => {
+                            e.stopPropagation();
+                            handleUpdateStatus(order._id, e.target.value);
+                          }}
+                        >
+                          <option value="Chờ xử lý">Chờ xử lý</option>
+                          <option value="Đang giao">Đang giao</option>
+                          <option value="Đã giao">Đã giao</option>
+                          <option value="Đã hủy">Đã hủy</option>
+                        </select>
+                      </td>
+                    </tr>
+                    {selectedOrder?._id === order._id && (
+                      <tr className={styles.detailRow}>
+                        <td colSpan="7">
+                          {detailLoading ? (
+                            <div className={styles.loading}>Đang tải chi tiết...</div>
+                          ) : (
+                            <div className={styles.detailContainer}>
+                              <p><strong>Mã đơn:</strong> {selectedOrder._id}</p>
+                              <p><strong>Khách hàng:</strong> {selectedOrder.fullName}</p>
+                              <p><strong>Ngày sinh:</strong> {new Date(selectedOrder.dateOfBirth).toLocaleDateString('vi-VN')}</p>
+                              <p><strong>SĐT:</strong> {selectedOrder.phoneNumber}</p>
+                              <p><strong>Email:</strong> {selectedOrder.email}</p>
+                              <p><strong>Địa chỉ:</strong> {`${selectedOrder.address}, ${selectedOrder.ward}, ${selectedOrder.district}, ${selectedOrder.city}, ${selectedOrder.country}`}</p>
+                              <p><strong>Ghi chú:</strong> {selectedOrder.orderNote || 'Không có'}</p>
+                              <p><strong>Trạng thái:</strong> {selectedOrder.status}</p>
+                              <p><strong>Ngày đặt:</strong> {new Date(selectedOrder.createdAt).toLocaleDateString('vi-VN')}</p>
+                              <h3>Sản phẩm:</h3>
+                              <table className={styles.detailTable}>
+                                <thead>
+                                  <tr>
+                                    <th>Tên sản phẩm</th>
+                                    <th>Số lượng</th>
+                                    <th>Đơn giá</th>
+                                    <th>Thành tiền</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {selectedOrder.products.map((item, idx) => (
+                                    <tr key={idx}>
+                                      <td>{item.productName}</td>
+                                      <td>{item.quantity}</td>
+                                      <td>{item.price.toLocaleString()} VNĐ</td>
+                                      <td>{(item.price * item.quantity).toLocaleString()} VNĐ</td>
+                                    </tr>
+                                  ))}
+                                </tbody>
+                              </table>
+                              <p><strong>Tổng tiền:</strong> {selectedOrder.totalAmount.toLocaleString()} VNĐ</p>
+                              <p><strong>Thành tiền cuối:</strong> {selectedOrder.grandTotal.toLocaleString()} VNĐ</p>
+                              <button
+                                className={styles.printButton}
+                                onClick={() => handlePrint(selectedOrder)}
+                              >
+                                In đơn hàng
+                              </button>
+                            </div>
+                          )}
+                        </td>
+                      </tr>
+                    )}
+                  </React.Fragment>
+                ))}
+              </tbody>
+            </table>
+          )}
         </div>
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className={styles.pagination}>
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+              <button
+                key={page}
+                className={`${styles.pageButton} ${currentPage === page ? styles.activePage : ''}`}
+                onClick={() => handlePageChange(page)}
+                disabled={currentPage === page}
+              >
+                {page}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
