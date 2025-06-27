@@ -18,7 +18,7 @@ import AD_Category from './Admin/pages/Category';
 import AD_New from './Admin/pages/New';
 import AddProductSite from './Admin/pages/Add_Product'; 
 import AddCategorySite from './Admin/pages/Add_Category'; 
-
+import AD_CategoryNew from './Admin/pages/Categorynew';
 
 
 
@@ -50,6 +50,7 @@ function App() {
             <Route path="/admin/new" element={<AD_New />} />
             <Route path="/admin/add_product" element={<AddProductSite />} />
             <Route path="/admin/add_category" element={<AddCategorySite />} />
+            <Route path="/admin/categorynew" element={<AD_CategoryNew />} />
 
 
             {/* Redirect to home for any unmatched routes */}
