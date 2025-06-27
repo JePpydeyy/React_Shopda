@@ -3,15 +3,14 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
-import Sidebar from '../Sidebar/Sidebar';
 import styles from './add_news.module.css';
 
 const AD_Add_New = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     title: '',
-    mainImage: null,
-    mainImagePreview: null,
+    thumbnail: null, // Đổi từ mainImage thành thumbnail
+    thumbnailPreview: null, // Đổi từ mainImagePreview thành thumbnailPreview
     thumbnailCaption: '',
     content: '',
     category: '',
@@ -69,7 +68,7 @@ const AD_Add_New = () => {
       setFormData((prev) => ({
         ...prev,
         [name]: file,
-        mainImagePreview: URL.createObjectURL(file),
+        thumbnailPreview: URL.createObjectURL(file), // Đổi từ mainImagePreview thành thumbnailPreview
       }));
     }
   };
@@ -94,8 +93,14 @@ const AD_Add_New = () => {
     setLoading(true);
     setError('');
 
+    // Kiểm tra các trường bắt buộc
     if (!formData.title) {
       setError('Tiêu đề không được để trống.');
+      setLoading(false);
+      return;
+    }
+    if (!formData.thumbnail) {
+      setError('Hình ảnh chủ đạo là bắt buộc.');
       setLoading(false);
       return;
     }
@@ -118,15 +123,14 @@ const AD_Add_New = () => {
     const formDataToSend = new FormData();
     formDataToSend.append('title', formData.title);
     formDataToSend.append('slug', slug);
-    if (formData.mainImage) {
-      formDataToSend.append('mainImage', formData.mainImage, formData.mainImage.name);
-    }
+    formDataToSend.append('thumbnail', formData.thumbnail); // Đổi từ mainImage thành thumbnail
     formDataToSend.append('thumbnailCaption', formData.thumbnailCaption);
     formDataToSend.append('publishedAt', currentDate);
     formDataToSend.append('content', formData.content);
-    formDataToSend.append('category', formData.category);
+    formDataToSend.append('category_new', JSON.stringify({ $oid: formData.category })); // Gửi category_new
     formDataToSend.append('status', formData.status);
 
+    // In FormData để debug
     for (let pair of formDataToSend.entries()) {
       console.log(`${pair[0]}: ${pair[1]}`);
     }
@@ -139,7 +143,7 @@ const AD_Add_New = () => {
         },
       });
       console.log('Phản hồi từ API:', response.data);
-      const imageUrl = response.data.imageUrl || response.data.mainImage || 'Không có URL ảnh';
+      const imageUrl = response.data.thumbnailUrl || 'Không có URL ảnh';
       alert(`🟢 Thêm bài viết thành công! URL ảnh: ${imageUrl}`);
       navigate('/admin/post');
     } catch (err) {
@@ -187,18 +191,18 @@ const AD_Add_New = () => {
               />
             </div>
             <div className={styles.formGroup}>
-              <label htmlFor="mainImage" className={styles.formLabel}>Hình ảnh chủ đạo của bài viết</label>
+              <label htmlFor="thumbnail" className={styles.formLabel}>Hình ảnh chủ đạo của bài viết</label>
               <input
-                id="mainImage"
-                name="mainImage"
+                id="thumbnail"
+                name="thumbnail" // Đổi từ mainImage thành thumbnail
                 type="file"
                 accept="image/jpeg,image/png"
                 className={styles.mainImageInput}
                 onChange={handleImageChange}
               />
-              {formData.mainImagePreview && (
+              {formData.thumbnailPreview && (
                 <div className={styles.imagePreview}>
-                  <img src={formData.mainImagePreview} alt="Preview" style={{ maxWidth: '200px' }} />
+                  <img src={formData.thumbnailPreview} alt="Preview" style={{ maxWidth: '200px' }} />
                 </div>
               )}
             </div>
@@ -271,7 +275,7 @@ const AD_Add_New = () => {
                 onChange={handleChange}
               >
                 <option value="show">Hiển thị</option>
-                <option value="hide">Ẩn</option>
+                <option value="hidden">Ẩn</option> {/* Đổi từ hide thành hidden để khớp với backend */}
               </select>
             </div>
             <div className={styles.formButtons}>
