@@ -155,12 +155,13 @@ const ProductManagement = () => {
     return () => document.removeEventListener('selectionchange', handleSelectionChange);
   }, [updateToolbarState]);
 
-  // Sync editor content with formData.description
+  // Sync editor content ONLY when opening modal (editProduct changes)
   useEffect(() => {
     if (editProduct && editorRef.current) {
       editorRef.current.innerHTML = formData.description || '';
     }
-  }, [editProduct, formData.description]);
+    // eslint-disable-next-line
+  }, [editProduct]);
 
   // Form handling
   const handleFormChange = useCallback((e) => {
@@ -216,11 +217,6 @@ const ProductManagement = () => {
     try {
       if (editorRef.current) {
         editorRef.current.focus();
-        const selection = window.getSelection();
-        if (selection.rangeCount > 0) {
-          const range = selection.getRangeAt(0);
-          editorRef.current.appendChild(range.commonAncestorContainer);
-        }
         document.execCommand(command, false, value);
         updateToolbarState();
       }
@@ -297,7 +293,8 @@ const ProductManagement = () => {
       formDataToSend.append('description', editorRef.current?.innerHTML || '');
 
       oldImages.forEach((img) => formDataToSend.append('images', img));
-      formData.images.forEach((image) => formDataToSend.append('images', image));
+      formDataToSend.append('oldImages', JSON.stringify(oldImages)); // Gửi danh sách ảnh cũ còn giữ lại
+      formData.images.forEach((image) => formDataToSend.append('images', image)); // Gửi file ảnh mới
 
       const response = await axios.put(
         `https://api-tuyendung-cty.onrender.com/api/product/${editProduct.slug}`,

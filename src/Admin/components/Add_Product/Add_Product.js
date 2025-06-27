@@ -480,14 +480,14 @@ const AddProduct = () => {
           </div>
 
           <div className={styles.formGroup}>
-            <TooltipButton field="level" activeTooltip={activeTooltip} setActiveTooltip={setActiveTooltip}>Cấp độ</TooltipButton>
+            <TooltipButton field="level" activeTooltip={activeTooltip} setActiveTooltip={setActiveTooltip}>sản phẩm thuộc dòng sản phẩm</TooltipButton>
             <select
               name="level"
               value={formData.level}
               onChange={handleChange}
               className={styles.select}
             >
-              <option value="">Chọn cấp độ</option>
+              <option value="">Sản Phẩm thuộc dòng sản phẩm</option>
               <option value="Cao Cấp">Cao Cấp</option>
               <option value="Trung Cấp">Trung Cấp</option>
               <option value="Phổ biến">Phổ biến</option>

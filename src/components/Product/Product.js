@@ -284,7 +284,7 @@ const Product = () => {
             <div className={styles.shopProductOption}>
               <div className={styles.shopProductOptionLeft}>
                 <p>
-                  Showing {paginatedProducts.length} of {sortedProducts.length} results
+                  hiển thị {paginatedProducts.length} trên {sortedProducts.length} sản phẩm
                   {search && ` for "${search}"`}
                 </p>
               </div>
