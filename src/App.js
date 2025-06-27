@@ -19,7 +19,10 @@ import AD_New from './Admin/pages/New';
 import AddProductSite from './Admin/pages/Add_Product'; 
 import AddCategorySite from './Admin/pages/Add_Category'; 
 import DiscoutPage from './Admin/pages/Discout'; 
-import DiscoutPage from './Admin/pages/Discout';
+import AD_CategoryNew from './Admin/pages/Categorynew';
+import AD_Add_New from './Admin/pages/AD_Add_New';
+import AD_Contact from './Admin/pages/AD_Contact';
+
 
 
 
