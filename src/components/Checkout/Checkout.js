@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import styles from './Checkout.module.css';
 import ToastNotification from '../ToastNotification/ToastNotification';
 
-const API_BASE_URL = 'http://localhost:10000/api';
+const API_BASE_URL = 'https://api-tuyendung-cty.onrender.com/api';
 
 const Checkout = () => {
   const [formData, setFormData] = useState({
@@ -29,11 +29,17 @@ const Checkout = () => {
   const [provinces, setProvinces] = useState([]);
   const [districts, setDistricts] = useState([]);
   const [wards, setWards] = useState([]);
+  const [orderSuccess, setOrderSuccess] = useState(false);
+
+  // State lưu bill
+  const [billInfo, setBillInfo] = useState(null);
+  const [billCart, setBillCart] = useState([]);
+  const [billDiscount, setBillDiscount] = useState(null);
+
   const monthNames = ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6', 'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'];
   const calendarRef = useRef(null);
   const navigate = useNavigate();
 
-  // Fetch provinces on component mount
   useEffect(() => {
     const fetchProvinces = async () => {
       try {
@@ -41,7 +47,6 @@ const Checkout = () => {
         const data = await response.json();
         setProvinces(data);
       } catch (error) {
-        console.error('Error fetching provinces:', error);
         setToastMessage('Không thể tải danh sách tỉnh/thành phố.');
         setToastType('error');
         setShowToast(true);
@@ -55,7 +60,6 @@ const Checkout = () => {
     setAppliedDiscount(discount);
   }, []);
 
-  // Fetch districts when province changes
   useEffect(() => {
     if (formData.province) {
       const fetchDistricts = async () => {
@@ -66,7 +70,6 @@ const Checkout = () => {
           setFormData(prev => ({ ...prev, district: '', ward: '' }));
           setWards([]);
         } catch (error) {
-          console.error('Error fetching districts:', error);
           setToastMessage('Không thể tải danh sách quận/huyện.');
           setToastType('error');
           setShowToast(true);
@@ -76,7 +79,6 @@ const Checkout = () => {
     }
   }, [formData.province]);
 
-  // Fetch wards when district changes
   useEffect(() => {
     if (formData.district) {
       const fetchWards = async () => {
@@ -86,7 +88,6 @@ const Checkout = () => {
           setWards(data.wards || []);
           setFormData(prev => ({ ...prev, ward: '' }));
         } catch (error) {
-          console.error('Error fetching wards:', error);
           setToastMessage('Không thể tải danh sách xã/phường.');
           setToastType('error');
           setShowToast(true);
@@ -96,7 +97,6 @@ const Checkout = () => {
     }
   }, [formData.district]);
 
-  // Handle calendar click outside
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (calendarRef.current && !calendarRef.current.contains(e.target)) {
@@ -148,26 +148,17 @@ const Checkout = () => {
   const formatPrice = (price) => new Intl.NumberFormat('vi-VN').format(price) + ' VND';
 
   const updateProductStock = async (productId, sizeName, quantity) => {
-    if (!sizeName || !productId || !quantity) {
-      console.warn(`Invalid stock update parameters: productId=${productId}, sizeName=${sizeName}, quantity=${quantity}`);
-      return;
-    }
+    if (!sizeName || !productId || !quantity) return;
     try {
-      const response = await fetch(`${API_BASE_URL}/products/${productId}`, {
+      await fetch(`${API_BASE_URL}/products/${productId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           size: [{ size_name: sizeName, stock: -quantity }],
         }),
       });
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Lỗi cập nhật số lượng sản phẩm');
-      }
-      const data = await response.json();
-      console.log('Cập nhật stock thành công:', data);
     } catch (error) {
-      console.error('Lỗi cập nhật stock:', error.message);
+      // Không cần thông báo lỗi stock ở đây
     }
   };
 
@@ -203,39 +194,38 @@ const Checkout = () => {
       return;
     }
 
-    // Construct order data (KHÔNG gửi paymentMethod)
- // ...existing code...
-const orderData = {
-  fullName: formData.fullName.trim(),
-  dateOfBirth: formData.selectedDate ? formData.selectedDate.toISOString() : null, // Sửa dòng này
-  phoneNumber: formData.phone.trim(),
-  email: formData.email.trim(),
-  country: 'Việt Nam',
-  city: provinces.find(p => p.code === parseInt(formData.province))?.name || formData.province,
-  district: districts.find(d => d.code === parseInt(formData.district))?.name || formData.district,
-  ward: wards.find(w => w.code === parseInt(formData.ward))?.name || formData.ward,
-  address: formData.addressDetail.trim(),
-  orderNote: formData.note ? formData.note.trim() : '',
-  products: cartItems.map(item => ({
-    productId: item._id || item.productId || '',
-    productName: item.name || 'Unknown Product',
-    quantity: parseInt(item.quantity) || 1,
-    price: parseFloat(item.price) || 0,
-    ...(item.size_name && item.size_name.trim() !== '' ? { size_name: item.size_name } : {})
-  })),
-  totalAmount: cartItems.reduce((sum, item) => sum + (parseFloat(item.price) || 0) * (parseInt(item.quantity) || 1), 0),
-  grandTotal: appliedDiscount
-    ? cartItems.reduce((sum, item) => sum + (parseFloat(item.price) || 0) * (parseInt(item.quantity) || 1), 0) -
-      (cartItems.reduce((sum, item) => sum + (parseFloat(item.price) || 0) * (parseInt(item.quantity) || 1), 0) * (appliedDiscount.discountPercentage || 0)) / 100
-    : cartItems.reduce((sum, item) => sum + (parseFloat(item.price) || 0) * (parseInt(item.quantity) || 1), 0),
-  status: 'Chờ xử lý'
-};
-// ...existing code...
+    // Lưu lại thông tin bill trước khi reset
+    setBillInfo({ ...formData });
+    setBillCart([...cartItems]);
+    setBillDiscount(appliedDiscount);
 
+    // Construct order data
+    const orderData = {
+      fullName: formData.fullName.trim(),
+      dateOfBirth: formData.selectedDate ? formData.selectedDate.toISOString() : null,
+      phoneNumber: formData.phone.trim(),
+      email: formData.email.trim(),
+      country: 'Việt Nam',
+      city: provinces.find(p => p.code === parseInt(formData.province))?.name || formData.province,
+      district: districts.find(d => d.code === parseInt(formData.district))?.name || formData.district,
+      ward: wards.find(w => w.code === parseInt(formData.ward))?.name || formData.ward,
+      address: formData.addressDetail.trim(),
+      orderNote: formData.note ? formData.note.trim() : '',
+      products: cartItems.map(item => ({
+        productId: item._id || item.productId || '',
+        productName: item.name || 'Unknown Product',
+        quantity: parseInt(item.quantity) || 1,
+        price: parseFloat(item.price) || 0,
+        ...(item.size_name && item.size_name.trim() !== '' ? { size_name: item.size_name } : {})
+      })),
+      totalAmount: cartItems.reduce((sum, item) => sum + (parseFloat(item.price) || 0) * (parseInt(item.quantity) || 1), 0),
+      grandTotal: appliedDiscount
+        ? cartItems.reduce((sum, item) => sum + (parseFloat(item.price) || 0) * (parseInt(item.quantity) || 1), 0) -
+          (cartItems.reduce((sum, item) => sum + (parseFloat(item.price) || 0) * (parseInt(item.quantity) || 1), 0) * (appliedDiscount.discountPercentage || 0)) / 100
+        : cartItems.reduce((sum, item) => sum + (parseFloat(item.price) || 0) * (parseInt(item.quantity) || 1), 0),
+      status: 'Chờ xử lý'
+    };
     try {
-      console.log('Sending order data:', JSON.stringify(orderData, null, 2));
-
-      // Send order to API
       const orderResponse = await fetch(`${API_BASE_URL}/order`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -247,9 +237,6 @@ const orderData = {
         throw new Error(errorData.message || `Lỗi gửi đơn hàng: ${orderResponse.status} ${orderResponse.statusText}`);
       }
 
-      const orderResult = await orderResponse.json();
-      console.log('Order response:', orderResult);
-
       // Update stock for each product
       for (const item of cartItems) {
         const productId = item._id || item.productId;
@@ -257,47 +244,23 @@ const orderData = {
         const quantity = parseInt(item.quantity) || 1;
         if (productId && sizeName && quantity > 0) {
           await updateProductStock(productId, sizeName, quantity);
-        } else {
-          console.warn(`Skipping stock update for product: productId=${productId}, sizeName=${sizeName}, quantity=${quantity}`);
         }
       }
 
       // Apply discount if present
       if (appliedDiscount && appliedDiscount.code) {
         try {
-          const discountResponse = await fetch(`${API_BASE_URL}/discount/apply`, {
+          await fetch(`${API_BASE_URL}/discount/apply`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ code: appliedDiscount.code }),
           });
-          if (!discountResponse.ok) {
-            const discountError = await discountResponse.json();
-            console.warn('Discount application failed:', discountError.message);
-            setToastMessage('Đặt hàng thành công nhưng có vấn đề với mã giảm giá. Vui lòng thanh toán khi nhận hàng.');
-            setToastType('warning');
-          } else {
-            const discountData = await discountResponse.json();
-            console.log('Discount applied:', discountData);
-            setToastMessage('Đặt hàng thành công! Vui lòng thanh toán khi nhận hàng.');
-            setToastType('success');
-          }
         } catch (discountError) {
-          console.warn('Discount application error:', discountError.message);
-          setToastMessage('Đặt hàng thành công nhưng có vấn đề với mã giảm giá. Vui lòng thanh toán khi nhận hàng.');
-          setToastType('warning');
+          // Không cần thông báo lỗi discount ở đây
         }
-      } else {
-        setToastMessage('Đặt hàng thành công! Vui lòng thanh toán khi nhận hàng.');
-        setToastType('success');
       }
-      setShowToast(true);
 
-      // Navigate to homepage after 3 seconds
-      setTimeout(() => {
-        navigate('/');
-      }, 3000);
-
-      // Clear localStorage and reset state
+      // Xóa localStorage và reset state
       localStorage.removeItem('cart_da');
       localStorage.removeItem('applied_discount');
       localStorage.removeItem('checkoutFormData');
@@ -317,8 +280,10 @@ const orderData = {
       });
       setDistricts([]);
       setWards([]);
+
+      setOrderSuccess(true);
+
     } catch (error) {
-      console.error('Order placement error:', error.message);
       setToastMessage(`Không thể đặt hàng: ${error.message}`);
       setToastType('error');
       setShowToast(true);
@@ -329,10 +294,66 @@ const orderData = {
     setShowToast(false);
   };
 
-  const subtotal = cartItems.reduce((sum, item) => sum + (parseFloat(item.price) || 0) * (parseInt(item.quantity) || 1), 0);
-  const discountAmount = appliedDiscount ? (subtotal * (appliedDiscount.discountPercentage || 0)) / 100 : 0;
-  const grandTotal = subtotal - discountAmount;
+  // Tính lại tổng cho bill (dùng billCart, billDiscount)
+  const billSubtotal = billCart.reduce((sum, item) => sum + (parseFloat(item.price) || 0) * (parseInt(item.quantity) || 1), 0);
+  const billDiscountAmount = billDiscount ? (billSubtotal * (billDiscount.discountPercentage || 0)) / 100 : 0;
+  const billGrandTotal = billSubtotal - billDiscountAmount;
 
+  // Trang in bill khi đặt hàng thành công (KHÔNG có nút in hóa đơn)
+  if (orderSuccess) {
+    return (
+      <div className={styles.successContainer}>
+        <div className={styles.successBox} id="bill-print">
+          <h2>ĐẶT HÀNG THÀNH CÔNG</h2>
+          <p>Cảm ơn bạn đã đặt hàng tại cửa hàng của chúng tôi.</p>
+          <h3>HÓA ĐƠN ĐẶT HÀNG</h3>
+          <div className={styles.billInfo}>
+            <p><b>Khách hàng:</b> {billInfo?.fullName}</p>
+            <p><b>SĐT:</b> {billInfo?.phone}</p>
+            <p><b>Email:</b> {billInfo?.email}</p>
+            <p><b>Địa chỉ:</b> {billInfo?.addressDetail}, {wards.find(w => w.code === billInfo?.ward)?.name || ''}, {districts.find(d => d.code === billInfo?.district)?.name || ''}, {provinces.find(p => p.code === billInfo?.province)?.name || ''}</p>
+          </div>
+          <table className={styles.billTable}>
+            <thead>
+              <tr>
+                <th>Sản phẩm</th>
+                <th>Số lượng</th>
+                <th>Đơn giá</th>
+                <th>Thành tiền</th>
+              </tr>
+            </thead>
+            <tbody>
+              {billCart.map((item, idx) => (
+                <tr key={idx}>
+                  <td>
+                    {item.name}
+                    {item.size_name && <span> ({item.size_name})</span>}
+                  </td>
+                  <td>{item.quantity}</td>
+                  <td>{formatPrice(item.price)}</td>
+                  <td>{formatPrice((parseFloat(item.price) || 0) * (parseInt(item.quantity) || 1))}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <div className={styles.billTotal}>
+            <p>Thành tiền: <b>{formatPrice(billSubtotal)}</b></p>
+            {billDiscount && (
+              <p>Giảm giá ({billDiscount.discountPercentage || 0}%): <b>-{formatPrice(billDiscountAmount)}</b></p>
+            )}
+            <p>Tổng cộng: <b>{formatPrice(billGrandTotal)}</b></p>
+            <p>Giao hàng: <b>Miễn phí vận chuyển</b></p>
+          </div>
+          <p style={{marginTop: 16}}>Đơn hàng của bạn đã được ghi nhận. Vui lòng để ý điện thoại, nhân viên sẽ liên hệ xác nhận trong 2-3 ngày tới.</p>
+          <div style={{marginTop: 24}}>
+            <button className={styles.successBtn} onClick={() => navigate('/')}>Về trang chủ</button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Giao diện form đặt hàng như cũ
   return (
     <div className={styles.container}>
       <h1 className={`${styles.container} h1`}>Đặt Hàng</h1>
@@ -528,17 +549,22 @@ const orderData = {
           <div className={styles.order}>
             <div className={`${styles.orderItem} ${styles.total}`}>
               <p>Thành tiền</p>
-              <p>{formatPrice(subtotal)}</p>
+              <p>{formatPrice(cartItems.reduce((sum, item) => sum + (parseFloat(item.price) || 0) * (parseInt(item.quantity) || 1), 0))}</p>
             </div>
             {appliedDiscount && (
               <div className={styles.orderItem}>
                 <p>Giảm giá ({appliedDiscount.discountPercentage || 0}%)</p>
-                <p>-{formatPrice(discountAmount)}</p>
+                <p>-{formatPrice((cartItems.reduce((sum, item) => sum + (parseFloat(item.price) || 0) * (parseInt(item.quantity) || 1), 0) * (appliedDiscount.discountPercentage || 0)) / 100)}</p>
               </div>
             )}
             <div className={`${styles.orderItem} ${styles.total}`}>
               <p>Tổng tiền</p>
-              <p>{formatPrice(grandTotal)}</p>
+              <p>
+                {formatPrice(
+                  cartItems.reduce((sum, item) => sum + (parseFloat(item.price) || 0) * (parseInt(item.quantity) || 1), 0) -
+                  (appliedDiscount ? (cartItems.reduce((sum, item) => sum + (parseFloat(item.price) || 0) * (parseInt(item.quantity) || 1), 0) * (appliedDiscount.discountPercentage || 0)) / 100 : 0)
+                )}
+              </p>
             </div>
             <div className={styles.orderItem}>
               <p>Giao Hàng</p>
@@ -546,7 +572,12 @@ const orderData = {
             </div>
             <div className={`${styles.orderItem} ${styles.total}`}>
               <p>Tổng cộng</p>
-              <p>{formatPrice(grandTotal)}</p>
+              <p>
+                {formatPrice(
+                  cartItems.reduce((sum, item) => sum + (parseFloat(item.price) || 0) * (parseInt(item.quantity) || 1), 0) -
+                  (appliedDiscount ? (cartItems.reduce((sum, item) => sum + (parseFloat(item.price) || 0) * (parseInt(item.quantity) || 1), 0) * (appliedDiscount.discountPercentage || 0)) / 100 : 0)
+                )}
+              </p>
             </div>
           </div>
           <div className={styles.orderBtn}>

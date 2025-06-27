@@ -275,3 +275,122 @@
 .orderBtn button:hover {
   background-color: #7a3a0f;
 }
+.successContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 60vh;
+}
+.successBox {
+  background: #fff;
+  padding: 32px 24px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px #0001;
+  text-align: center;
+}
+.successBtn {
+  margin-top: 24px;
+  padding: 10px 32px;
+  background: #1abc9c;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 1.1rem;
+  cursor: pointer;
+}.successContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 60vh;
+  background: #f8f8f8;
+}
+
+.successBox {
+  background: #fff;
+  padding: 32px 24px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px #0001;
+  text-align: center;
+  max-width: 600px;
+  width: 100%;
+}
+
+.successBox h2 {
+  color: #222;
+  margin-bottom: 8px;
+  font-size: 2rem;
+  font-weight: 600;
+}
+
+.successBox h3 {
+  margin: 18px 0 10px 0;
+  font-size: 1.3rem;
+  font-weight: 500;
+  color: #1abc9c;
+}
+
+.billInfo {
+  text-align: left;
+  margin: 0 auto 16px auto;
+  max-width: 420px;
+  font-size: 1.05rem;
+}
+
+.billTable {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 16px 0;
+  font-size: 1rem;
+}
+
+.billTable th, .billTable td {
+  border: 1px solid #ddd;
+  padding: 8px 12px;
+  text-align: left;
+}
+
+.billTable th {
+  background: #f5f5f5;
+  font-weight: 600;
+}
+
+.billTotal {
+  text-align: right;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.billTotal p {
+  margin: 4px 0;
+  font-size: 1.1em;
+}
+
+.successBtn {
+  margin-top: 24px;
+  padding: 10px 32px;
+  background: #1abc9c;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.successBtn:hover {
+  background: #159c85;
+}
+
+@media (max-width: 700px) {
+  .successBox {
+    padding: 16px 4px;
+    font-size: 0.97rem;
+  }
+  .billInfo {
+    max-width: 100%;
+    font-size: 0.98rem;
+  }
+  .billTable th, .billTable td {
+    padding: 6px 4px;
+  }
+}

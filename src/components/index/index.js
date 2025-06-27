@@ -54,7 +54,7 @@ const Index = () => {
         setLoading(true);
         
         // Fetch products
-        const productsResponse = await fetch(`${API_URL}/product`);
+        const productsResponse = await fetch(`${API_URL}/product/show`);
         const productsData = await productsResponse.json();
         
         // Fetch news
@@ -193,7 +193,7 @@ const Index = () => {
                   phù hợp với từng mệnh, giúp gia tăng năng lượng tích cực và 
                   thu hút tài lộc trong cuộc sống.
                 </p>
-                <Link to="/product" className={styles.viewAllBtn}>
+                <Link to="/product/show" className={styles.viewAllBtn}>
                   Xem Tất Cả Sản Phẩm
                 </Link>
               </div>

@@ -233,16 +233,16 @@ const CategoryManagement = () => {
             <table className={styles.table}>
               <thead>
                 <tr className={styles.tableHeader}>
-                  <th>Mã danh mục</th>
+                  <th>STT</th>
                   <th>Tên danh mục</th>
                   <th>Trạng thái</th>
                   <th>Hành động</th>
                 </tr>
               </thead>
               <tbody>
-                {filteredCategories.map(category => (
+                {filteredCategories.map((category, index) => (
                   <tr key={category.id} className={styles.tableRow}>
-                    <td>{category.id}</td>
+                    <td>{index + 1}</td>
                     <td>{category.name_categories}</td>
                     <td>{category.status === 'show' ? 'Hiển thị' : 'Ẩn'}</td>
                     <td>

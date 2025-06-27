@@ -29,7 +29,7 @@ const Product = () => {
   };
 
   useEffect(() => {
-    fetch(`${API_BASE_URL}/product`)
+    fetch(`${API_BASE_URL}/product/show`)
       .then(res => res.json())
       .then(data => {
         setProducts(data);
@@ -284,7 +284,7 @@ const Product = () => {
             <div className={styles.shopProductOption}>
               <div className={styles.shopProductOptionLeft}>
                 <p>
-                  Showing {paginatedProducts.length} of {sortedProducts.length} results
+                  hiển thị {paginatedProducts.length} trên {sortedProducts.length} sản phẩm
                   {search && ` for "${search}"`}
                 </p>
               </div>
