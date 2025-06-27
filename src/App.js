@@ -23,12 +23,6 @@ import AD_Add_New from './Admin/pages/AD_Add_New';
 import AD_Contact from './Admin/pages/AD_Contact'; // Thêm dòng này
 
 
-
-
-
-
-
-
 import './App.css';
 
 function App() {

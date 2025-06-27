@@ -1,115 +1,190 @@
-.wpContainer {
+.container {
   display: flex;
   min-height: 100vh;
-  background-color: #f1f1f1;
+  background-color: #f8fafc;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
-.wpMain {
-  flex: 1;
-  padding: 20px;
+.sidebar {
+  width: 250px;
+  background-color: #1e293b;
+  color: #ffffff;
+  padding: 20px 0;
 }
 
-.wpHeader {
-  background-color: #fff;
+.sidebar a {
+  display: block;
+  color: #a3bffa;
   padding: 10px 20px;
-  border-bottom: 1px solid #ddd;
-  margin: -20px -20px 20px;
+  text-decoration: none;
+  font-size: 0.95rem;
 }
 
-.wpHeader h1 {
-  font-size: 23px;
-  font-weight: 400;
-  margin: 0;
-  padding: 9px 0 4px;
-  line-height: 1.3;
+.sidebar a:hover {
+  background-color: #2d3d5a;
+  color: #ffffff;
 }
 
-.wpContent {
-  background-color: #fff;
-  padding: 20px;
-  border: 1px solid #ddd;
-  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
+.content {
+  flex-grow: 1;
+  padding: 24px;
+  margin-left: 250px;
+  transition: margin-left 0.3s ease-in-out;
 }
 
-.wpForm {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
+.title {
+  font-size: 1.75rem;
+  font-weight: bold;
+  margin-bottom: 24px;
+  color: #1a1a3d;
+  letter-spacing: -0.02em;
 }
 
-.wpFormGroup {
-  margin-bottom: 15px;
+.mainImageSection {
+  margin-bottom: 24px;
 }
 
-.wpFormGroup label {
+.mainImageLabel {
   display: block;
   font-weight: 600;
-  margin-bottom: 5px;
-  color: #23282d;
+  margin-bottom: 8px;
+  color: #64748b;
+  font-size: 0.95rem;
 }
 
-.wpFormGroup input,
-.wpFormGroup select {
+.mainImageInput {
   width: 100%;
-  padding: 8px 10px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 14px;
-  box-sizing: border-box;
+  padding: 8px 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  color: #374151;
+  background-color: #ffffff;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-.wpFormGroup input:focus,
-.wpFormGroup select:focus {
-  border-color: #5b9dd9;
-  box-shadow: 0 0 2px rgba(30, 140, 190, 0.8);
+.mainImageInput:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.detailSection {
+  margin-bottom: 20px;
+}
+
+.detailLabel {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #64748b;
+  font-size: 0.95rem;
+}
+
+.wpEditor {
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  margin-bottom: 24px;
+  background-color: #fff;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+.wpEditor:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
   outline: none;
 }
 
-.wpQuill {
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  margin-bottom: 15px;
-}
-
-.wpQuill .ql-container {
+.wpEditorContainer {
   min-height: 200px;
-  font-size: 14px;
+  padding: 12px;
 }
 
-.wpQuill .ql-toolbar {
-  border-top-left-radius: 4px;
-  border-top-right-radius: 4px;
+.imageUpload {
+  margin-top: 12px;
 }
 
-.wpQuill .ql-container {
-  border-bottom-left-radius: 4px;
-  border-bottom-right-radius: 4px;
-}
-
-button {
-  padding: 10px 20px;
-  border: none;
-  background-color: #0073aa;
-  color: white;
+.imageUploadLabel {
+  display: block;
   font-weight: 600;
-  font-size: 14px;
-  border-radius: 4px;
+  margin-bottom: 8px;
+  color: #64748b;
+  font-size: 0.95rem;
+}
+
+.imageUploadInput {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  color: #374151;
+  background-color: #ffffff;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.imageUploadInput:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.formButtons {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.submitButton {
+  background-color: #3b82f6;
+  color: #ffffff;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  font-weight: 500;
   cursor: pointer;
   transition: background-color 0.2s ease;
-  width: auto;
 }
 
-button:hover {
-  background-color: #005d87;
+.submitButton:hover {
+  background-color: #2563eb;
 }
 
-button:disabled {
-  background-color: #ccc;
-  cursor: not-allowed;
+.cancelButton {
+  background-color: #64748b;
+  color: #ffffff;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
 }
 
-.wpError {
-  color: #dc3232;
-  font-size: 14px;
-  margin-bottom: 15px;
+.cancelButton:hover {
+  background-color: #475569;
+}
+
+@media (max-width: 768px) {
+  .content {
+    margin-left: 0;
+    padding: 16px;
+  }
+
+  .formInput,
+  .formSelect,
+  .submitButton,
+  .cancelButton,
+  .mainImageInput,
+  .imageUploadInput {
+    width: 100%;
+  }
+
+  .formButtons {
+    flex-direction: column;
+  }
 }

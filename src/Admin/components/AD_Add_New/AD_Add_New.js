@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -11,14 +10,10 @@ const AD_Add_New = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     title: '',
-    slug: '',
-    thumbnailUrl: '',
-    thumbnailCaption: '',
-    categoryNew: '',
-    status: 'show',
-    contentBlocks: [],
+    mainImage: '',
+    detailedDescription: '',
+    status: 'Hiển thị',
   });
-  const [quillContent, setQuillContent] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -27,124 +22,126 @@ const AD_Add_New = () => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
+  const handleImageChange = (e) => {
+    const { name, files } = e.target;
+    setFormData(prev => ({ ...prev, [name]: files[0] }));
+  };
+
+  const handleQuillChange = (value) => {
+    setFormData(prev => ({ ...prev, detailedDescription: value }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError('');
 
-    const fullForm = {
-      ...formData,
-      contentBlocks: [{ type: 'text', content: quillContent }],
-    };
+    const formDataToSend = new FormData();
+    formDataToSend.append('title', formData.title);
+    formDataToSend.append('mainImage', formData.mainImage);
+    formDataToSend.append('detailedDescription', formData.detailedDescription);
+    formDataToSend.append('status', formData.status);
 
     try {
-      await axios.post('https://api-tuyendung-cty.onrender.com/api/new', fullForm, {
+      await axios.post('https://api-tuyendung-cty.onrender.com/api/product', formDataToSend, {
         headers: {
-          'Content-Type': 'application/json',
+          'Content-Type': 'multipart/form-data',
           Authorization: `Bearer ${localStorage.getItem('adminToken')}`,
         },
       });
-      alert('🟢 Thêm tin tức thành công!');
-      navigate('/admin/new');
+      alert('🟢 Thêm sản phẩm thành công!');
+      navigate('/admin/product');
     } catch (err) {
       console.error(err);
-      setError('❌ Thêm tin thất bại. Vui lòng thử lại.');
+      setError('❌ Thêm sản phẩm thất bại. Vui lòng thử lại.');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className={styles.wpContainer}>
-      <Sidebar />
-      <div className={styles.wpMain}>
-        <header className={styles.wpHeader}>
-          <h1>Thêm Tin Tức Mới</h1>
+    <div className={styles.container}>
+      <div className={styles.sidebar}>
+        <a href="#dashboard">Dashboard</a>
+        <a href="#danh-muc">Danh mục</a>
+        <a href="#san-pham">Sản phẩm</a>
+        <a href="#don-hang">Đơn hàng</a>
+        <a href="#dich-vu">Dịch vụ</a>
+        <a href="#lien-he">Liên hệ</a>
+        <a href="#dang-xuat">Đăng xuất</a>
+      </div>
+      <div className={styles.content}>
+        <header>
+          <h1 className={styles.title}>Thêm Sản Phẩm</h1>
         </header>
-        <div className={styles.wpContent}>
-          {error && <div className={styles.wpError}>{error}</div>}
-          <form className={styles.wpForm} onSubmit={handleSubmit}>
-            <div className={styles.wpFormGroup}>
-              <label htmlFor="title">Tiêu đề</label>
+        <div>
+          {error && <div className={styles.noData}>{error}</div>}
+          <form className={styles.formGroup} onSubmit={handleSubmit}>
+            <div className={styles.formGroup}>
+              <label htmlFor="title" className={styles.formLabel}>Tiêu đề</label>
               <input
                 id="title"
                 name="title"
                 type="text"
-                placeholder="Tiêu đề"
+                className={styles.formInput}
                 value={formData.title}
                 onChange={handleChange}
                 required
               />
             </div>
-            <div className={styles.wpFormGroup}>
-              <label htmlFor="slug">Slug (URL)</label>
+            <div className={styles.mainImageSection}>
+              <label htmlFor="mainImage" className={styles.mainImageLabel}>Hình ảnh chủ đạo của bài viết</label>
               <input
-                id="slug"
-                name="slug"
-                type="text"
-                placeholder="Slug (URL)"
-                value={formData.slug}
-                onChange={handleChange}
-                required
+                id="mainImage"
+                name="mainImage"
+                type="file"
+                className={styles.mainImageInput}
+                onChange={handleImageChange}
               />
             </div>
-            <div className={styles.wpFormGroup}>
-              <label htmlFor="thumbnailUrl">URL ảnh đại diện</label>
-              <input
-                id="thumbnailUrl"
-                name="thumbnailUrl"
-                type="text"
-                placeholder="URL ảnh đại diện"
-                value={formData.thumbnailUrl}
-                onChange={handleChange}
-              />
+            <div className={styles.detailSection}>
+              <label htmlFor="detailedDescription" className={styles.detailLabel}>Mô tả chi tiết</label>
+              <div className={styles.wpEditor}>
+                <div className={styles.wpEditorContainer}>
+                  <ReactQuill
+                    value={formData.detailedDescription}
+                    onChange={handleQuillChange}
+                    theme="snow"
+                  />
+                </div>
+              </div>
+              <div className={styles.imageUpload}>
+                <label htmlFor="imageUpload" className={styles.imageUploadLabel}>Thêm hình ảnh vào mô tả</label>
+                <input
+                  id="imageUpload"
+                  name="imageUpload"
+                  type="file"
+                  className={styles.imageUploadInput}
+                  onChange={handleImageChange}
+                />
+              </div>
             </div>
-            <div className={styles.wpFormGroup}>
-              <label htmlFor="thumbnailCaption">Chú thích ảnh</label>
-              <input
-                id="thumbnailCaption"
-                name="thumbnailCaption"
-                type="text"
-                placeholder="Chú thích ảnh"
-                value={formData.thumbnailCaption}
-                onChange={handleChange}
-              />
-            </div>
-            <div className={styles.wpFormGroup}>
-              <label htmlFor="categoryNew">Danh mục tin tức</label>
-              <input
-                id="categoryNew"
-                name="categoryNew"
-                type="text"
-                placeholder="Danh mục tin tức"
-                value={formData.categoryNew}
-                onChange={handleChange}
-              />
-            </div>
-            <div className={styles.wpFormGroup}>
-              <label htmlFor="status">Trạng thái</label>
+            <div className={styles.formGroup}>
+              <label htmlFor="status" className={styles.formLabel}>Trạng thái</label>
               <select
                 id="status"
                 name="status"
+                className={styles.formSelect}
                 value={formData.status}
                 onChange={handleChange}
               >
-                <option value="show">Hiển thị</option>
-                <option value="hidden">Ẩn</option>
+                <option value="Hiển thị">Hiển thị</option>
+                <option value="Ẩn">Ẩn</option>
               </select>
             </div>
-            <div className={styles.wpFormGroup}>
-              <label htmlFor="content">Nội dung chi tiết</label>
-              <ReactQuill
-                value={quillContent}
-                onChange={setQuillContent}
-                theme="snow"
-                className={styles.wpQuill}
-              />
+            <div className={styles.formButtons}>
+              <button type="submit" className={styles.submitButton} disabled={loading}>
+                {loading ? 'Đang lưu...' : 'Thêm sản phẩm'}
+              </button>
+              <button type="button" className={styles.cancelButton} onClick={() => navigate('/admin/product')}>
+                Hủy
+              </button>
             </div>
-            <button type="submit" disabled={loading}>
-              {loading ? 'Đang lưu...' : 'Thêm Tin Tức'}
-            </button>
           </form>
         </div>
       </div>
