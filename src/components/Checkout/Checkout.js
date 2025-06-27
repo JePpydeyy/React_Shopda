@@ -1,3 +1,4 @@
+// ...existing imports...
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './Checkout.module.css';
@@ -6,6 +7,7 @@ import ToastNotification from '../ToastNotification/ToastNotification';
 const API_BASE_URL = 'https://api-tuyendung-cty.onrender.com/api';
 
 const Checkout = () => {
+  // ...existing state...
   const [formData, setFormData] = useState({
     fullName: '',
     selectedDate: null,
@@ -39,6 +41,8 @@ const Checkout = () => {
   const monthNames = ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6', 'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'];
   const calendarRef = useRef(null);
   const navigate = useNavigate();
+
+  // ...existing useEffect for provinces, districts, wards...
 
   useEffect(() => {
     const fetchProvinces = async () => {
@@ -194,8 +198,13 @@ const Checkout = () => {
       return;
     }
 
-    // Lưu lại thông tin bill trước khi reset
-    setBillInfo({ ...formData });
+    // Lưu lại thông tin bill trước khi reset, bao gồm tên tỉnh/thành/quận/xã
+    setBillInfo({
+      ...formData,
+      provinceName: provinces.find(p => p.code === parseInt(formData.province))?.name || '',
+      districtName: districts.find(d => d.code === parseInt(formData.district))?.name || '',
+      wardName: wards.find(w => w.code === parseInt(formData.ward))?.name || ''
+    });
     setBillCart([...cartItems]);
     setBillDiscount(appliedDiscount);
 
@@ -311,7 +320,12 @@ const Checkout = () => {
             <p><b>Khách hàng:</b> {billInfo?.fullName}</p>
             <p><b>SĐT:</b> {billInfo?.phone}</p>
             <p><b>Email:</b> {billInfo?.email}</p>
-            <p><b>Địa chỉ:</b> {billInfo?.addressDetail}, {wards.find(w => w.code === billInfo?.ward)?.name || ''}, {districts.find(d => d.code === billInfo?.district)?.name || ''}, {provinces.find(p => p.code === billInfo?.province)?.name || ''}</p>
+            <p>
+              <b>Địa chỉ:</b> {billInfo?.addressDetail}
+              {billInfo?.wardName && `, ${billInfo.wardName}`}
+              {billInfo?.districtName && `, ${billInfo.districtName}`}
+              {billInfo?.provinceName && `, ${billInfo.provinceName}`}
+            </p>
           </div>
           <table className={styles.billTable}>
             <thead>
@@ -353,7 +367,7 @@ const Checkout = () => {
     );
   }
 
-  // Giao diện form đặt hàng như cũ
+  
   return (
     <div className={styles.container}>
       <h1 className={`${styles.container} h1`}>Đặt Hàng</h1>
