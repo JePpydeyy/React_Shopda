@@ -1,15 +1,22 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom'; 
-import styles from './Sidebar.module.css';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../AuthContext/AuthContext';
+import styles from './Sidebar.module.css';
 
-const Sidebar = ({ isAlwaysVisible = false }) => {
+const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
   const { checkAuth } = useAuth();
 
   const toggleSidebar = () => {
-    setIsOpen(!isOpen);
+    setIsOpen(prev => !prev);
+  };
+
+  const closeSidebar = () => {
+    if (window.innerWidth <= 992) {
+      setIsOpen(false);
+    }
   };
 
   const handleLogout = () => {
@@ -17,87 +24,98 @@ const Sidebar = ({ isAlwaysVisible = false }) => {
     localStorage.removeItem('user');
     checkAuth();
     navigate('/');
+    closeSidebar();
   };
 
   useEffect(() => {
-    if (isOpen) {
-      document.body.classList.add('sidebar-open');
-    } else {
-      document.body.classList.remove('sidebar-open');
-    }
-    return () => {
-      document.body.classList.remove('sidebar-open');
+    const handleResize = () => {
+      setIsOpen(window.innerWidth > 992);
     };
+
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      document.body.style.overflow = 'auto';
+    };
+  }, []);
+
+  useEffect(() => {
+    if (window.innerWidth <= 992) {
+      document.body.style.overflow = isOpen ? 'hidden' : 'auto';
+    }
   }, [isOpen]);
+
+  const menuItems = [
+    { path: '/admin', icon: 'fa-chart-line', label: 'Dashboard' },
+    { path: '/admin/category', icon: 'fa-list', label: 'Danh mục' },
+    { path: '/admin/product', icon: 'fa-gem', label: 'Sản phẩm' },
+    { path: '/admin/order', icon: 'fa-shopping-cart', label: 'Đơn hàng' },
+    { path: '/admin/new', icon: 'fa-newspaper', label: 'Tin tức' },
+    { path: '/admin/categorynew', icon: 'fa-list-ol', label: 'Danh mục tin' },
+    { path: '/admin/contact', icon: 'fa-envelope', label: 'Liên hệ' }
+  ];
 
   return (
     <>
-      {/* Nút toggle luôn hiển thị trên mobile */}
-      <button className={`${styles.toggleButton} ${styles.mobileToggle}`} onClick={toggleSidebar}>
+      <button 
+        className={`${styles.mobileToggle} ${isOpen ? styles.open : ''}`}
+        onClick={toggleSidebar}
+        aria-label="Toggle menu"
+      >
         <i className={`fa-solid ${isOpen ? 'fa-times' : 'fa-bars'}`}></i>
       </button>
 
-      {/* Sidebar hoặc Menu */}
       <div className={`${styles.sidebar} ${isOpen ? styles.open : ''}`}>
         <div className={styles.header}>
           <div className={styles.logo}>
-            <Link to="/admin">
-              <img src="/assets/images/logo.png" alt="Logo" />
+            <Link to="/admin" onClick={closeSidebar}>
+              <a href="/" className={styles.logo}>
+          <div className={styles.logoIcon}>LOGO</div>
+          <div>
+            <div className={styles.logoText}>Tên công ty </div>
+            <div className={styles.logoSubtitle}>TRANG SỨC PHONG THỦY</div>
+          </div>
+        </a>
             </Link>
           </div>
-          {/* Nút toggle trong sidebar, chỉ hiển thị trên desktop */}
-          <button className={styles.toggleButton} onClick={toggleSidebar}>
-            <i className={`fa-solid ${isOpen ? 'fa-times' : 'fa-bars'}`}></i>
+        </div>
+
+        <nav className={styles.nav}>
+          <ul className={styles.menu}>
+            {menuItems.map((item) => (
+              <li key={item.path}>
+                <Link
+                  to={item.path}
+                  className={`${styles.menuLink} ${
+                    location.pathname === item.path ? styles.active : ''
+                  }`}
+                  onClick={closeSidebar}
+                >
+                  <i className={`fa-solid ${item.icon} ${styles.menuIcon}`}></i>
+                  <span className={styles.menuText}>{item.label}</span>
+                  {location.pathname === item.path && (
+                    <div className={styles.activeIndicator}></div>
+                  )}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
+
+        <div className={styles.footer}>
+          <button onClick={handleLogout} className={styles.logoutBtn}>
+            <i className="fa-solid fa-right-from-bracket"></i>
+            <span>Đăng xuất</span>
           </button>
         </div>
-        <ul className={styles.menu}>
-          <li>
-            <Link to="/admin">
-              <i className="fa-solid fa-chart-line"></i> Dashboard
-            </Link>
-          </li>
-        
-          <li>
-            <Link to="/admin/category">
-              <i className="fa-regular fa-newspaper"></i> danh mục
-            </Link>
-          </li>
-            <li>
-            <Link to="/admin/product">
-              <i className="fa-regular fa-newspaper"></i> Sản Phẩm
-            </Link>
-          </li>
-            <li>
-            <Link to="/admin/order">
-              <i className="fa-regular fa-newspaper"></i> đơn hàng
-            </Link>
-          </li>
-          <li>
-            <Link to="/admin/new">
-              <i className="fa-regular fa-newspaper"></i> tin tức
-            </Link>
-          </li>
-        <li>
-            <Link to="/admin/categorynew">
-              <i className="fa-regular fa-newspaper"></i> danh mục tin tức
-            </Link>
-          </li>
-        <li>
-          <Link to="/admin/contact">Liên hệ</Link>
-        </li>
-
-          <li>
-            <button onClick={handleLogout} className={styles.logoutBtn}>
-              <i className="fa-solid fa-right-from-bracket"></i> Đăng Xuất
-            </button>
-          </li>
-        </ul>
       </div>
 
-      {/* Overlay khi menu mở trên di động */}
-      {isOpen && (
-        <div className={styles.overlay} onClick={toggleSidebar}></div>
-      )}
+      <div 
+        className={`${styles.overlay} ${isOpen ? styles.show : ''}`} 
+        onClick={closeSidebar}
+      />
     </>
   );
 };

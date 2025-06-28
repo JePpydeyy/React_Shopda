@@ -275,29 +275,8 @@
 .orderBtn button:hover {
   background-color: #7a3a0f;
 }
+
 .successContainer {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 60vh;
-}
-.successBox {
-  background: #fff;
-  padding: 32px 24px;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px #0001;
-  text-align: center;
-}
-.successBtn {
-  margin-top: 24px;
-  padding: 10px 32px;
-  background: #1abc9c;
-  color: #fff;
-  border: none;
-  border-radius: 6px;
-  font-size: 1.1rem;
-  cursor: pointer;
-}.successContainer {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -381,16 +360,198 @@
   background: #159c85;
 }
 
-@media (max-width: 700px) {
-  .successBox {
-    padding: 16px 4px;
-    font-size: 0.97rem;
+/* Responsive for Tablets/iPads (481px - 1024px) */
+@media (max-width: 1024px) {
+  .container {
+    max-width: 100%;
+    padding: 15px;
   }
+
+  .formContainer {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .customerInfo, .orderInfo {
+    max-width: 100%;
+    padding: 15px;
+  }
+
+  .orderInfo {
+    max-width: 100%;
+  }
+
+  .container h1 {
+    font-size: 20px;
+  }
+
+  .customerInfo h2, .orderInfo h2 {
+    font-size: 16px;
+  }
+
+  .mergeForms {
+    flex-direction: column;
+  }
+
+  .mergeForms .sdt,
+  .mergeForms .email,
+  .mergeForms .districtWard,
+  .mergeForms .ward,
+  .mergeForms .country,
+  .mergeForms .province {
+    width: 100%;
+  }
+
+  .calendarPopup {
+    width: 100%;
+    max-width: 300px;
+  }
+
+  .calendarHeader {
+    flex-wrap: wrap;
+    gap: 5px;
+  }
+
+  .calendarHeader select, .calendarHeader button {
+    width: 100%;
+    margin-left: 0;
+    margin-bottom: 5px;
+  }
+
+  .orderBtn button {
+    max-width: 100%;
+  }
+
+  .successBox {
+    padding: 20px 15px;
+    max-width: 90%;
+  }
+
+  .successBox h2 {
+    font-size: 1.8rem;
+  }
+
   .billInfo {
     max-width: 100%;
-    font-size: 0.98rem;
+    font-size: 1rem;
   }
+
   .billTable th, .billTable td {
-    padding: 6px 4px;
+    padding: 6px 8px;
+    font-size: 0.95rem;
+  }
+}
+
+/* Responsive for Mobile Phones (up to 480px) */
+@media (max-width: 480px) {
+  .container {
+    padding: 10px;
+  }
+
+  .container h1 {
+    font-size: 18px;
+    margin-bottom: 15px;
+  }
+
+  .customerInfo, .orderInfo {
+    padding: 10px;
+  }
+
+  .customerInfo h2, .orderInfo h2 {
+    font-size: 14px;
+    margin-bottom: 10px;
+  }
+
+  .formGroup {
+    margin-bottom: 8px;
+  }
+
+  .formGroup label {
+    font-size: 14px;
+  }
+
+  .formGroup input,
+  .formGroup select,
+  .formGroup textarea {
+    padding: 10px;
+    font-size: 14px;
+  }
+
+  .datePicker input#selectedDate {
+    padding: 10px;
+  }
+
+  .calendarBtn {
+    padding: 10px 12px;
+    margin-left: 5px;
+  }
+
+  .calendarPopup {
+    width: 100%;
+    max-width: 260px;
+    padding: 8px;
+  }
+
+  .calendarDays div, .calendarDates div {
+    padding: 4px;
+    font-size: 12px;
+  }
+
+  .error {
+    font-size: 12px;
+  }
+
+  .orderItem {
+    padding: 10px;
+    font-size: 12px;
+  }
+
+  .orderItem.total {
+    font-size: 14px;
+    padding: 12px;
+  }
+
+  .orderBtn button {
+    height: 40px;
+    font-size: 14px;
+  }
+
+  .successContainer {
+    min-height: 100vh;
+    padding: 10px;
+  }
+
+  .successBox {
+    padding: 15px 10px;
+    font-size: 0.9rem;
+  }
+
+  .successBox h2 {
+    font-size: 1.5rem;
+  }
+
+  .successBox h3 {
+    font-size: 1.1rem;
+  }
+
+  .billInfo {
+    font-size: 0.9rem;
+  }
+
+  .billTable {
+    font-size: 0.85rem;
+  }
+
+  .billTable th, .billTable td {
+    padding: 5px 6px;
+  }
+
+  .billTotal p {
+    font-size: 1rem;
+  }
+
+  .successBtn {
+    padding: 8px 20px;
+    font-size: 1rem;
   }
 }

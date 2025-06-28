@@ -1,17 +1,20 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './LoginForm.module.css';
+import ToastNotification from '../../../components/ToastNotification/ToastNotification';
 
 const LoginForm = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
+    setSuccess(null);
     setIsLoading(true);
 
     try {
@@ -30,13 +33,21 @@ const LoginForm = () => {
 
       localStorage.setItem('adminToken', data.token);
       console.log('Đăng nhập thành công, token đã lưu:', data.token);
-      navigate('/admin');
+      setSuccess('Đăng nhập thành công');
+      setTimeout(() => {
+        navigate('/admin');
+      }, 2000); // Delay navigation by 2 seconds
     } catch (err) {
       setError(err.message);
       console.error('Lỗi đăng nhập:', err);
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleCloseToast = () => {
+    setError(null);
+    setSuccess(null);
   };
 
   return (
@@ -83,8 +94,21 @@ const LoginForm = () => {
             )}
           </button>
         </div>
-        {error && <div className={styles.error}>{error}</div>}
       </form>
+      {error && (
+        <ToastNotification
+          message={error}
+          type="error"
+          onClose={handleCloseToast}
+        />
+      )}
+      {success && (
+        <ToastNotification
+          message={success}
+          type="success"
+          onClose={handleCloseToast}
+        />
+      )}
     </div>
   );
 };
