@@ -17,6 +17,7 @@ const NewsManagement = () => {
   const navigate = useNavigate();
 
   const API_BASE_URL = process.env.REACT_APP_API_BASE || 'https://api-tuyendung-cty.onrender.com';
+  const PLACEHOLDER_IMAGE = 'https://via.placeholder.com/150'; // Placeholder công khai
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -40,6 +41,7 @@ const NewsManagement = () => {
   const fetchNews = async () => {
     try {
       setLoading(true);
+      console.log('API_BASE_URL:', API_BASE_URL); // Kiểm tra API_BASE_URL
       const res = await fetch(`${API_BASE_URL}/api/new`, {
         headers: {
           'Content-Type': 'application/json',
@@ -49,14 +51,16 @@ const NewsManagement = () => {
 
       if (!res.ok) throw new Error(`Lỗi HTTP: ${res.status} ${res.statusText}`);
       const result = await res.json();
+      console.log('API Response:', result); // Kiểm tra dữ liệu API
       const data = result.data || result.news || result || [];
 
       const transformed = data.map(item => {
-        const imageUrl = item.thumbnailUrl
+        console.log('Raw thumbnailUrl:', item.thumbnailUrl); // Kiểm tra thumbnailUrl
+        const imageUrl = item.thumbnailUrl && typeof item.thumbnailUrl === 'string' && item.thumbnailUrl !== '+image'
           ? item.thumbnailUrl.startsWith('http') || item.thumbnailUrl.startsWith('data:')
             ? item.thumbnailUrl
             : `${API_BASE_URL}/${item.thumbnailUrl.replace(/^\/+/, '')}`
-          : '/placeholder-image.jpg';
+          : PLACEHOLDER_IMAGE;
 
         const category = categories.find(c => c._id === item.category_new)?._id || 'Chưa phân loại';
 
@@ -74,8 +78,10 @@ const NewsManagement = () => {
         };
       });
 
+      console.log('Transformed News:', transformed); // Kiểm tra dữ liệu đã biến đổi
       setNews(transformed);
     } catch (err) {
+      console.error('Lỗi fetchNews:', err);
       setError(err.message);
     } finally {
       setLoading(false);
@@ -111,6 +117,8 @@ const NewsManagement = () => {
         },
         body: JSON.stringify({ status: newStatus === 'Hiển thị' ? 'show' : 'hide' }),
       });
+
+     
 
       if (!res.ok) throw new Error('Lỗi cập nhật trạng thái');
       await res.json();
@@ -154,9 +162,19 @@ const NewsManagement = () => {
 
   const createMarkup = (html) => {
     const safeHTML = html?.replace(
-      /<img\s+[^>]*src=["'](?!https?:\/\/)([^"']+)["']/gi,
-      (_, src) => `<img src="${API_BASE_URL}/${src.replace(/^\/+/, '')}"`
+      /<img\s+[^>]*src=["']([^"']+)["']/gi,
+      (_, src) => {
+        if (!src || src === '+image') {
+          return `<img src="${PLACEHOLDER_IMAGE}"`;
+        }
+        return `<img src="${
+          src.startsWith('http') || src.startsWith('data:') 
+            ? src 
+            : `${API_BASE_URL}/${src.replace(/^\/+/, '')}`
+        }"`;
+      }
     );
+    console.log('Processed HTML:', safeHTML); // Kiểm tra HTML đã xử lý
     return { __html: safeHTML || '' };
   };
 
@@ -276,7 +294,7 @@ const NewsManagement = () => {
                   </p>
                 </div>
                 <div className={styles.postImage}>
-                  <img src={selectedArticle.image} alt={selectedArticle.title} className={styles.articleImage} />
+                  <img src={selectedArticle.image} alt={selectedArticle.title} className={styles.articleImage} onError={(e) => e.target.src = PLACEHOLDER_IMAGE} />
                 </div>
                 <div className={styles.articleContent} dangerouslySetInnerHTML={createMarkup(selectedArticle.content)} />
               </div>

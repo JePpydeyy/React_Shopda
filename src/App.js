@@ -57,6 +57,7 @@ function App() {
             <Route path="/admin/contact" element={<AD_Contact />} />
             <Route path="/admin/discout" element={<DiscoutPage />} />
             <Route path="/admin/editnew/:slug" element={<EditNews />} /> {/* Sửa để sử dụng EditNews */}
+            <Route path="/admin/DiscoutPage" element={<DiscoutPage />} />
           </Routes>
         </div>
       </Router>

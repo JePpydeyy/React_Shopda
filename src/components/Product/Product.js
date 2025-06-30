@@ -233,7 +233,7 @@ const Product = () => {
                 </div>
               </div>
               <div className={styles.filterSection}>
-                <h6>PDanh mục sản phẩm</h6>
+                <h6>Danh mục sản phẩm</h6>
                 <div className={styles.categoryCheckboxGroup}>
                   <label className={styles.categoryCheckboxLabel}>
                     <input

@@ -40,7 +40,7 @@ const fieldGuides = {
   tag: "Sale: Giảm giá | New: Sản phẩm mới",
   short_description: "Mô tả ngắn gọn (100-150 ký tự)",
   description: "Mô tả chi tiết: nguồn gốc, khối lượng, lợi ích, bảo quản...",
-  weight: "Khối lượng sản phẩm (gram hoặc kg)",
+  // weight: "Khối lượng sản phẩm (gram hoặc kg)",
   images: "Chọn tối đa 10 ảnh chất lượng cao (JPEG, PNG, GIF)",
   status: "Hiển thị: Hiện trên website | Ẩn: Không hiện | Sale: Đang giảm giá",
   purchases: "Số lượng đã bán (mặc định 0, không âm)",
@@ -69,7 +69,7 @@ const ProductManagement = () => {
     tag: '',
     short_description: '',
     description: '',
-    weight: '',
+    weight: '1', // <-- mặc định là 1
     status: 'show',
     images: [],
   });
@@ -357,7 +357,7 @@ const ProductManagement = () => {
       tag: '',
       short_description: '',
       description: '',
-      weight: '',
+      weight: '1',
       status: 'show',
       images: [],
     });
@@ -590,7 +590,7 @@ const ProductManagement = () => {
                           <p><strong>Thẻ:</strong> {product.tag}</p>
                           <p><strong>Mô tả ngắn:</strong> {product.short_description}</p>
                           <p><strong>Mô tả chi tiết:</strong> <div dangerouslySetInnerHTML={{ __html: product.description }} /></p>
-                          <p><strong>Khối lượng:</strong> {product.weight}</p>
+                          {/* <p><strong>Khối lượng:</strong> {product.weight}</p> */}
                           <p><strong>Tồn kho theo kích thước:</strong></p>
                           <ul>
                             {product.size.map((size, index) => (

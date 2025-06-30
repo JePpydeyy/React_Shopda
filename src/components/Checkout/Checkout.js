@@ -554,7 +554,7 @@ const Checkout = () => {
                 <div key={index} className={styles.productGroup}>
                   <p className={styles.productName}>{item.name} x {item.quantity} - {formatPrice((parseFloat(item.price) || 0) * (parseInt(item.quantity) || 1))}</p>
                   <p className={styles.productDetails}>
-                    Chất: {item.charm || 'N/A'}, Size Viên Đá: {item.stoneSize || 'N/A'}, Size Tay: {item.wristSize || 'N/A'}
+                    Chất: {item.charm || 'N/A'}, Size Tay: {item.wristSize || 'N/A'}
                   </p>
                 </div>
               ))}
