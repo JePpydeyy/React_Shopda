@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Sidebar from '../Sidebar/Sidebar';
 import styles from './new.module.css';
-
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPenToSquare, faEye, faEyeSlash, faTrash } from '@fortawesome/free-solid-svg-icons';
 
@@ -47,17 +46,19 @@ const NewsManagement = () => {
           'Authorization': `Bearer ${localStorage.getItem('adminToken') || ''}`,
         },
       });
+
+      if (!res.ok) throw new Error(`Lỗi HTTP: ${res.status} ${res.statusText}`);
       const result = await res.json();
       const data = result.data || result.news || result || [];
 
       const transformed = data.map(item => {
         const imageUrl = item.thumbnailUrl
-          ? item.thumbnailUrl.startsWith('http')
+          ? item.thumbnailUrl.startsWith('http') || item.thumbnailUrl.startsWith('data:')
             ? item.thumbnailUrl
             : `${API_BASE_URL}/${item.thumbnailUrl.replace(/^\/+/, '')}`
           : '/placeholder-image.jpg';
 
-        const category = categories.find(c => c._id === item.category_new)?.category || 'Chưa phân loại';
+        const category = categories.find(c => c._id === item.category_new)?._id || 'Chưa phân loại';
 
         return {
           id: item._id,
@@ -66,6 +67,7 @@ const NewsManagement = () => {
           content: item.content,
           publishedAt: item.publishedAt || item.createdAt,
           views: item.views || 0,
+          reviews: item.reviews || 0,
           status: item.status === 'show' ? 'Hiển thị' : 'Ẩn',
           category,
           image: imageUrl,
@@ -110,6 +112,7 @@ const NewsManagement = () => {
         body: JSON.stringify({ status: newStatus === 'Hiển thị' ? 'show' : 'hide' }),
       });
 
+      if (!res.ok) throw new Error('Lỗi cập nhật trạng thái');
       await res.json();
       await fetchNews();
 
@@ -119,7 +122,7 @@ const NewsManagement = () => {
 
       alert(`Đã cập nhật trạng thái: ${newStatus}`);
     } catch (err) {
-      alert('Lỗi cập nhật trạng thái');
+      alert(`Lỗi cập nhật trạng thái: ${err.message}`);
     }
   };
 
@@ -145,7 +148,7 @@ const NewsManagement = () => {
         alert(`Xóa thất bại: ${result.message || 'Lỗi không xác định'}`);
       }
     } catch (err) {
-      alert('Lỗi khi xóa bài viết.');
+      alert(`Lỗi khi xóa bài viết: ${err.message}`);
     }
   };
 
@@ -191,10 +194,10 @@ const NewsManagement = () => {
             <option value="all">Tất cả danh mục</option>
             <option value="Chưa phân loại">Chưa phân loại</option>
             {categories.map(c => (
-              <option key={c._id} value={c.category}>{c.category}</option>
+              <option key={c._id} value={c._id}>{c.category}</option>
             ))}
           </select>
-          <button onClick={() => navigate('/admin/add_news')}>+ Thêm Tin Tức</button>
+          <button className={styles.addButton} onClick={() => navigate('/admin/add_news')}>+ Thêm Tin Tức</button>
         </div>
 
         <div className={styles.tableContainer}>
@@ -205,6 +208,7 @@ const NewsManagement = () => {
                 <th>Danh mục</th>
                 <th>Ngày xuất bản</th>
                 <th>Lượt xem</th>
+                <th>Lượt đánh giá</th>
                 <th>Trạng thái</th>
                 <th>Hành động</th>
               </tr>
@@ -213,9 +217,10 @@ const NewsManagement = () => {
               {filteredNews.length > 0 ? filteredNews.map(article => (
                 <tr key={article.slug} className={styles.tableRow} onClick={() => setSelectedArticle(article)}>
                   <td>{article.title}</td>
-                  <td>{article.category}</td>
+                  <td>{categories.find(c => c._id === article.category)?.category || 'Chưa phân loại'}</td>
                   <td>{new Date(article.publishedAt).toLocaleDateString('vi-VN')}</td>
                   <td>{article.views}</td>
+                  <td>{article.reviews}</td>
                   <td>
                     <span className={`${styles.status} ${article.status === 'Hiển thị' ? styles.statusShow : styles.statusHidden}`}>
                       {article.status}
@@ -247,7 +252,7 @@ const NewsManagement = () => {
                 </tr>
               )) : (
                 <tr>
-                  <td colSpan="6" className={styles.noData}>Không có bài viết để hiển thị.</td>
+                  <td colSpan="7" className={styles.noData}>Không có bài viết để hiển thị.</td>
                 </tr>
               )}
             </tbody>
@@ -262,15 +267,16 @@ const NewsManagement = () => {
                 <div className={styles.articleHeader}>
                   <h3>{selectedArticle.title}</h3>
                   <p className={styles.meta}>
-                    Danh mục: {selectedArticle.category} | Ngày: {new Date(selectedArticle.publishedAt).toLocaleDateString('vi-VN')} |
-                    Lượt xem: {selectedArticle.views} |
+                    Danh mục: {categories.find(c => c._id === selectedArticle.category)?.category || 'Chưa phân loại'} | 
+                    Ngày: {new Date(selectedArticle.publishedAt).toLocaleDateString('vi-VN')} |
+                    Lượt xem: {selectedArticle.views} | Lượt đánh giá: {selectedArticle.reviews} |
                     Trạng thái: <span className={selectedArticle.status === 'Hiển thị' ? styles.statusShow : styles.statusHidden}>
                       {selectedArticle.status}
                     </span>
                   </p>
                 </div>
                 <div className={styles.postImage}>
-                  <img src={selectedArticle.image} alt="" className={styles.articleImage} />
+                  <img src={selectedArticle.image} alt={selectedArticle.title} className={styles.articleImage} />
                 </div>
                 <div className={styles.articleContent} dangerouslySetInnerHTML={createMarkup(selectedArticle.content)} />
               </div>

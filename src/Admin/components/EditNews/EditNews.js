@@ -15,6 +15,7 @@ const EditNew = () => {
     thumbnailUrl: '',
     status: 'show',
     views: 0,
+    reviews: 0,
   });
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -29,11 +30,11 @@ const EditNew = () => {
     const images = doc.getElementsByTagName('img');
     for (let img of images) {
       let src = img.getAttribute('src') || '';
-      if (!src.startsWith('http') && !src.startsWith('/')) {
-        img.setAttribute('src', `${API_BASE_URL}/${src}`);
-      } else if (src.startsWith('/')) {
-        img.setAttribute('src', `${API_BASE_URL}${src}`);
+      if (src && !src.startsWith('http') && !src.startsWith('data:')) {
+        img.setAttribute('src', `${API_BASE_URL}/${src.replace(/^\/+/, '')}`);
       }
+      // Đảm bảo giữ nguyên base64 nếu đã có
+      img.classList.add('quill-image');
     }
     return doc.body.innerHTML;
   };
@@ -74,9 +75,10 @@ const EditNew = () => {
           title: result.title || '',
           content: processedContent,
           category_new: result.category_new?._id || result.category_new || '',
-          thumbnailUrl: result.thumbnailUrl || '',
+          thumbnailUrl: result.thumbnailUrl || '', // Giữ nguyên base64 nếu có
           status: result.status || 'show',
           views: result.views || 0,
+          reviews: result.reviews || 0,
         });
       } catch (err) {
         setError(err.message);
@@ -100,8 +102,11 @@ const EditNew = () => {
     const file = e.target.files[0];
     if (file) {
       setSelectedFile(file);
-      const previewUrl = URL.createObjectURL(file);
-      setArticle((prev) => ({ ...prev, thumbnailUrl: previewUrl }));
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setArticle((prev) => ({ ...prev, thumbnailUrl: reader.result })); // Chuyển thành base64
+      };
+      reader.readAsDataURL(file);
     }
   };
 
@@ -129,6 +134,7 @@ const EditNew = () => {
         formData.append('content', processedContent);
         formData.append('category_new', article.category_new);
         formData.append('views', article.views);
+        formData.append('reviews', article.reviews);
         formData.append('status', article.status);
         formData.append('thumbnail', selectedFile);
         options.body = formData;
@@ -139,8 +145,9 @@ const EditNew = () => {
           content: processedContent,
           category_new: article.category_new,
           views: article.views,
+          reviews: article.reviews,
           status: article.status,
-          thumbnailUrl: article.thumbnailUrl.replace(`${API_BASE_URL}/`, ''),
+          thumbnailUrl: article.thumbnailUrl, // Gửi base64 trực tiếp
         });
       }
 
@@ -206,9 +213,7 @@ const EditNew = () => {
     );
   }
 
-  const fullThumbnailUrl = article.thumbnailUrl.startsWith('http')
-    ? article.thumbnailUrl
-    : `${API_BASE_URL}/${article.thumbnailUrl}`;
+  const fullThumbnailUrl = article.thumbnailUrl; // Sử dụng trực tiếp base64
 
   return (
     <div className={styles.container}>
@@ -286,6 +291,18 @@ const EditNew = () => {
             />
           </div>
           <div className={styles.formGroup}>
+            <label htmlFor="reviews">Lượt đánh giá</label>
+            <input
+              type="number"
+              id="reviews"
+              name="reviews"
+              value={article.reviews}
+              onChange={handleChange}
+              className={styles.inputField}
+              min={0}
+            />
+          </div>
+          <div className={styles.formGroup}>
             <label htmlFor="status">Trạng thái</label>
             <select
               id="status"
@@ -299,21 +316,9 @@ const EditNew = () => {
             </select>
           </div>
           <div className={styles.formGroup}>
-            <button type="submit" className={styles.saveButton}>
-              Lưu thay đổi
-            </button>
-            <button
-              type="button"
-              className={styles.cancelButton}
-              onClick={() => navigate('/admin/new')}
-            >
-              Hủy
-            </button>
-            <button
-              type="button"
-              className={styles.deleteButton}
-              onClick={handleDelete}
-            >
+            <button type="submit" className={styles.saveButton}>Lưu thay đổi</button>
+            <button type="button" className={styles.cancelButton} onClick={() => navigate('/admin/new')}>Hủy</button>
+            <button type="button" className={styles.deleteButton} onClick={handleDelete}>
               <i className="fa-solid fa-trash"></i> Xoá bài viết
             </button>
           </div>
@@ -325,7 +330,7 @@ const EditNew = () => {
 
 EditNew.modules = {
   toolbar: [
-    [{ header: '1' }, { header: '2' }, { font: [] }],
+    [{ header: '1' }, { header: '2' }, { header: '3' }, { header: '4' }, { header: '5' }, { font: [] }],
     [{ size: [] }],
     ['bold', 'italic', 'underline', 'strike', 'blockquote'],
     [{ list: 'ordered' }, { list: 'bullet' }, { indent: '-1' }, { indent: '+1' }],
@@ -342,4 +347,3 @@ EditNew.formats = [
 ];
 
 export default EditNew;
-

@@ -37,7 +37,7 @@ const AD_Add_New = () => {
           console.warn('Không tìm thấy danh mục trong phản hồi API');
           setError('Không có danh mục nào được tải. Vui lòng kiểm tra API.');
         }
-        setCategories(categoryData.filter(cat => cat.status === 'show')); // Chỉ lấy danh mục đang hiển thị
+        setCategories(categoryData.filter(cat => cat.status === 'show'));
       } catch (err) {
         console.error('Lỗi khi tải danh mục:', err.response?.data, err.response?.status);
         setError(`Không thể tải danh mục: ${err.response?.data?.message || err.message}`);
@@ -125,7 +125,6 @@ const AD_Add_New = () => {
     formDataToSend.append('thumbnailCaption', formData.thumbnailCaption);
     formDataToSend.append('publishedAt', currentDate);
     formDataToSend.append('content', formData.content);
-    // FIX: Gửi trực tiếp ID danh mục thay vì JSON object
     formDataToSend.append('category_new', formData.category);
     formDataToSend.append('status', formData.status);
 
@@ -210,21 +209,8 @@ const AD_Add_New = () => {
                 onChange={handleQuillChange}
                 theme="snow"
                 placeholder="Viết nội dung bài viết..."
-                modules={{
-                  toolbar: [
-                    [{ header: [1, 2, false] }],
-                    ['bold', 'italic', 'underline', 'strike', 'blockquote'],
-                    [{ list: 'ordered' }, { list: 'bullet' }],
-                    ['link', 'image'],
-                    ['clean'],
-                  ],
-                }}
-                formats={[
-                  'header',
-                  'bold', 'italic', 'underline', 'strike', 'blockquote',
-                  'list', 'bullet',
-                  'link', 'image',
-                ]}
+                modules={AD_Add_New.modules}
+                formats={AD_Add_New.formats}
               />
             </div>
           </div>
@@ -247,7 +233,6 @@ const AD_Add_New = () => {
                 <option value="" disabled>Không có danh mục</option>
               )}
             </select>
-            {/* Debug info */}
             <small style={{ color: '#666', fontSize: '12px' }}>
               Danh mục hiện tại: {formData.category || 'Chưa chọn'} | 
               Số danh mục: {categories.length}
@@ -278,5 +263,24 @@ const AD_Add_New = () => {
     </div>
   );
 };
+
+// Toolbar configuration from EditNew
+AD_Add_New.modules = {
+  toolbar: [
+    [{ header: '1' }, { header: '2' },{ header: '3' },{ header: '4' },{ header: '5' }, { font: [] }],
+    [{ size: [] }],
+    ['bold', 'italic', 'underline', 'strike', 'blockquote'],
+    [{ list: 'ordered' }, { list: 'bullet' }, { indent: '-1' }, { indent: '+1' }],
+    ['link', 'image'],
+    ['clean'],
+  ],
+};
+
+AD_Add_New.formats = [
+  'header', 'font', 'size',
+  'bold', 'italic', 'underline', 'strike', 'blockquote',
+  'list', 'bullet', 'indent',
+  'link', 'image',
+];
 
 export default AD_Add_New;

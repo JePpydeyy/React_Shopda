@@ -58,6 +58,17 @@
   object-fit: contain;
 }
 
+/* Thêm class riêng cho ảnh trong nội dung */
+.quillEditor .ql-editor img.quill-image {
+  max-width: 100%;
+  height: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  margin: 10px 0;
+  display: block;
+  object-fit: contain;
+}
+
 .imagePreview {
   margin-top: 10px;
 }

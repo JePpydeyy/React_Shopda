@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import './postdetails.module.css';
+import styles from './postdetails.module.css';
 
 const PostDetail = () => {
   const { slug } = useParams();
@@ -58,7 +58,7 @@ const PostDetail = () => {
       }
 
       alert('Bài viết đã được xóa.');
-      navigate('/admin/news'); // đổi thành trang danh sách bài viết của bạn
+      navigate('/admin/news');
     } catch (err) {
       alert(`Lỗi khi xóa bài viết: ${err.message}`);
     } finally {
@@ -66,31 +66,28 @@ const PostDetail = () => {
     }
   };
 
-  if (loading) return <div>Đang tải bài viết...</div>;
-  if (error) return <div className="error">Lỗi: {error}</div>;
-  if (!article) return <div>Không có bài viết nào.</div>;
+  if (loading) return <div className={styles.loading}>Đang tải bài viết...</div>;
+  if (error) return <div className={styles.error}>Lỗi: {error}</div>;
+  if (!article) return <div className={styles.empty}>Không có bài viết nào.</div>;
 
   return (
-    <div className="container">
-      <div className="postContent">
-        <h1 className="postTitle">{article.title}</h1>
-        <p>
+    <div className={styles.container}>
+      <div className={styles.postContent}>
+        <h1 className={styles.postTitle}>{article.title}</h1>
+        <p className={styles.meta}>
           <em>
             Ngày đăng: {new Date(article.publishedAt).toLocaleDateString('vi-VN')} | Lượt xem: {article.views}
           </em>
         </p>
 
         <div
-          className="post-html"
+          className={styles.postHtml}
           dangerouslySetInnerHTML={{ __html: transformImageSrc(article.content) }}
         />
 
-        <div className="navigation" style={{ marginTop: '20px' }}>
-          <button onClick={() => window.history.back()} style={{ marginRight: '10px' }}>
+        <div className={styles.navigation}>
+          <button className={styles.backButton} onClick={() => navigate(-1)}>
             ← Quay lại
-          </button>
-          <button onClick={handleDelete} disabled={isDeleting} style={{ background: 'red', color: '#fff' }}>
-            {isDeleting ? 'Đang xóa...' : '🗑 Xóa bài viết'}
           </button>
         </div>
       </div>
