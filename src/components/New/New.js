@@ -10,7 +10,7 @@ const New = () => {
   const [error, setError] = useState(null);
   const [selectedCategoryId, setSelectedCategoryId] = useState(null);
 
-  const API_BASE_URL = process.env.REACT_APP_API_BASE || 'https://api-tuyendung-cty.onrender.com';
+  const API_BASE_URL = process.env.REACT_APP_API_BASE;
 
   useEffect(() => {
     const fetchCategories = async () => {

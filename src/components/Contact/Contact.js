@@ -1,6 +1,8 @@
 import styles from './contact.module.css';
 import React, { useState } from 'react';
 
+const API_URL = process.env.REACT_APP_API_URL;
+
 function Contact() {
   const [formData, setFormData] = useState({
     fullName: '',
@@ -38,7 +40,7 @@ function Contact() {
     }
 
     try {
-      const response = await fetch('https://api-tuyendung-cty.onrender.com/api/contact', {
+      const response = await fetch(`${API_URL}/contact`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -197,7 +197,7 @@ const NewsManagement = () => {
               <option key={c._id} value={c._id}>{c.category}</option>
             ))}
           </select>
-          <button className={styles.addButton} onClick={() => navigate('/admin/add_news')}>+ Thêm Tin Tức</button>
+          <button className={styles.addbutton} onClick={() => navigate('/admin/add_news')}>+ Thêm Tin Tức</button>
         </div>
 
         <div className={styles.tableContainer}>

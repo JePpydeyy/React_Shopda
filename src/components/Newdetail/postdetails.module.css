@@ -5,34 +5,6 @@
   font-family: 'Segoe UI', sans-serif;
 }
 
-.socialShare {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-  margin-bottom: 20px;
-}
-
-.socialShare a {
-  display: inline-block;
-  width: 40px;
-  height: 40px;
-  line-height: 40px;
-  text-align: center;
-  color: white;
-  border-radius: 50%;
-  text-decoration: none;
-  transition: background-color 0.3s;
-}
-
-.facebook { background-color: #3b5998; }
-.twitter { background-color: #1da1f2; }
-.pinterest { background-color: #bd081c; }
-.linkedin { background-color: #0077b5; }
-
-.socialShare a:hover {
-  opacity: 0.8;
-}
-
 .postTitle {
   font-size: 2rem;
   font-weight: bold;
@@ -83,14 +55,13 @@
   text-decoration: underline;
 }
 
-/* Ảnh trong bài viết */
-.postContent img {
-  display: block;
-  margin: 0 auto;
+/* Ảnh được gắn qua transformImageSrc */
+.postImage {
   max-width: 100%;
   height: auto;
+  display: block;
+  margin: 0 auto 12px;
   border-radius: 8px;
-  margin-bottom: 12px;
   object-fit: cover;
 }
 
@@ -123,32 +94,6 @@
   background-color: #0b5ed7;
 }
 
-/* Gallery ảnh */
-.image-gallery {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  justify-content: center;
-}
-
-.image-gallery img {
-  width: 100%;
-  max-width: 320px;
-  object-fit: cover;
-  border-radius: 8px;
-  margin-bottom: 12px;
-  display: block;
-}
-
-.gallery-img {
-  width: 100%;
-  max-width: 320px;
-  object-fit: cover;
-  border-radius: 8px;
-  margin-bottom: 12px;
-  display: block;
-}
-
 /* Responsive */
 @media (max-width: 600px) {
   .container {
@@ -178,27 +123,12 @@
     margin-bottom: 6px;
   }
 
-  .socialShare {
-    justify-content: center;
-    gap: 6px;
-    margin-bottom: 14px;
-  }
-
-  .socialShare a {
-    width: 32px;
-    height: 32px;
-    line-height: 32px;
-    font-size: 1rem;
-  }
-
   .navigation button {
     font-size: 0.95rem;
     padding: 10px 16px;
   }
 
-  .postContent img,
-  .image-gallery img,
-  .gallery-img {
+  .postImage {
     max-width: 100%;
     height: auto;
   }

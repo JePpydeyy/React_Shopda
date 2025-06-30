@@ -4,7 +4,7 @@ import styles from './Header.module.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMagnifyingGlass, faCartShopping, faCaretDown, faBars, faTimes, faBell } from '@fortawesome/free-solid-svg-icons';
 
-const API_BASE_URL = 'https://api-tuyendung-cty.onrender.com/api';
+const API_BASE_URL = process.env.REACT_APP_API_URL;
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);

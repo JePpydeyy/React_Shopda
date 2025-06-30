@@ -14,11 +14,13 @@ const PostDetail = () => {
 
   const transformImageSrc = (html) => {
     if (!html) return '';
+    const imgClass = styles.postImage || 'post-image'; // fallback nếu có lỗi
+
     return html.replace(
-      /<img[^>]+src=["']?(?!http|https:\/\/|data:)([^"'>]+)["']?[^>]*>/gi,
-      (match, src) => {
+      /<img([^>]+?)src=["']?(?!http|https:\/\/|data:)([^"'>]+)["']?([^>]*)>/gi,
+      (match, before, src, after) => {
         const cleanSrc = src.replace(/^\/+/, '');
-        return match.replace(src, `${API_BASE_URL}/${cleanSrc}`);
+        return `<img${before}src="${API_BASE_URL}/${cleanSrc}" class="${imgClass}"${after}>`;
       }
     );
   };
@@ -66,29 +68,27 @@ const PostDetail = () => {
     }
   };
 
-  if (loading) return <div className={styles.loading}>Đang tải bài viết...</div>;
+  if (loading) return <div>Đang tải bài viết...</div>;
   if (error) return <div className={styles.error}>Lỗi: {error}</div>;
-  if (!article) return <div className={styles.empty}>Không có bài viết nào.</div>;
+  if (!article) return <div>Không có bài viết nào.</div>;
 
   return (
     <div className={styles.container}>
       <div className={styles.postContent}>
         <h1 className={styles.postTitle}>{article.title}</h1>
-        <p className={styles.meta}>
+        <p>
           <em>
             Ngày đăng: {new Date(article.publishedAt).toLocaleDateString('vi-VN')} | Lượt xem: {article.views}
           </em>
         </p>
 
         <div
-          className={styles.postHtml}
+          className="post-html"
           dangerouslySetInnerHTML={{ __html: transformImageSrc(article.content) }}
         />
 
         <div className={styles.navigation}>
-          <button className={styles.backButton} onClick={() => navigate(-1)}>
-            ← Quay lại
-          </button>
+          <button onClick={() => window.history.back()}>← Quay lại</button>
         </div>
       </div>
     </div>

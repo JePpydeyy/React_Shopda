@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import styles from './Checkout.module.css';
 import ToastNotification from '../ToastNotification/ToastNotification';
 
-const API_BASE_URL = 'https://api-tuyendung-cty.onrender.com/api';
+const API_BASE_URL = process.env.REACT_APP_API_URL;
 
 const Checkout = () => {
   // ...existing state...
