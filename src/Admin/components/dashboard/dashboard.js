@@ -15,8 +15,21 @@ const formatCurrency = (amount) => {
 const Dashboard = () => {
   const [stats, setStats] = useState([]);
   const [orders, setOrders] = useState([]);
+  const [chartData, setChartData] = useState({
+    labels: [],
+    datasets: [
+      {
+        label: 'Doanh thu',
+        data: [],
+        borderColor: '#3b82f6',
+        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+        tension: 0.3
+      }
+    ]
+  });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [timePeriod, setTimePeriod] = useState('month'); // Default to month
 
   // Base API URL
   const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://api-tuyendung-cty.onrender.com/api';
@@ -43,19 +56,83 @@ const Dashboard = () => {
           axios.get(`${API_BASE_URL}/new`, { headers: { Authorization: `Bearer ${localStorage.getItem('adminToken')}` } })
         ]);
 
-        // Set recent orders (limit to 5, sorted by createdAt descending)
-        const sortedOrders = ordersResponse.data
+        // Filter delivered orders only
+        const deliveredOrders = ordersResponse.data.filter(order => order.status === 'Đã giao');
+
+        // Set recent delivered orders (limit to 5, sorted by createdAt descending)
+        const sortedOrders = deliveredOrders
           .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
           .slice(0, 5);
         setOrders(sortedOrders);
 
-        // Calculate total revenue from orders
-        const totalRevenue = ordersResponse.data.reduce((sum, order) => sum + (order.grandTotal || 0), 0) / 1000000; // Convert to millions
+        // Calculate total revenue from delivered orders only
+        const totalRevenue = deliveredOrders.reduce((sum, order) => sum + (order.grandTotal || 0), 0) / 1000000; // Convert to millions
+
+        // Aggregate revenue based on selected time period
+        const today = new Date();
+        const labels = [];
+        const revenueData = [];
+
+        if (timePeriod === 'week') {
+          // Last 6 weeks
+          for (let i = 0; i < 6; i++) {
+            const weekStart = new Date(today.getFullYear(), today.getMonth(), today.getDate() - i * 7);
+            const weekEnd = new Date(today.getFullYear(), today.getMonth(), today.getDate() - (i - 1) * 7);
+            labels.unshift(`Tuần ${weekStart.getDate()}/${weekStart.getMonth() + 1}`);
+            const weekRevenue = deliveredOrders
+              .filter(order => {
+                const orderDate = new Date(order.createdAt);
+                return orderDate >= weekStart && orderDate < weekEnd;
+              })
+              .reduce((sum, order) => sum + (order.grandTotal || 0), 0) / 1000000; // Convert to millions
+            revenueData.unshift(weekRevenue.toFixed(2));
+          }
+        } else if (timePeriod === 'month') {
+          // Last 6 months
+          for (let i = 0; i < 6; i++) {
+            const monthDate = new Date(today.getFullYear(), today.getMonth() - i, 1);
+            labels.unshift(`Tháng ${monthDate.getMonth() + 1}`);
+            const monthRevenue = deliveredOrders
+              .filter(order => {
+                const orderDate = new Date(order.createdAt);
+                return orderDate.getFullYear() === monthDate.getFullYear() && orderDate.getMonth() === monthDate.getMonth();
+              })
+              .reduce((sum, order) => sum + (order.grandTotal || 0), 0) / 1000000; // Convert to millions
+            revenueData.unshift(monthRevenue.toFixed(2));
+          }
+        } else if (timePeriod === 'year') {
+          // Last 6 years
+          for (let i = 0; i < 6; i++) {
+            const year = today.getFullYear() - i;
+            labels.unshift(`Năm ${year}`);
+            const yearRevenue = deliveredOrders
+              .filter(order => {
+                const orderDate = new Date(order.createdAt);
+                return orderDate.getFullYear() === year;
+              })
+              .reduce((sum, order) => sum + (order.grandTotal || 0), 0) / 1000000; // Convert to millions
+            revenueData.unshift(yearRevenue.toFixed(2));
+          }
+        }
+
+        // Update chart data with fallback for empty data
+        setChartData({
+          labels: labels.length ? labels : ['Không có dữ liệu'],
+          datasets: [
+            {
+              label: 'Doanh thu',
+              data: revenueData.length ? revenueData : [0],
+              borderColor: '#3b82f6',
+              backgroundColor: 'rgba(59, 130, 246, 0.1)',
+              tension: 0.3
+            }
+          ]
+        });
 
         // Update stats with API data
         const newStats = [
           { value: productsResponse.data.length || 0, change: 12, trend: 'up', label: 'Tổng sản phẩm', suffix: '' },
-          { value: ordersResponse.data.length || 0, change: 5, trend: 'up', label: 'Đơn hàng', suffix: '' },
+          { value: deliveredOrders.length || 0, change: 5, trend: 'up', label: 'Đơn hàng đã giao', suffix: '' },
           { value: totalRevenue.toFixed(2), change: 18, trend: 'up', label: 'Doanh thu', suffix: ' triệu' },
           { value: categoriesResponse.data.length || 0, change: 8, trend: 'up', label: 'Danh mục sản phẩm', suffix: '' },
           { value: discountsResponse.data.length || 0, change: 3, trend: 'down', label: 'Mã giảm giá', suffix: '' },
@@ -72,51 +149,33 @@ const Dashboard = () => {
       }
     };
     fetchData();
-  }, []);
-
-  const chartData = {
-    labels: ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6'],
-    datasets: [
-      {
-        label: 'Doanh thu',
-        data: [1000, 1170, 660, 1030, 2000, 1500],
-        borderColor: '#3b82f6',
-        backgroundColor: 'rgba(59, 130, 246, 0.1)',
-        tension: 0.3
-      },
-      {
-        label: 'Chi phí',
-        data: [400, 460, 1120, 540, 800, 600],
-        borderColor: '#dc2626',
-        backgroundColor: 'rgba(220, 38, 38, 0.1)',
-        tension: 0.3
-      },
-      {
-        label: 'Lợi nhuận',
-        data: [600, 710, -460, 490, 1200, 900],
-        borderColor: '#28a745',
-        backgroundColor: 'rgba(40, 167, 69, 0.1)',
-        tension: 0.3
-      }
-    ]
-  };
+  }, [timePeriod]);
 
   const chartOptions = {
     responsive: true,
+    maintainAspectRatio: true,
+    aspectRatio: 2, // Adjust aspect ratio for better responsiveness
     plugins: {
       legend: { position: 'bottom' },
       title: {
         display: true,
-        text: 'Báo cáo doanh thu 6 tháng',
+        text: `Báo cáo doanh thu theo ${timePeriod === 'week' ? 'tuần' : timePeriod === 'month' ? 'tháng' : 'năm'}`,
         font: { size: 16 }
       }
     },
     scales: {
       y: {
-        beginAtZero: false,
+        beginAtZero: true,
         title: { display: true, text: 'Triệu đồng' }
+      },
+      x: {
+        title: { display: true, text: timePeriod === 'week' ? 'Tuần' : timePeriod === 'month' ? 'Tháng' : 'Năm' }
       }
     }
+  };
+
+  const handleTimePeriodChange = (e) => {
+    setTimePeriod(e.target.value);
   };
 
   return (
@@ -164,7 +223,7 @@ const Dashboard = () => {
               <div className={styles.leftColumn}>
                 <div className={styles.recentOrders}>
                   <div className={styles.sectionHeader}>
-                    <h2>Đơn hàng gần đây</h2>
+                    <h2>Đơn hàng đã giao gần đây</h2>
                     <a href="/admin/product">Xem tất cả</a>
                   </div>
                   <div className={styles.tableContainer}>
@@ -184,7 +243,7 @@ const Dashboard = () => {
                             <td>{order.fullName}</td>
                             <td>{formatCurrency(order.grandTotal)}</td>
                             <td>
-                              <span className={`${styles.status} ${styles[order.status === 'Chờ xử lý' ? 'pending' : 'completed']}`}>
+                              <span className={`${styles.status} ${styles.completed}`}>
                                 {order.status}
                               </span>
                             </td>
@@ -195,29 +254,14 @@ const Dashboard = () => {
                   </div>
                 </div>
                 <div className={styles.chartContainer}>
+                  <div className={styles.chartHeader}>
+                    <select value={timePeriod} onChange={handleTimePeriodChange} className={styles.timePeriodSelect}>
+                      <option value="week">Theo tuần</option>
+                      <option value="month">Theo tháng</option>
+                      <option value="year">Theo năm</option>
+                    </select>
+                  </div>
                   <Line data={chartData} options={chartOptions} />
-                </div>
-              </div>
-
-              <div className={styles.rightColumn}>
-                <div className={styles.quickStats}>
-                  <div className={styles.sectionHeader}>
-                    <h2>Thống kê nhanh</h2>
-                  </div>
-                  <div className={styles.statsGridSmall}>
-                    {[
-                      { icon: 'eye', value: '1.2K', label: 'Lượt xem' },
-                      { icon: 'comment', value: '56', label: 'Đánh giá' },
-                      { icon: 'heart', value: '324', label: 'Yêu thích' },
-                      { icon: 'share-alt', value: '78', label: 'Chia sẻ' }
-                    ].map((stat, index) => (
-                      <div key={index} className={styles.statItem}>
-                        <i className={`fas fa-${stat.icon}`}></i>
-                        <div className={styles.statValue}>{stat.value}</div>
-                        <div className={styles.statLabel}>{stat.label}</div>
-                      </div>
-                    ))}
-                  </div>
                 </div>
               </div>
             </div>

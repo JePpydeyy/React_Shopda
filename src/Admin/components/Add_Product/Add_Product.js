@@ -15,7 +15,7 @@ const fieldGuides = {
   tag: "Sale: Giảm giá | New: Sản phẩm mới",
   short_description: "Mô tả ngắn gọn (100-150 ký tự)",
   description: "Mô tả chi tiết: nguồn gốc, khối lượng, lợi ích, bảo quản...",
-  weight: "Khối lượng sản phẩm (gram hoặc kg)",
+  // weight: "Khối lượng sản phẩm (gram hoặc kg)",
   images: "Chọn tối đa 4 ảnh chất lượng cao (JPEG, PNG, GIF)",
   status: "Hiển thị: Hiện trên website | Ẩn: Không hiện | Sale: Đang giảm giá",
 };
@@ -53,7 +53,7 @@ const AddProduct = () => {
     tag: 'new',
     short_description: '',
     description: '',
-    weight: '',
+    weight: '1', // <-- mặc định là 1
     status: 'show',
     images: [],
   });
@@ -304,7 +304,7 @@ const AddProduct = () => {
         }
       );
 
-      navigate('/admin/products');
+      navigate('/admin/product');
     } catch (err) {
       let errorMessage = 'Không thể tạo sản phẩm';
       if (err.response?.status === 400) {
@@ -532,7 +532,7 @@ const AddProduct = () => {
             />
           </div>
 
-          <div className={styles.formGroup}>
+          {/* <div className={styles.formGroup}>
             <TooltipButton field="weight" activeTooltip={activeTooltip} setActiveTooltip={setActiveTooltip}>Khối lượng</TooltipButton>
             <input
               type="text"
@@ -542,7 +542,7 @@ const AddProduct = () => {
               className={styles.input}
               placeholder="VD: 150g"
             />
-          </div>
+          </div> */}
 
           <div className={styles.formGroup}>
             <TooltipButton field="description" activeTooltip={activeTooltip} setActiveTooltip={setActiveTooltip}>Mô tả chi tiết</TooltipButton>

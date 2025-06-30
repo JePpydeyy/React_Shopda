@@ -26,7 +26,11 @@ const OrderManagement = () => {
         const res = await axios.get('https://api-tuyendung-cty.onrender.com/api/order', {
           headers: { Authorization: `Bearer ${token}` },
         });
-        setOrders(res.data);
+        // Sắp xếp đơn hàng mới nhất lên đầu
+        const sortedOrders = res.data.sort(
+          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+        );
+        setOrders(sortedOrders);
       } catch (err) {
         setError('Không thể tải danh sách đơn hàng');
       } finally {

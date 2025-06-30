@@ -54,7 +54,9 @@ const Sidebar = () => {
     { path: '/admin/order', icon: 'fa-shopping-cart', label: 'Đơn hàng' },
     { path: '/admin/new', icon: 'fa-newspaper', label: 'Tin tức' },
     { path: '/admin/categorynew', icon: 'fa-list-ol', label: 'Danh mục tin tức' },
-    { path: '/admin/contact', icon: 'fa-envelope', label: 'Liên hệ' }
+    { path: '/admin/contact', icon: 'fa-envelope', label: 'Liên hệ' },
+    { path: '/admin/discout', icon: 'fa-envelope', label: 'mã giảm giá' }
+
   ];
 
   return (

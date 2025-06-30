@@ -219,7 +219,7 @@ const Cart = () => {
                           <div className={styles.productDetails}>
                             <h3>{item.name}</h3>
                             <div className={styles.charmInfo}>Charm: {item.charm}</div>
-                            <div className={styles.sizeInfo}>Size Viên Đá: {item.stoneSize}</div>
+                            {/* <div className={styles.sizeInfo}>Size Viên Đá: {item.stoneSize}</div> */}
                             <div className={styles.sizeInfo}>Size Tay: {item.wristSize}</div>
                           </div>
                         </div>
@@ -279,7 +279,7 @@ const Cart = () => {
                       <div className={styles.mobileProductDetails}>
                         <h3>{item.name}</h3>
                         <div className={styles.charmInfo}>Charm: {item.charm}</div>
-                        <div className={styles.sizeInfo}>Size Viên Đá: {item.stoneSize}</div>
+                        {/* <div className={styles.sizeInfo}>Size Viên Đá: {item.stoneSize}</div> */}
                         <div className={styles.sizeInfo}>Size Tay: {item.wristSize}</div>
                       </div>
                     </div>
