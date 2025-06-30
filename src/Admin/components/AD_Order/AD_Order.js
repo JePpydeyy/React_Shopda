@@ -103,7 +103,6 @@ const OrderManagement = () => {
     const printContent = `
       <div>
         <h2>Chi tiết đơn hàng</h2>
-        <p><strong>Mã đơn:</strong> ${order._id}</p>
         <p><strong>Khách hàng:</strong> ${order.fullName}</p>
         <p><strong>Ngày sinh:</strong> ${new Date(order.dateOfBirth).toLocaleDateString('vi-VN')}</p>
         <p><strong>SĐT:</strong> ${order.phoneNumber}</p>
@@ -209,7 +208,7 @@ const OrderManagement = () => {
               <thead>
                 <tr className={styles.tableHeader}>
                   <th>STT</th>
-                  <th>Mã đơn</th>
+                  {/* <th>Mã đơn</th> */}
                   <th>Khách hàng</th>
                   <th>Tổng tiền</th>
                   <th>Trạng thái</th>
@@ -225,7 +224,7 @@ const OrderManagement = () => {
                       onClick={() => handleView(order._id)}
                     >
                       <td>{(currentPage - 1) * ORDERS_PER_PAGE + idx + 1}</td>
-                      <td>{order._id}</td>
+                      {/* <td>{order._id}</td> */}
                       <td>{order.fullName}</td>
                       <td>{order.grandTotal?.toLocaleString() || order.totalAmount?.toLocaleString()} VNĐ</td>
                       <td>{order.status}</td>
@@ -253,7 +252,7 @@ const OrderManagement = () => {
                             <div className={styles.loading}>Đang tải chi tiết...</div>
                           ) : (
                             <div className={styles.detailContainer}>
-                              <p><strong>Mã đơn:</strong> {selectedOrder._id}</p>
+                              {/* <p><strong>Mã đơn:</strong> {selectedOrder._id}</p> */}
                               <p><strong>Khách hàng:</strong> {selectedOrder.fullName}</p>
                               <p><strong>Ngày sinh:</strong> {new Date(selectedOrder.dateOfBirth).toLocaleDateString('vi-VN')}</p>
                               <p><strong>SĐT:</strong> {selectedOrder.phoneNumber}</p>

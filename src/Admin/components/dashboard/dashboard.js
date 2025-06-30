@@ -224,7 +224,7 @@ const Dashboard = () => {
                 <div className={styles.recentOrders}>
                   <div className={styles.sectionHeader}>
                     <h2>Đơn hàng đã giao gần đây</h2>
-                    <a href="/admin/product">Xem tất cả</a>
+                    <a href="/admin/order">Xem tất cả</a>
                   </div>
                   <div className={styles.tableContainer}>
                     <table className={styles.table}>
