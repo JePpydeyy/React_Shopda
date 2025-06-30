@@ -10,7 +10,7 @@ const PostDetail = () => {
   const [error, setError] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  const API_BASE_URL = 'https://api-tuyendung-cty.onrender.com';
+ const API_BASE_URL = process.env.REACT_APP_API_URL;
 
   const transformImageSrc = (html) => {
     if (!html) return '';

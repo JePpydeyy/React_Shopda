@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import styles from './Product.module.css';
 
-const API_BASE_URL = 'https://api-tuyendung-cty.onrender.com/api';
+const API_BASE_URL = process.env.REACT_APP_API_URL;
 const PRODUCTS_PER_PAGE = 9;
 
 const Product = () => {
