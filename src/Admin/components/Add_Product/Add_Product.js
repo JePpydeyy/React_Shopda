@@ -663,7 +663,6 @@ const AddProduct = () => {
             >
               <option value="show">Hiển thị</option>
               <option value="hidden">Ẩn</option>
-              <option value="sale">Sale</option>
             </select>
           </div>
 

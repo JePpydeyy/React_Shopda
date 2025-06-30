@@ -1047,7 +1047,7 @@ const ProductManagement = () => {
                   />
                   {formErrors.description && <span className={styles.error}>{formErrors.description}</span>}
                 </div>
-                <div className={styles.formGroup}>
+                {/* <div className={styles.formGroup}>
                   <TooltipButton
                     field="weight"
                     activeTooltip={activeTooltip}
@@ -1063,7 +1063,7 @@ const ProductManagement = () => {
                     onChange={handleFormChange}
                     className={styles.input}
                   />
-                </div>
+                </div> */}
                 <div className={styles.formGroup}>
                   <TooltipButton
                     field="status"
