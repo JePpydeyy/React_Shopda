@@ -42,6 +42,9 @@ const TooltipButton = ({ field, children, activeTooltip, setActiveTooltip }) => 
   </div>
 );
 
+const API_URL = process.env.REACT_APP_API_URL;
+const API_BASE = process.env.REACT_APP_API_BASE;
+
 const AddProduct = () => {
   const [formData, setFormData] = useState({
     name: '',
@@ -72,7 +75,7 @@ const AddProduct = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await axios.get('https://api-tuyendung-cty.onrender.com/api/category', {
+        const response = await axios.get(`${API_URL}/category`, {
           headers: token ? { Authorization: `Bearer ${token}` } : {},
         });
         setCategories(response.data);
@@ -294,7 +297,7 @@ const AddProduct = () => {
       });
 
       await axios.post(
-        'https://api-tuyendung-cty.onrender.com/api/product',
+        `${API_URL}/product`,
         formDataToSend,
         {
           headers: {

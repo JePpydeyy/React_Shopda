@@ -5,6 +5,7 @@ import styles from './Order.module.css';
 import axios from 'axios';
 
 const ORDERS_PER_PAGE = 10;
+const API_URL = process.env.REACT_APP_API_URL;
 
 const OrderManagement = () => {
   const [orders, setOrders] = useState([]);
@@ -23,7 +24,7 @@ const OrderManagement = () => {
       setError('');
       try {
         const token = localStorage.getItem('adminToken');
-        const res = await axios.get('https://api-tuyendung-cty.onrender.com/api/order', {
+        const res = await axios.get(`${API_URL}/order`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         // Sắp xếp đơn hàng mới nhất lên đầu
@@ -63,7 +64,7 @@ const OrderManagement = () => {
     try {
       const token = localStorage.getItem('adminToken');
       await axios.put(
-        `https://api-tuyendung-cty.onrender.com/api/order/${id}/toggle-status`,
+        `${API_URL}/order/${id}/toggle-status`,
         { status: newStatus },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -87,7 +88,7 @@ const OrderManagement = () => {
     setDetailLoading(true);
     try {
       const token = localStorage.getItem('adminToken');
-      const res = await axios.get(`https://api-tuyendung-cty.onrender.com/api/order/${id}`, {
+      const res = await axios.get(`${API_URL}/order/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setSelectedOrder(res.data);

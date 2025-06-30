@@ -5,6 +5,9 @@ import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import styles from './add_news.module.css';
 
+const API_URL = process.env.REACT_APP_API_URL;
+const API_BASE = process.env.REACT_APP_API_BASE;
+
 const AD_Add_New = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
@@ -28,7 +31,7 @@ const AD_Add_New = () => {
           setError('Không tìm thấy token. Vui lòng đăng nhập lại.');
           return;
         }
-        const response = await axios.get('https://api-tuyendung-cty.onrender.com/api/new-category', {
+        const response = await axios.get(`${API_URL}/new-category`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         console.log('Danh mục đã tải:', response.data);
@@ -134,7 +137,7 @@ const AD_Add_New = () => {
     }
 
     try {
-      const response = await axios.post('https://api-tuyendung-cty.onrender.com/api/new/', formDataToSend, {
+      const response = await axios.post(`${API_URL}/new/`, formDataToSend, {
         headers: {
           'Content-Type': 'multipart/form-data',
           Authorization: `Bearer ${token}`,

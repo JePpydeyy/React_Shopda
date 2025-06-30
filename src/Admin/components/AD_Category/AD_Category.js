@@ -13,9 +13,10 @@ const CategoryManagement = () => {
   const [currentCategory, setCurrentCategory] = useState({ id: '', name_categories: '', status: 'show' });
   const [modalError, setModalError] = useState(null);
   const [modalLoading, setModalLoading] = useState(false);
+  const [deleteConfirm, setDeleteConfirm] = useState({ open: false, id: null });
 
   // Base API URL (use proxy in development)
-  const API_BASE_URL = process.env.REACT_APP_API_URL || '/api/category';
+  const API_URL = process.env.REACT_APP_API_URL;
 
   // Check if user is authenticated
   const isAuthenticated = () => !!localStorage.getItem('adminToken');
@@ -25,7 +26,7 @@ const CategoryManagement = () => {
     const fetchCategories = async () => {
       setIsLoading(true);
       try {
-        const response = await axios.get(`https://api-tuyendung-cty.onrender.com/api/category`);
+        const response = await axios.get(`${API_URL}/category`);
         const transformedCategories = response.data.map(cat => ({
           id: cat._id,
           name_categories: cat.category,
@@ -66,7 +67,7 @@ const CategoryManagement = () => {
     setModalError(null);
     setModalLoading(true);
     try {
-      const response = await axios.get(`https://api-tuyendung-cty.onrender.com/api/category/${id}`);
+      const response = await axios.get(`${API_URL}/category/${id}`);
       setCurrentCategory({
         id: response.data._id,
         name_categories: response.data.category,
@@ -103,7 +104,7 @@ const CategoryManagement = () => {
 
       let response;
       if (modalMode === 'edit') {
-        response = await axios.put(`https://api-tuyendung-cty.onrender.com/api/category/${currentCategory.id}`, data, config);
+        response = await axios.put(`${API_URL}/category/${currentCategory.id}`, data, config);
         const updatedCategory = {
           id: response.data._id,
           name_categories: response.data.category,
@@ -111,7 +112,7 @@ const CategoryManagement = () => {
         };
         setCategories(categories.map(cat => (cat.id === currentCategory.id ? updatedCategory : cat)));
       } else {
-        response = await axios.post(`https://api-tuyendung-cty.onrender.com/api/category`, data, config);
+        response = await axios.post(`${API_URL}/category`, data, config);
         const newCategory = {
           id: response.data._id,
           name_categories: response.data.category,
@@ -125,7 +126,7 @@ const CategoryManagement = () => {
         setModalError('Phiên đăng nhập hết hạn hoặc không có quyền admin. Đang chuyển hướng đến trang đăng nhập...');
         setTimeout(() => window.location.href = '/admin/login', 2000);
       } else {
-        setModalError(err.response?. piècesdata?.message || 'Có lỗi xảy ra. Vui lòng thử lại.');
+        setModalError(err.response?.data?.message || 'Có lỗi xảy ra. Vui lòng thử lại.');
       }
       console.error('Error saving category:', err);
     } finally {
@@ -140,23 +141,21 @@ const CategoryManagement = () => {
       setTimeout(() => window.location.href = '/admin/login', 2000);
       return;
     }
-    if (window.confirm('Bạn có chắc muốn xóa danh mục này?')) {
-      try {
-        await axios.delete(`https://api-tuyendung-cty.onrender.com/api/category/${id}`, {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('adminToken')}`,
-          },
-        });
-        setCategories(categories.filter(category => category.id !== id));
-      } catch (err) {
-        if (err.response?.status === 401) {
-          setError('Phiên đăng nhập hết hạn hoặc không có quyền admin. Đang chuyển hướng đến trang đăng nhập...');
-          setTimeout(() => window.location.href = '/admin/login', 2000);
-        } else {
-          setError('Không thể xóa danh mục. Vui lòng thử lại.');
-        }
-        console.error('Error deleting category:', err);
+    try {
+      await axios.delete(`${API_URL}/category/${id}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('adminToken')}`,
+        },
+      });
+      setCategories(categories.filter(category => category.id !== id));
+    } catch (err) {
+      if (err.response?.status === 401) {
+        setError('Phiên đăng nhập hết hạn hoặc không có quyền admin. Đang chuyển hướng đến trang đăng nhập...');
+        setTimeout(() => window.location.href = '/admin/login', 2000);
+      } else {
+        setError('Không thể xóa danh mục. Vui lòng thử lại.');
       }
+      console.error('Error deleting category:', err);
     }
   };
 
@@ -171,7 +170,7 @@ const CategoryManagement = () => {
     }
     try {
       const response = await axios.put(
-        `https://api-tuyendung-cty.onrender.com/api/category/${id}/toggle-status`,
+        `${API_URL}/category/${id}/toggle-status`,
         {},
         {
           headers: {
@@ -253,7 +252,7 @@ const CategoryManagement = () => {
                         Sửa
                       </button>
                       <button
-                        onClick={() => handleDelete(category.id)}
+                        onClick={() => setDeleteConfirm({ open: true, id: category.id })}
                         className={`${styles.actionButton} ${styles.deleteButton}`}
                       >
                         Xóa
@@ -322,6 +321,43 @@ const CategoryManagement = () => {
                   </div>
                 </form>
               )}
+            </div>
+          </div>
+        )}
+
+        {/* Delete Confirmation Modal */}
+        {deleteConfirm.open && (
+          <div className={styles.modalOverlay}>
+            <div className={styles.modal} style={{ maxWidth: 400, textAlign: 'center' }}>
+              <div style={{ marginBottom: 16 }}>
+                <svg width="48" height="48" fill="none" viewBox="0 0 24 24">
+                  <circle cx="12" cy="12" r="12" fill="#fdecea"/>
+                  <path d="M15 9l-6 6M9 9l6 6" stroke="#e74c3c" strokeWidth="2" strokeLinecap="round"/>
+                </svg>
+              </div>
+              <h3 style={{ color: '#e74c3c', marginBottom: 12, fontWeight: 600 }}>Xác nhận xóa danh mục</h3>
+              <p style={{ marginBottom: 24, color: '#333' }}>
+                <strong>Tất cả sản phẩm trong danh mục này sẽ bị ẩn đi.</strong><br />
+                Bạn có chắc muốn xóa danh mục này?
+              </p>
+              <div className={styles.formActions}>
+                <button
+                  className={styles.submitButton}
+                  style={{ background: '#e74c3c' }}
+                  onClick={async () => {
+                    await handleDelete(deleteConfirm.id);
+                    setDeleteConfirm({ open: false, id: null });
+                  }}
+                >
+                  Đồng ý
+                </button>
+                <button
+                  className={styles.cancelButton}
+                  onClick={() => setDeleteConfirm({ open: false, id: null })}
+                >
+                  Hủy
+                </button>
+              </div>
             </div>
           </div>
         )}
