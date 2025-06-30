@@ -218,5 +218,6 @@
 }
 img{
   margin :0 auto;
-  width :80%
+  width :500px;
+  object-fit: cover;
 }

@@ -53,7 +53,7 @@ const Sidebar = () => {
     { path: '/admin/product', icon: 'fa-gem', label: 'Sản phẩm' },
     { path: '/admin/order', icon: 'fa-shopping-cart', label: 'Đơn hàng' },
     { path: '/admin/new', icon: 'fa-newspaper', label: 'Tin tức' },
-    { path: '/admin/categorynew', icon: 'fa-list-ol', label: 'Danh mục tin' },
+    { path: '/admin/categorynew', icon: 'fa-list-ol', label: 'Danh mục tin tức' },
     { path: '/admin/contact', icon: 'fa-envelope', label: 'Liên hệ' }
   ];
 

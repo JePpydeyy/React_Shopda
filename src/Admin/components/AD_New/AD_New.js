@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import Sidebar from '../Sidebar/Sidebar';
 import styles from './new.module.css';
 
-// Font Awesome Icons
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPenToSquare, faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
+import { faPenToSquare, faEye, faEyeSlash, faTrash } from '@fortawesome/free-solid-svg-icons';
 
 const NewsManagement = () => {
   const [news, setNews] = useState([]);
@@ -20,7 +19,6 @@ const NewsManagement = () => {
 
   const API_BASE_URL = process.env.REACT_APP_API_BASE || 'https://api-tuyendung-cty.onrender.com';
 
-  // Fetch categories
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -40,7 +38,6 @@ const NewsManagement = () => {
     fetchCategories();
   }, []);
 
-  // Fetch news (reusable)
   const fetchNews = async () => {
     try {
       setLoading(true);
@@ -83,26 +80,22 @@ const NewsManagement = () => {
     }
   };
 
-  // Initial fetch when categories loaded
   useEffect(() => {
     if (categories.length > 0) {
       fetchNews();
     }
   }, [categories]);
 
-  // Filtered news
   const filteredNews = news.filter(article =>
     article.title.toLowerCase().includes(searchTerm.toLowerCase()) &&
     (statusFilter === 'all' || article.status === statusFilter) &&
     (categoryFilter === 'all' || article.category === categoryFilter)
   );
 
-  // Edit handler (SPA)
   const handleEdit = (slug) => {
-    navigate(`/admin/news/edit/${slug}`);
+    navigate(`/admin/editnew/${slug}`);
   };
 
-  // Toggle show/hide
   const handleToggleStatus = async (slug, currentStatus) => {
     const newStatus = currentStatus === 'Hiển thị' ? 'Ẩn' : 'Hiển thị';
     if (!window.confirm(`Bạn có chắc muốn ${newStatus.toLowerCase()} bài viết này?`)) return;
@@ -117,12 +110,9 @@ const NewsManagement = () => {
         body: JSON.stringify({ status: newStatus === 'Hiển thị' ? 'show' : 'hide' }),
       });
 
-      const result = await res.json();
-
-      // ✅ Reload latest data from server
+      await res.json();
       await fetchNews();
 
-      // ✅ Update selected article if it's open
       if (selectedArticle?.slug === slug) {
         setSelectedArticle(prev => ({ ...prev, status: newStatus }));
       }
@@ -133,7 +123,32 @@ const NewsManagement = () => {
     }
   };
 
-  // Render HTML safely
+  const handleDeleteArticle = async (slug) => {
+    if (!window.confirm('Bạn có chắc muốn xóa bài viết này không?')) return;
+
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/new/${slug}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('adminToken') || ''}`,
+        },
+      });
+
+      const result = await res.json();
+      if (res.ok) {
+        alert('Đã xóa bài viết thành công.');
+        fetchNews();
+        if (selectedArticle?.slug === slug) {
+          setSelectedArticle(null);
+        }
+      } else {
+        alert(`Xóa thất bại: ${result.message || 'Lỗi không xác định'}`);
+      }
+    } catch (err) {
+      alert('Lỗi khi xóa bài viết.');
+    }
+  };
+
   const createMarkup = (html) => {
     const safeHTML = html?.replace(
       /<img\s+[^>]*src=["'](?!https?:\/\/)([^"']+)["']/gi,
@@ -151,7 +166,6 @@ const NewsManagement = () => {
       <div className={styles.content}>
         <h1 className={styles.title}>Quản Lý Tin Tức</h1>
 
-        {/* Filter & Search */}
         <div className={styles.searchFilter}>
           <input
             className={styles.searchInput}
@@ -180,13 +194,9 @@ const NewsManagement = () => {
               <option key={c._id} value={c.category}>{c.category}</option>
             ))}
           </select>
-          <button onClick={() => navigate('/admin/add_news')}>
-            + Thêm Tin Tức
-            </button>
-
+          <button onClick={() => navigate('/admin/add_news')}>+ Thêm Tin Tức</button>
         </div>
 
-        {/* Table */}
         <div className={styles.tableContainer}>
           <table className={styles.table}>
             <thead className={styles.tableHeader}>
@@ -226,6 +236,13 @@ const NewsManagement = () => {
                     >
                       <FontAwesomeIcon icon={article.status === 'Hiển thị' ? faEyeSlash : faEye} />
                     </button>
+                    <button
+                      className={styles.iconButton}
+                      title="Xóa bài viết"
+                      onClick={(e) => { e.stopPropagation(); handleDeleteArticle(article.slug); }}
+                    >
+                      <FontAwesomeIcon icon={faTrash} />
+                    </button>
                   </td>
                 </tr>
               )) : (
@@ -237,7 +254,6 @@ const NewsManagement = () => {
           </table>
         </div>
 
-        {/* Detail popup */}
         {selectedArticle && (
           <div className={styles.popupOverlay} onClick={(e) => e.target === e.currentTarget && setSelectedArticle(null)}>
             <div className={styles.popup}>
@@ -246,8 +262,8 @@ const NewsManagement = () => {
                 <div className={styles.articleHeader}>
                   <h3>{selectedArticle.title}</h3>
                   <p className={styles.meta}>
-                    Danh mục: {selectedArticle.category} | Ngày: {new Date(selectedArticle.publishedAt).toLocaleDateString('vi-VN')} | 
-                    Lượt xem: {selectedArticle.views} | 
+                    Danh mục: {selectedArticle.category} | Ngày: {new Date(selectedArticle.publishedAt).toLocaleDateString('vi-VN')} |
+                    Lượt xem: {selectedArticle.views} |
                     Trạng thái: <span className={selectedArticle.status === 'Hiển thị' ? styles.statusShow : styles.statusHidden}>
                       {selectedArticle.status}
                     </span>

@@ -10,6 +10,11 @@
   background-color: #1e293b;
   color: #ffffff;
   padding: 20px 0;
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  overflow-y: auto;
 }
 
 .sidebar a {
@@ -18,6 +23,9 @@
   padding: 10px 20px;
   text-decoration: none;
   font-size: 0.95rem;
+  border-radius: 4px;
+  margin: 0 10px;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 .sidebar a:hover {
@@ -33,155 +41,172 @@
 }
 
 .title {
-  font-size: 1.875rem;
-  font-weight: 700;
-  margin-bottom: 1.5rem;
+  font-size: 1.75rem;
+  font-weight: bold;
+  margin-bottom: 24px;
   color: #1a1a3d;
   letter-spacing: -0.02em;
 }
 
 .formContainer {
-  background-color: #ffffff;
-  padding: 2rem;
-  border-radius: 0.75rem;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  max-width: 800px;
+  padding: 50px;
+  width: 100%;
   margin: 0 auto;
+  display: grid;
+  gap: 20px;
 }
 
-.formGroup {
-  margin-bottom: 1.5rem;
+.inputSection {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .formLabel {
   display: block;
-  font-weight: 600;
-  margin-bottom: 0.5rem;
-  color: #64748b;
   font-size: 0.95rem;
+  font-weight: 500;
+  color: #1e293b;
+  margin-bottom: 8px;
 }
 
 .formInput,
-.formSelect {
+.formSelect,
+.mainImageInput {
   width: 100%;
-  padding: 0.75rem 1rem;
-  border: 1px solid #e5e7eb;
-  border-radius: 0.375rem;
+  padding: 12px 16px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
   font-size: 0.95rem;
-  color: #374151;
-  background-color: #f8fafc;
+  color: #475569;
+  background: #ffffff;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .formInput:focus,
-.formSelect:focus {
+.formSelect:focus,
+.mainImageInput:focus {
   outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  border-color: #1e40af;
+  box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.2);
+}
+
+.formSelect {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23475569' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 1rem;
+  padding-right: 2.5rem;
 }
 
 .formSelect option {
-  color: #374151;
+  color: #475569;
 }
 
 .formSelect option:disabled {
-  color: #9ca3af;
+  color: #94a3b8;
 }
 
-.mainImageInput {
-  width: 100%;
-  padding: 0.75rem 1rem;
-  border: 1px solid #e5e7eb;
-  border-radius: 0.375rem;
-  font-size: 0.95rem;
-  color: #374151;
-  background-color: #ffffff;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+.imagePreview {
+  margin-top: 10px;
 }
 
-.mainImageInput:focus {
-  outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+.imagePreview img {
+  max-width: 300px;
+  max-height: 300px;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  object-fit: cover;
 }
 
 .wpEditor {
-  border: 1px solid #e5e7eb;
-  border-radius: 0.375rem;
-  background-color: #fff;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  background: #ffffff;
   font-size: 0.95rem;
   line-height: 1.6;
 }
 
 .wpEditor .ql-toolbar {
-  border-bottom: 1px solid #e5e7eb;
-  background-color: #f8fafc;
+  border-bottom: 1px solid #cbd5e1;
+  background-color: #f1f5f9;
   padding: 0.75rem;
 }
 
 .wpEditor .ql-container {
-  min-height: 250px;
+  min-height: 300px;
+  max-height: 600px;
   padding: 1rem;
-}
-
-.wpEditor .ql-editor {
-  color: #374151;
+  color: #475569;
+  resize: vertical;
+  overflow: auto;
 }
 
 .wpEditor .ql-editor.ql-blank::before {
-  color: #9ca3af;
-  content: 'Write something awesome...';
+  color: #94a3b8;
+  content: 'Viết nội dung bài viết...';
   font-style: italic;
-}
-
-.imagePreview {
-  margin-top: 0.75rem;
-}
-
-.imagePreview img {
-  max-width: 250px;
-  max-height: 250px;
-  border-radius: 0.375rem;
-  object-fit: cover;
 }
 
 .formButtons {
   display: flex;
-  gap: 1rem;
-  margin-top: 1.5rem;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-top: 24px;
+}
+
+.submitButton,
+.cancelButton {
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  transition: background-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .submitButton {
-  background-color: #3b82f6;
+  background-color: #1e40af;
   color: #ffffff;
-  padding: 0.75rem 1.5rem;
-  border: none;
-  border-radius: 0.375rem;
-  font-size: 0.95rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .submitButton:hover {
-  background-color: #2563eb;
+  background-color: #1e3a8a;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+}
+
+.submitButton:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.3);
+}
+
+.submitButton:disabled {
+  background-color: #60a5fa;
+  cursor: not-allowed;
 }
 
 .cancelButton {
-  background-color: #64748b;
-  color: #ffffff;
-  padding: 0.75rem 1.5rem;
-  border: none;
-  border-radius: 0.375rem;
-  font-size: 0.95rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
+  background-color: #e2e8f0;
+  color: #1e293b;
 }
 
 .cancelButton:hover {
-  background-color: #475569;
+  background-color: #cbd5e1;
+}
+
+.cancelButton:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(71, 85, 105, 0.3);
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .formContainer {
+    max-width: 900px;
+  }
 }
 
 @media (max-width: 768px) {
@@ -191,19 +216,53 @@
   }
 
   .formContainer {
-    padding: 1.5rem;
+    padding: 16px;
     max-width: 100%;
   }
 
   .formInput,
   .formSelect,
-  .submitButton,
-  .cancelButton,
   .mainImageInput {
-    width: 100%;
+    padding: 8px 12px;
   }
 
   .formButtons {
     flex-direction: column;
+    gap: 8px;
+  }
+
+  .submitButton,
+  .cancelButton {
+    width: 100%;
+  }
+
+  .imagePreview img {
+    max-width: 200px;
+    max-height: 200px;
+  }
+
+  .wpEditor .ql-container {
+    min-height: 200px;
+    max-height: 400px;
+  }
+}
+
+@media (max-width: 576px) {
+  .title {
+    font-size: 1.5rem;
+  }
+
+  .formLabel {
+    font-size: 0.9rem;
+  }
+
+  .imagePreview img {
+    max-width: 150px;
+    max-height: 150px;
+  }
+
+  .wpEditor .ql-container {
+    min-height: 150px;
+    max-height: 300px;
   }
 }

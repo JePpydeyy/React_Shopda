@@ -9,8 +9,8 @@ const AD_Add_New = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     title: '',
-    thumbnail: null, // Đổi từ mainImage thành thumbnail
-    thumbnailPreview: null, // Đổi từ mainImagePreview thành thumbnailPreview
+    thumbnail: null,
+    thumbnailPreview: null,
     thumbnailCaption: '',
     content: '',
     category: '',
@@ -37,7 +37,7 @@ const AD_Add_New = () => {
           console.warn('Không tìm thấy danh mục trong phản hồi API');
           setError('Không có danh mục nào được tải. Vui lòng kiểm tra API.');
         }
-        setCategories(categoryData);
+        setCategories(categoryData.filter(cat => cat.status === 'show')); // Chỉ lấy danh mục đang hiển thị
       } catch (err) {
         console.error('Lỗi khi tải danh mục:', err.response?.data, err.response?.status);
         setError(`Không thể tải danh mục: ${err.response?.data?.message || err.message}`);
@@ -68,7 +68,7 @@ const AD_Add_New = () => {
       setFormData((prev) => ({
         ...prev,
         [name]: file,
-        thumbnailPreview: URL.createObjectURL(file), // Đổi từ mainImagePreview thành thumbnailPreview
+        thumbnailPreview: URL.createObjectURL(file),
       }));
     }
   };
@@ -88,12 +88,10 @@ const AD_Add_New = () => {
       .replace(/-+/g, '-');
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSubmit = async () => {
     setLoading(true);
     setError('');
 
-    // Kiểm tra các trường bắt buộc
     if (!formData.title) {
       setError('Tiêu đề không được để trống.');
       setLoading(false);
@@ -123,14 +121,15 @@ const AD_Add_New = () => {
     const formDataToSend = new FormData();
     formDataToSend.append('title', formData.title);
     formDataToSend.append('slug', slug);
-    formDataToSend.append('thumbnail', formData.thumbnail); // Đổi từ mainImage thành thumbnail
+    formDataToSend.append('thumbnail', formData.thumbnail);
     formDataToSend.append('thumbnailCaption', formData.thumbnailCaption);
     formDataToSend.append('publishedAt', currentDate);
     formDataToSend.append('content', formData.content);
-    formDataToSend.append('category_new', JSON.stringify({ $oid: formData.category })); // Gửi category_new
+    // FIX: Gửi trực tiếp ID danh mục thay vì JSON object
+    formDataToSend.append('category_new', formData.category);
     formDataToSend.append('status', formData.status);
 
-    // In FormData để debug
+    console.log('Dữ liệu gửi đi:');
     for (let pair of formDataToSend.entries()) {
       console.log(`${pair[0]}: ${pair[1]}`);
     }
@@ -144,11 +143,11 @@ const AD_Add_New = () => {
       });
       console.log('Phản hồi từ API:', response.data);
       const imageUrl = response.data.thumbnailUrl || 'Không có URL ảnh';
-      alert(`🟢 Thêm bài viết thành công! URL ảnh: ${imageUrl}`);
-      navigate('/admin/post');
+      alert(`Thêm bài viết thành công! URL ảnh: ${imageUrl}`);
+      navigate('/admin/new');
     } catch (err) {
       console.error('Lỗi khi thêm bài viết:', err.response?.data, err.response?.status);
-      let errorMessage = '❌ Thêm bài viết thất bại.';
+      let errorMessage = 'Thêm bài viết thất bại.';
       if (err.response) {
         errorMessage += ` Mã lỗi: ${err.response.status}. Chi tiết: ${err.response.data?.message || err.message}`;
       } else {
@@ -162,131 +161,118 @@ const AD_Add_New = () => {
 
   return (
     <div className={styles.container}>
-      <div className={styles.sidebar}>
-        <a href="#dashboard">Dashboard</a>
-        <a href="#danh-muc">Danh mục</a>
-        <a href="#bai-viet">Bài viết</a>
-        <a href="#don-hang">Đơn hàng</a>
-        <a href="#dich-vu">Dịch vụ</a>
-        <a href="#lien-he">Liên hệ</a>
-        <a href="#dang-xuat">Đăng xuất</a>
-      </div>
       <div className={styles.content}>
         <header>
           <h1 className={styles.title}>Thêm Bài Viết</h1>
         </header>
         <div className={styles.formContainer}>
           {error && <div style={{ color: '#ef4444', marginBottom: '1rem' }}>{error}</div>}
-          <form className={styles.formGroup} onSubmit={handleSubmit}>
-            <div className={styles.formGroup}>
-              <label htmlFor="title" className={styles.formLabel}>Tiêu đề</label>
-              <input
-                id="title"
-                name="title"
-                type="text"
-                className={styles.formInput}
-                value={formData.title}
-                onChange={handleChange}
-                required
-              />
-            </div>
-            <div className={styles.formGroup}>
-              <label htmlFor="thumbnail" className={styles.formLabel}>Hình ảnh chủ đạo của bài viết</label>
-              <input
-                id="thumbnail"
-                name="thumbnail" // Đổi từ mainImage thành thumbnail
-                type="file"
-                accept="image/jpeg,image/png"
-                className={styles.mainImageInput}
-                onChange={handleImageChange}
-              />
-              {formData.thumbnailPreview && (
-                <div className={styles.imagePreview}>
-                  <img src={formData.thumbnailPreview} alt="Preview" style={{ maxWidth: '200px' }} />
-                </div>
-              )}
-            </div>
-            <div className={styles.formGroup}>
-              <label htmlFor="thumbnailCaption" className={styles.formLabel}>Chú thích hình ảnh</label>
-              <input
-                id="thumbnailCaption"
-                name="thumbnailCaption"
-                type="text"
-                className={styles.formInput}
-                value={formData.thumbnailCaption}
-                onChange={handleChange}
-              />
-            </div>
-            <div className={styles.formGroup}>
-              <label htmlFor="content" className={styles.formLabel}>Nội dung</label>
-              <div className={styles.wpEditor}>
-                <ReactQuill
-                  value={formData.content}
-                  onChange={handleQuillChange}
-                  theme="snow"
-                  placeholder="Viết nội dung bài viết..."
-                  modules={{
-                    toolbar: [
-                      [{ header: [1, 2, false] }],
-                      ['bold', 'italic', 'underline', 'strike', 'blockquote'],
-                      [{ list: 'ordered' }, { list: 'bullet' }],
-                      ['link', 'image'],
-                      ['clean'],
-                    ],
-                  }}
-                  formats={[
-                    'header',
-                    'bold', 'italic', 'underline', 'strike', 'blockquote',
-                    'list', 'bullet',
-                    'link', 'image',
-                  ]}
-                />
+          <div className={styles.inputSection}>
+            <label className={styles.formLabel}>Tiêu đề</label>
+            <input
+              name="title"
+              type="text"
+              className={styles.formInput}
+              value={formData.title}
+              onChange={handleChange}
+            />
+          </div>
+          <div className={styles.inputSection}>
+            <label className={styles.formLabel}>Hình ảnh chủ đạo của bài viết</label>
+            <input
+              name="thumbnail"
+              type="file"
+              accept="image/jpeg,image/png"
+              className={styles.mainImageInput}
+              onChange={handleImageChange}
+            />
+            {formData.thumbnailPreview && (
+              <div className={styles.imagePreview}>
+                <img src={formData.thumbnailPreview} alt="Preview" />
               </div>
+            )}
+          </div>
+          <div className={styles.inputSection}>
+            <label className={styles.formLabel}>Chú thích hình ảnh</label>
+            <input
+              name="thumbnailCaption"
+              type="text"
+              className={styles.formInput}
+              value={formData.thumbnailCaption}
+              onChange={handleChange}
+            />
+          </div>
+          <div className={styles.inputSection}>
+            <label className={styles.formLabel}>Nội dung</label>
+            <div className={styles.wpEditor}>
+              <ReactQuill
+                value={formData.content}
+                onChange={handleQuillChange}
+                theme="snow"
+                placeholder="Viết nội dung bài viết..."
+                modules={{
+                  toolbar: [
+                    [{ header: [1, 2, false] }],
+                    ['bold', 'italic', 'underline', 'strike', 'blockquote'],
+                    [{ list: 'ordered' }, { list: 'bullet' }],
+                    ['link', 'image'],
+                    ['clean'],
+                  ],
+                }}
+                formats={[
+                  'header',
+                  'bold', 'italic', 'underline', 'strike', 'blockquote',
+                  'list', 'bullet',
+                  'link', 'image',
+                ]}
+              />
             </div>
-            <div className={styles.formGroup}>
-              <label htmlFor="category" className={styles.formLabel}>Danh mục bài viết</label>
-              <select
-                id="category"
-                name="category"
-                className={styles.formSelect}
-                value={formData.category}
-                onChange={handleChange}
-                required
-              >
-                <option value="" disabled>Chọn danh mục</option>
-                {categories.length > 0 ? (
-                  categories.map((cat) => (
-                    <option key={cat._id} value={cat._id}>
-                      {cat.category}
-                    </option>
-                  ))
-                ) : (
-                  <option value="" disabled>Không có danh mục</option>
-                )}
-              </select>
-            </div>
-            <div className={styles.formGroup}>
-              <label htmlFor="status" className={styles.formLabel}>Trạng thái</label>
-              <select
-                id="status"
-                name="status"
-                className={styles.formSelect}
-                value={formData.status}
-                onChange={handleChange}
-              >
-                <option value="show">Hiển thị</option>
-                <option value="hidden">Ẩn</option> {/* Đổi từ hide thành hidden để khớp với backend */}
-              </select>
-            </div>
-            <div className={styles.formButtons}>
-              <button type="submit" className={styles.submitButton} disabled={loading}>
-                {loading ? 'Đang lưu...' : 'Thêm bài viết'}
-              </button>
-              <button type="button" className={styles.cancelButton} onClick={() => navigate('/admin/post')}>
-                Hủy
-              </button>
-            </div>
-          </form>
+          </div>
+          <div className={styles.inputSection}>
+            <label className={styles.formLabel}>Danh mục bài viết</label>
+            <select
+              name="category"
+              className={styles.formSelect}
+              value={formData.category}
+              onChange={handleChange}
+            >
+              <option value="" disabled>Chọn danh mục</option>
+              {categories.length > 0 ? (
+                categories.map((cat) => (
+                  <option key={cat._id} value={cat._id}>
+                    {cat.category}
+                  </option>
+                ))
+              ) : (
+                <option value="" disabled>Không có danh mục</option>
+              )}
+            </select>
+            {/* Debug info */}
+            <small style={{ color: '#666', fontSize: '12px' }}>
+              Danh mục hiện tại: {formData.category || 'Chưa chọn'} | 
+              Số danh mục: {categories.length}
+            </small>
+          </div>
+          <div className={styles.inputSection}>
+            <label className={styles.formLabel}>Trạng thái</label>
+            <select
+              name="status"
+              className={styles.formSelect}
+              value={formData.status}
+              onChange={handleChange}
+            >
+              <option value="show">Hiển thị</option>
+              <option value="hide">Ẩn</option>
+            </select>
+          </div>
+          <div className={styles.formButtons}>
+            <button type="button" className={styles.submitButton} disabled={loading} onClick={handleSubmit}>
+              {loading ? 'Đang lưu...' : 'Thêm bài viết'}
+            </button>
+            <button type="button" className={styles.cancelButton} onClick={() => navigate('/admin/new')}>
+              Hủy
+            </button>
+          </div>
         </div>
       </div>
     </div>

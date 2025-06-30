@@ -1,0 +1,130 @@
+.container {
+  padding-left: 90px;
+}
+
+img {
+  max-width: 50%;
+  height: 50%;
+}
+
+.content {
+  margin-left: 250px;
+  margin-right: 250px;
+}
+
+.title {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.formGroup {
+  margin-bottom: 15px;
+}
+
+.formGroup label {
+  font-weight: bold;
+  display: block;
+  margin-bottom: 5px;
+  color: #555;
+}
+
+.inputField {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.inputField:focus {
+  border-color: #007bff;
+  outline: none;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+.quillEditor {
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+.quillEditor .ql-container {
+  min-height: 200px;
+}
+
+.ql-snow .ql-editor img {
+  max-height: 25%;
+  max-width: 20%;
+  height: auto;
+  width: auto;
+  border-radius: 4px;
+  border: 1px solid #ddd;
+  object-fit: contain;
+}
+
+.imagePreview {
+  margin-top: 10px;
+}
+
+.previewImage {
+  max-width: 250px;
+  height: 250px;
+  border-radius: 4px;
+  border: 1px solid #ddd;
+}
+
+.saveButton {
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-right: 10px;
+}
+
+.saveButton:hover {
+  background-color: #0056b3;
+}
+
+.cancelButton {
+  padding: 10px 20px;
+  background-color: #dc3545;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-right: 10px;
+}
+
+.cancelButton:hover {
+  background-color: #c82333;
+}
+
+.deleteButton {
+  padding: 10px 20px;
+  background-color: #6c757d;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.deleteButton:hover {
+  background-color: #5a6268;
+}
+
+.loadingSpinner {
+  text-align: center;
+  padding: 20px;
+  font-size: 18px;
+  color: #666;
+}
+
+.errorMessage {
+  color: #dc3545;
+  text-align: center;
+  padding: 20px;
+  font-size: 16px;
+}

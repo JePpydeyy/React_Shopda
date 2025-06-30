@@ -1,6 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { AuthProvider } from './Admin/components/AuthContext/AuthContext'; // Sửa lỗi chính tả
+import { AuthProvider } from './Admin/components/AuthContext/AuthContext';
 import Home from './pages/Home';
 import About from './pages/About';
 import Contactus from './pages/Contact';
@@ -12,23 +12,23 @@ import Cart from './pages/Cart';
 import ProductDetail from './pages/ProductDetail';
 import Adminpage from './Admin/pages/Dashboard';
 import AdminLogin from './Admin/pages/Login';
-import AD_Product from './Admin/pages/Product'; 
-import AD_Order from './Admin/pages/Order'; 
-import AD_Category from './Admin/pages/Category'; 
+import AD_Product from './Admin/pages/Product';
+import AD_Order from './Admin/pages/Order';
+import AD_Category from './Admin/pages/Category';
 import AD_New from './Admin/pages/New';
-import AddProductSite from './Admin/pages/Add_Product'; 
-import AddCategorySite from './Admin/pages/Add_Category'; 
-import DiscoutPage from './Admin/pages/Discout'; 
+import AddProductSite from './Admin/pages/Add_Product';
+import AddCategorySite from './Admin/pages/Add_Category';
+import DiscoutPage from './Admin/pages/Discout';
 import AD_CategoryNew from './Admin/pages/Categorynew';
 import AD_Add_New from './Admin/pages/AD_Add_New';
-import AD_Contact from './Admin/pages/AD_Contact'; // Thêm dòng này
-
+import AD_Contact from './Admin/pages/AD_Contact';
+import EditNews from './Admin/components/EditNews/EditNews'; // Sửa import để sử dụng EditNews
 
 import './App.css';
 
 function App() {
   return (
-    <AuthProvider> {/* Thêm AuthProvider */}
+    <AuthProvider>
       <Router>
         <div className="App">
           <Routes>
@@ -56,9 +56,7 @@ function App() {
             <Route path="/admin/add_news" element={<AD_Add_New />} />
             <Route path="/admin/contact" element={<AD_Contact />} />
             <Route path="/admin/discout" element={<DiscoutPage />} />
-
-
-            {/* Redirect to home for any unmatched routes */}
+            <Route path="/admin/editnew/:slug" element={<EditNews />} /> {/* Sửa để sử dụng EditNews */}
           </Routes>
         </div>
       </Router>
