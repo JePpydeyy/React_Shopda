@@ -1,11 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
-import { Link } from 'react-router-dom';
 import axios from 'axios';
 import Sidebar from '../Sidebar/Sidebar';
 import styles from './Product.module.css';
-
-const API_URL = process.env.REACT_APP_API_URL || 'https://api-tuyendung-cty.onrender.com/api';
-const API_BASE = process.env.REACT_APP_API_BASE || 'https://api-tuyendung-cty.onrender.com';
 
 // Reusable TooltipButton component
 const TooltipButton = React.memo(({ field, children, activeTooltip, setActiveTooltip, guide }) => (
@@ -32,12 +28,28 @@ const TooltipButton = React.memo(({ field, children, activeTooltip, setActiveToo
   </div>
 ));
 
+// Reusable ErrorPopup component
+const ErrorPopup = ({ errors, onClose }) => (
+  <div className={styles.errorPopupOverlay}>
+    <div className={styles.errorPopup}>
+      <h3>Lỗi nhập liệu</h3>
+      <ul>
+        {Object.entries(errors).map(([key, message]) => (
+          <li key={key}>{message}</li>
+        ))}
+      </ul>
+      <button onClick={onClose} className={styles.errorPopupCloseButton}>
+        Đóng
+      </button>
+    </div>
+  </div>
+);
+
 // Tooltip guides
 const fieldGuides = {
   name: "Nhập tên sản phẩm rõ ràng, cụ thể. VD: 'Vòng tay Thạch Anh Hồng'",
   category: "Chọn danh mục phù hợp nhất với sản phẩm của bạn",
-  price: "Nhập giá bán lẻ tính bằng VNĐ. VD: 150000 (không có dấu phẩy)",
-  sizes: "Thêm các kích thước và tồn kho. VD: 12cm (vòng tay) hoặc 50*14*33cm (tượng phong thủy)",
+  option: "Thêm các kích thước, tồn kho và giá. VD: 12cm, 10 đơn vị, 150000 VNĐ",
   level: "Phân loại: Cao Cấp, Trung Cấp, Phổ biến",
   element: "Nguyên tố phong thủy: Thổ, Kim, Mộc, Hỏa, Thủy",
   tag: "Sale: Giảm giá | New: Sản phẩm mới",
@@ -56,38 +68,42 @@ const ProductManagement = () => {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [expandedRow, setExpandedRow] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [editProduct, setEditProduct] = useState(null);
+  const [addProduct, setAddProduct] = useState(false);
+  const [showDetailProduct, setShowDetailProduct] = useState(null);
   const [oldImages, setOldImages] = useState([]);
   const [formData, setFormData] = useState({
     name: '',
     category: '',
-    price: '',
-    stock: '',
-    size: [{ size_name: '', stock: '' }],
+    option: [{ size_name: '', stock: '', price: '' }],
     level: '',
     element: '',
-    tag: '',
+    tag: 'new',
     short_description: '',
     description: '',
-    weight: '1',
     status: 'show',
     images: [],
+    purchases: '0',
   });
   const [formErrors, setFormErrors] = useState({});
+  const [showErrorPopup, setShowErrorPopup] = useState(false);
   const [activeButtons, setActiveButtons] = useState(new Set());
   const [activeTooltip, setActiveTooltip] = useState(null);
   const editorRef = useRef(null);
+  const modalRef = useRef(null);
   const token = localStorage.getItem('adminToken');
   const productsPerPage = 9;
+  const API_URL = process.env.REACT_APP_API_URL || 'https://api-tuyendung-cty.onrender.com/api';
+  const API_BASE = process.env.REACT_APP_API_BASE || 'https://api-tuyendung-cty.onrender.com';
+  const MAX_IMAGES = 10;
 
   // Memoized filtered products
   const filteredProducts = useMemo(() => {
     return products.filter(
       (product) =>
         product.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
-        (categoryFilter === 'all' || product.category.name_categories === categoryFilter) &&
+        (categoryFilter === 'all' || product.category?.name_categories === categoryFilter) &&
         (statusFilter === 'all' || product.status === statusFilter)
     );
   }, [products, searchTerm, categoryFilter, statusFilter]);
@@ -106,12 +122,11 @@ const ProductManagement = () => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(
-          `${API_URL}/product?limit=1000`,
-          {
-            headers: token ? { Authorization: `Bearer ${token}` } : {},
-          }
-        );
+        const endpoint = statusFilter === 'show' ? `${API_URL}/product/show` : `${API_URL}/product`;
+        const response = await axios.get(`${endpoint}?limit=1000`, {
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
+        });
+        console.log('Fetched products:', response.data);
         setProducts(response.data);
       } catch (err) {
         setError(err.response?.data?.message || 'Không thể tải dữ liệu sản phẩm');
@@ -120,17 +135,16 @@ const ProductManagement = () => {
       }
     };
     fetchData();
-  }, [token]);
+  }, [token, statusFilter]);
 
-  // Fetch categories from API
+  // Fetch categories
   useEffect(() => {
     const fetchCategories = async () => {
       try {
         const res = await axios.get(`${API_URL}/category`, {
           headers: token ? { Authorization: `Bearer ${token}` } : {},
         });
-        console.log('Fetched categories:', res.data); // Debug log
-        setCategories(res.data); // Expecting [{_id, category, status, createdAt, __v}]
+        setCategories(res.data);
       } catch (err) {
         setError(err.response?.data?.message || 'Không thể tải dữ liệu danh mục');
       }
@@ -168,12 +182,43 @@ const ProductManagement = () => {
     return () => document.removeEventListener('selectionchange', handleSelectionChange);
   }, [updateToolbarState]);
 
-  // Sync editor content when opening modal
+  // Utility to save and restore cursor position
+  const saveCursorPosition = useCallback((element) => {
+    const selection = window.getSelection();
+    if (!selection.rangeCount || !element.contains(selection.anchorNode)) return null;
+
+    const range = selection.getRangeAt(0);
+    const preCaretRange = range.cloneRange();
+    preCaretRange.selectNodeContents(element);
+    preCaretRange.setEnd(range.endContainer, range.endOffset);
+    return {
+      range: preCaretRange,
+      offset: range.endOffset,
+      container: range.endContainer
+    };
+  }, []);
+
+  const restoreCursorPosition = useCallback((element, savedPosition) => {
+    if (!savedPosition || !element.contains(savedPosition.container)) return;
+
+    const selection = window.getSelection();
+    const range = document.createRange();
+    try {
+      range.setStart(savedPosition.container, savedPosition.offset);
+      range.setEnd(savedPosition.container, savedPosition.offset);
+      selection.removeAllRanges();
+      selection.addRange(range);
+    } catch (error) {
+      console.warn('Error restoring cursor position:', error);
+    }
+  }, []);
+
+  // Sync editor content
   useEffect(() => {
-    if (editProduct && editorRef.current) {
+    if ((editProduct || addProduct) && editorRef.current) {
       editorRef.current.innerHTML = formData.description || '';
     }
-  }, [editProduct, formData.description]);
+  }, [editProduct, addProduct]);
 
   // Form handling
   const handleFormChange = useCallback((e) => {
@@ -181,34 +226,35 @@ const ProductManagement = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   }, []);
 
-  const handleSizeChange = useCallback((index, e) => {
+  const handleOptionChange = useCallback((index, e) => {
     const { name, value } = e.target;
     setFormData((prev) => {
-      const newSizes = [...prev.size];
-      newSizes[index] = { ...newSizes[index], [name]: value };
-      return { ...prev, size: newSizes };
+      const newOptions = [...prev.option];
+      newOptions[index] = { ...newOptions[index], [name]: value };
+      return { ...prev, option: newOptions };
     });
   }, []);
 
-  const addSize = useCallback(() => {
+  const addOption = useCallback(() => {
     setFormData((prev) => ({
       ...prev,
-      size: [...prev.size, { size_name: '', stock: '' }],
+      option: [...prev.option, { size_name: '', stock: '', price: '' }],
     }));
   }, []);
 
-  const removeSize = useCallback((index) => {
+  const removeOption = useCallback((index) => {
     setFormData((prev) => ({
       ...prev,
-      size: prev.size.filter((_, i) => i !== index),
+      option: prev.option.filter((_, i) => i !== index)
     }));
   }, []);
 
   const handleImageChange = useCallback((e) => {
     const newImages = Array.from(e.target.files);
     const totalImages = (oldImages?.length || 0) + formData.images.length + newImages.length;
-    if (totalImages > 4) {
-      alert('Tổng số ảnh không được vượt quá 4.');
+    if (totalImages > MAX_IMAGES) {
+      setFormErrors({ images: `Tổng số ảnh không được vượt quá ${MAX_IMAGES}.` });
+      setShowErrorPopup(true);
       return;
     }
     setFormData((prev) => ({ ...prev, images: [...prev.images, ...newImages] }));
@@ -217,34 +263,39 @@ const ProductManagement = () => {
   const removeImage = useCallback((index) => {
     setFormData((prev) => ({
       ...prev,
-      images: prev.images.filter((_, i) => i !== index),
+      images: prev.images.filter((_, i) => i !== index)
     }));
   }, []);
 
   const deleteExistingImage = useCallback((index) => {
-    setFormData((prev) => ({
-      ...prev,
-      images: prev.images.filter((_, i) => i !== index),
-    }));
+    setOldImages((prev) => prev.filter((_, i) => i !== index));
   }, []);
 
   const execCommand = useCallback((command, value = null) => {
+    if (!editorRef.current) return;
+
+    const savedPosition = saveCursorPosition(editorRef.current);
     try {
-      if (editorRef.current) {
-        editorRef.current.focus();
-        document.execCommand(command, false, value);
-        updateToolbarState();
+      editorRef.current.focus();
+      document.execCommand(command, false, value);
+      if (savedPosition) {
+        restoreCursorPosition(editorRef.current, savedPosition);
       }
+      updateToolbarState();
+      setFormData((prev) => ({
+        ...prev,
+        description: editorRef.current.innerHTML
+      }));
     } catch (error) {
       console.error('Error executing command:', error);
     }
-  }, [updateToolbarState]);
+  }, [updateToolbarState, saveCursorPosition, restoreCursorPosition]);
 
   const handleDescriptionChange = useCallback(() => {
     if (editorRef.current) {
       setFormData((prev) => ({
         ...prev,
-        description: editorRef.current.innerHTML,
+        description: editorRef.current.innerHTML
       }));
     }
   }, []);
@@ -267,23 +318,27 @@ const ProductManagement = () => {
   }, [execCommand]);
 
   const handleEditorFocus = useCallback(() => {
-    setTimeout(updateToolbarState, 10);
+    updateToolbarState();
   }, [updateToolbarState]);
 
   const validateForm = useCallback(() => {
     const errors = {};
     if (!formData.name) errors.name = 'Tên sản phẩm là bắt buộc';
     if (!formData.category) errors.category = 'Danh mục là bắt buộc';
-    if (!formData.price || formData.price <= 0) errors.price = 'Giá phải lớn hơn 0';
-    if (!formData.stock && formData.stock !== 0) errors.stock = 'Tồn kho không hợp lệ';
-    formData.size.forEach((size, index) => {
-      if (!size.size_name) errors[`size_name_${index}`] = 'Kích thước là bắt buộc';
-      if (!size.stock && size.stock !== 0) errors[`size_stock_${index}`] = 'Tồn kho kích thước không hợp lệ';
+    if (formData.option.length === 0) errors.option = 'Cần ít nhất một tùy chọn kích thước';
+    formData.option.forEach((opt, index) => {
+      if (!opt.size_name) errors[`option_size_name_${index}`] = 'Kích thước là bắt buộc';
+      if (!opt.stock && opt.stock !== '0') errors[`option_stock_${index}`] = 'Tồn kho không hợp lệ';
+      if (!opt.price || parseFloat(opt.price) <= 0) errors[`option_price_${index}`] = 'Giá tùy chọn phải lớn hơn 0';
     });
     if ((oldImages?.length || 0) + formData.images.length === 0) {
       errors.images = 'Cần ít nhất một hình ảnh';
     }
+    if (formData.purchases < 0) errors.purchases = 'Số lượng mua không được âm';
     setFormErrors(errors);
+    if (Object.keys(errors).length > 0) {
+      setShowErrorPopup(true);
+    }
     return Object.keys(errors).length === 0;
   }, [formData, oldImages]);
 
@@ -294,101 +349,137 @@ const ProductManagement = () => {
     try {
       const formDataToSend = new FormData();
       formDataToSend.append('name', formData.name);
-
-      // Find category object by _id
       const categoryObj = categories.find((cat) => cat._id === formData.category);
+      if (!categoryObj) {
+        setFormErrors({ category: 'Danh mục không hợp lệ' });
+        setShowErrorPopup(true);
+        return;
+      }
       formDataToSend.append('category', JSON.stringify({
-        id: categoryObj?._id,
-        name_categories: categoryObj?.category
+        id: categoryObj._id,
+        name_categories: categoryObj.category
       }));
-
-      formDataToSend.append('price', formData.price);
-      formDataToSend.append('stock', formData.stock);
-      formDataToSend.append('size', JSON.stringify(formData.size));
-      formDataToSend.append('level', formData.level);
-      formDataToSend.append('element', formData.element);
-      formDataToSend.append('tag', formData.tag);
-      formDataToSend.append('short_description', formData.short_description);
-      formDataToSend.append('weight', formData.weight);
-      formDataToSend.append('status', formData.status);
+      const derivedPrice = formData.option.length > 0 ? parseFloat(formData.option[0].price) : 0;
+      formDataToSend.append('price', derivedPrice);
+      formDataToSend.append('level', formData.level || '');
+      formDataToSend.append('element', formData.element || '');
+      formDataToSend.append('tag', formData.tag || 'new');
+      formDataToSend.append('short_description', formData.short_description || '');
+      formDataToSend.append('status', formData.status || 'show');
       formDataToSend.append('description', editorRef.current?.innerHTML || '');
-
-      oldImages.forEach((img) => formDataToSend.append('images', img));
-      formDataToSend.append('oldImages', JSON.stringify(oldImages));
+      formDataToSend.append('purchases', parseInt(formData.purchases) || 0);
+      const options = formData.option.map(opt => ({
+        size_name: opt.size_name,
+        stock: parseInt(opt.stock) || 0,
+        price: parseFloat(opt.price)
+      }));
+      formDataToSend.append('option', JSON.stringify(options));
       formData.images.forEach((image) => formDataToSend.append('images', image));
+      if (editProduct && oldImages.length > 0) {
+        formDataToSend.append('oldImages', JSON.stringify(oldImages));
+      }
 
-      const response = await axios.put(
-        `${API_URL}/product/${editProduct.slug}`,
-        formDataToSend,
-        {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const config = {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          Authorization: `Bearer ${token}`,
+        },
+      };
 
-      setProducts((prev) =>
-        prev.map((p) => (p._id === editProduct._id ? response.data.product : p))
-      );
+      let response;
+      if (editProduct) {
+        response = await axios.put(
+          `${API_URL}/product/${editProduct.slug}`,
+          formDataToSend,
+          config
+        );
+        setProducts((prev) =>
+          prev.map((p) => (p._id === editProduct._id ? response.data.product : p))
+        );
+      } else {
+        response = await axios.post(
+          `${API_URL}/product`,
+          formDataToSend,
+          config
+        );
+        setProducts((prev) => [...prev, response.data.product]);
+      }
+
       closeModal();
     } catch (err) {
       setFormErrors({
-        api: err.response?.data?.error || err.response?.data?.message || 'Không thể cập nhật sản phẩm',
+        api: err.response?.data?.error || err.response?.data?.message || 'Không thể lưu sản phẩm',
       });
+      setShowErrorPopup(true);
     }
   }, [formData, editProduct, oldImages, categories, token, validateForm]);
 
   const handleEdit = useCallback((product) => {
-    console.log('Product category:', product.category); // Debug log
-    const categoryId = typeof product.category === 'object' && product.category?._id
-      ? product.category._id
-      : product.category || '';
-    console.log('Setting formData.category to:', categoryId); // Debug log
-
+    console.log('Editing product:', product);
+    const categoryId = product.category?._id || product.category?.id || '';
     setEditProduct(product);
+    setAddProduct(false);
     setOldImages(product.images || []);
     setFormData({
       name: product.name || '',
       category: categoryId,
-      price: product.price || '',
-      stock: product.stock || 0,
-      size:
-        product.size?.length > 0
-          ? product.size.map((s) => ({
-              size_name: s.size_name || '',
-              stock: s.stock || 0,
+      option:
+        product.option?.length > 0
+          ? product.option.map((opt) => ({
+              size_name: opt.size_name || '',
+              stock: (opt.stock || 0).toString(),
+              price: (opt.price || 0).toString(),
             }))
-          : [{ size_name: '', stock: '' }],
+          : [{ size_name: '', stock: '0', price: '0' }],
       level: product.level || '',
       element: product.element || '',
-      tag: product.tag || '',
+      tag: product.tag || 'new',
       short_description: product.short_description || '',
-      weight: product.weight || '1',
       status: product.status || 'show',
       description: product.description || '',
       images: [],
+      purchases: (product.purchases || 0).toString(),
+    });
+  }, []);
+
+  const handleAddProduct = useCallback(() => {
+    setAddProduct(true);
+    setEditProduct(null);
+    setOldImages([]);
+    setFormData({
+      name: '',
+      category: '',
+      option: [{ size_name: '', stock: '0', price: '' }],
+      level: '',
+      element: '',
+      tag: 'new',
+      short_description: '',
+      description: '',
+      status: 'show',
+      images: [],
+      purchases: '0',
     });
   }, []);
 
   const closeModal = useCallback(() => {
     setEditProduct(null);
+    setAddProduct(false);
+    setShowDetailProduct(null);
     setFormData({
       name: '',
       category: '',
-      price: '',
-      stock: '',
-      size: [{ size_name: '', stock: '' }],
+      option: [{ size_name: '', stock: '0', price: '' }],
       level: '',
       element: '',
-      tag: '',
+      tag: 'new',
       short_description: '',
       description: '',
-      weight: '1',
       status: 'show',
       images: [],
+      purchases: '0',
     });
     setFormErrors({});
+    setShowErrorPopup(false);
     setActiveButtons(new Set());
     setActiveTooltip(null);
     if (editorRef.current) {
@@ -396,10 +487,13 @@ const ProductManagement = () => {
     }
   }, []);
 
+  const closeErrorPopup = useCallback(() => {
+    setShowErrorPopup(false);
+  }, []);
+
   const handlePageChange = useCallback((page) => {
     if (page >= 1 && page <= totalPages) {
       setCurrentPage(page);
-      setExpandedRow(null);
     }
   }, [totalPages]);
 
@@ -442,7 +536,7 @@ const ProductManagement = () => {
 
     if (endPage < totalPages) {
       if (endPage < totalPages - 1) {
-        buttons.push(<span key="endPage-ellipsis" className={styles.ellipsis}>...</span>);
+        buttons.push(<span key="end-ellipsis" className={styles.ellipsis}>...</span>);
       }
       buttons.push(
         <button
@@ -458,20 +552,20 @@ const ProductManagement = () => {
     return buttons;
   }, [currentPage, totalPages, handlePageChange]);
 
-  const toggleRow = useCallback((id) => {
-    setExpandedRow((prev) => (prev === id ? null : id));
+  const handleShowDetails = useCallback((product, e) => {
+    if (e.target.tagName === 'BUTTON') return;
+    console.log('Showing details for product:', product);
+    setShowDetailProduct(product);
   }, []);
 
-  const handleDelete = useCallback(async (id) => {
+  const handleDelete = useCallback(async (slug) => {
     if (window.confirm('Bạn có chắc muốn xóa sản phẩm này?')) {
       try {
-        await axios.delete(
-          `${API_URL}/product/${id}`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
-        setProducts((prev) => prev.filter((p) => p._id !== id));
+        await axios.delete(`${API_URL}/product/${slug}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setProducts((prev) => prev.filter((p) => p.slug !== slug));
+        setError(null);
       } catch (err) {
         setError(err.response?.data?.message || 'Không thể xóa sản phẩm');
       }
@@ -479,9 +573,11 @@ const ProductManagement = () => {
   }, [token]);
 
   const toggleStatus = useCallback(async (product) => {
-    const newStatus = product.status === 'show' ? 'hidden' : 'show';
+    const validStatuses = ['show', 'hidden', 'sale'];
+    const currentStatus = product.status || 'show';
+    const newStatus = validStatuses[(validStatuses.indexOf(currentStatus) + 1) % validStatuses.length];
     try {
-      await axios.patch(
+      const response = await axios.patch(
         `${API_URL}/product/${product.slug}/status`,
         { status: newStatus },
         {
@@ -489,15 +585,16 @@ const ProductManagement = () => {
         }
       );
       setProducts((prev) =>
-        prev.map((p) => (p._id === product._id ? { ...p, status: newStatus } : p))
+        prev.map((p) => (p._id === product._id ? response.data.product : p))
       );
+      setError(null);
     } catch (err) {
-      alert('Không thể đổi trạng thái sản phẩm');
+      setError(err.response?.data?.message || 'Không thể đổi trạng thái sản phẩm');
     }
   }, [token]);
 
   const calculateTotalStock = useCallback((product) => {
-    return product.size.reduce((total, size) => total + (size.stock || 0), 0);
+    return product.option?.reduce((total, opt) => total + (parseInt(opt.stock) || 0), 0) || 0;
   }, []);
 
   if (loading) return <div className={styles.loading}>Đang tải...</div>;
@@ -534,15 +631,13 @@ const ProductManagement = () => {
             onChange={(e) => setStatusFilter(e.target.value)}
           >
             <option value="all">Tất cả trạng thái</option>
-            {[...new Set(products.map((p) => p.status))].map((status) => (
-              <option key={status} value={status}>
-                {status === 'show' ? 'Hiển thị' : status === 'hidden' ? 'Ẩn' : 'Sale'}
-              </option>
-            ))}
+            <option value="show">Hiển thị</option>
+            <option value="hidden">Ẩn</option>
+            <option value="sale">Sale</option>
           </select>
-          <Link to="/admin/add_product" className={styles.addButton}>
+          <button onClick={handleAddProduct} className={styles.addButton}>
             Thêm Sản Phẩm
-          </Link>
+          </button>
         </div>
         <div className={styles.tableContainer}>
           <table className={styles.table}>
@@ -558,92 +653,50 @@ const ProductManagement = () => {
             </thead>
             <tbody>
               {paginatedProducts.map((product) => (
-                <React.Fragment key={product._id}>
-                  <tr
-                    className={styles.tableRow}
-                    onClick={() => toggleRow(product._id)}
-                    style={{ cursor: 'pointer' }}
-                  >
-                    <td>
-                      {product.images?.length > 0 ? (
-                        <img
-                          src={`${API_BASE}/${product.images[0]}`}
-                          alt={product.name}
-                          className={styles.tableImage}
-                        />
-                      ) : (
-                        'Không có ảnh'
-                      )}
-                    </td>
-                    <td>{product.name}</td>
-                    <td>{product.category.name_categories}</td>
-                    <td>{calculateTotalStock(product)}</td>
-                    <td>
-                      {product.status === 'show'
-                        ? 'Hiển thị'
-                        : product.status === 'hidden'
-                        ? 'Ẩn'
-                        : 'Sale'}
-                    </td>
-                    <td>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleEdit(product);
-                        }}
-                        className={styles.actionButton}
-                      >
-                        Sửa
-                      </button>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          toggleStatus(product);
-                        }}
-                        className={`${styles.actionButton} ${styles.deleteButton}`}
-                      >
-                        {product.status === 'show' ? 'Ẩn' : 'Hiện'}
-                      </button>
-                    </td>
-                  </tr>
-                  {expandedRow === product._id && (
-                    <tr className={styles.detailRow}>
-                      <td colSpan="6">
-                        <div className={styles.detailContainer}>
-                          <h3>Chi tiết sản phẩm: {product.name}</h3>
-                          <p><strong>Giá:</strong> {product.price.toLocaleString()} VNĐ</p>
-                          <p><strong>Cấp độ:</strong> {product.level}</p>
-                          <p><strong>Nguyên tố:</strong> {product.element}</p>
-                          <p><strong>Thẻ:</strong> {product.tag}</p>
-                          <p><strong>Mô tả ngắn:</strong> {product.short_description}</p>
-                          <p><strong>Mô tả chi tiết:</strong> <div dangerouslySetInnerHTML={{ __html: product.description }} /></p>
-                          <p><strong>Tồn kho theo kích thước:</strong></p>
-                          <ul>
-                            {product.size.map((size, index) => (
-                              <li key={size._id}>
-                                {size.size_name}: {size.stock || 0} đơn vị
-                              </li>
-                            ))}
-                          </ul>
-                          <p><strong>Lượt xem:</strong> {product.views}</p>
-                          <p><strong>Lượt mua:</strong> {product.purchases}</p>
-                          <p><strong>Ngày tạo:</strong> {new Date(product.createdAt).toLocaleDateString()}</p>
-                          <p><strong>Hình ảnh:</strong></p>
-                          <div className={styles.imageContainer}>
-                            {product.images.map((image, index) => (
-                              <img
-                                key={index}
-                                src={`${API_BASE}/${image}`}
-                                alt={`${product.name} ${index + 1}`}
-                                className={styles.productImage}
-                              />
-                            ))}
-                          </div>
-                        </div>
-                      </td>
-                    </tr>
-                  )}
-                </React.Fragment>
+                <tr
+                  key={product._id}
+                  className={styles.tableRow}
+                  onClick={(e) => handleShowDetails(product, e)}
+                  style={{ cursor: 'pointer' }}
+                >
+                  <td>
+                    {product.images?.length > 0 ? (
+                      <img
+                        src={`${API_BASE}/${product.images[0]}`}
+                        alt={product.name}
+                        className={styles.tableImage}
+                      />
+                    ) : (
+                      'Không có ảnh'
+                    )}
+                  </td>
+                  <td>{product.name}</td>
+                  <td>{product.category?.name_categories || 'Chưa xác định'}</td>
+                  <td>{calculateTotalStock(product)}</td>
+                  <td>
+                    {product.status === 'show' ? 'Hiển thị' : product.status === 'hidden' ? 'Ẩn' : 'Sale'}
+                  </td>
+                  <td onClick={(e) => e.stopPropagation()}>
+                    <button
+                      onClick={() => handleEdit(product)}
+                      className={styles.actionButton}
+                    >
+                      Sửa
+                    </button>
+                    <button
+                      onClick={() => toggleStatus(product)}
+                      className={`${styles.actionButton} ${styles.toggleButton}`}
+                    >
+                      {product.status === 'show' ? 'Ẩn' : product.status === 'hidden' ? 'Hiện' : 'Hủy Sale'}
+                    </button>
+                    <button
+                      onClick={() => handleDelete(product.slug)}
+                      className={`${styles.actionButton} ${styles.deleteButton}`}
+                    >
+                      Xóa
+                    </button>
+                  </td>
+                </tr>
               ))}
             </tbody>
           </table>
@@ -665,11 +718,10 @@ const ProductManagement = () => {
             Sau
           </button>
         </div>
-        {editProduct && (
+        {(editProduct || addProduct) && (
           <div className={styles.modalOverlay}>
-            <div className={styles.modal}>
-              <h2>Sửa Sản Phẩm: {editProduct.name}</h2>
-              {formErrors.api && <span className={styles.error}>{formErrors.api}</span>}
+            <div className={styles.modal} ref={modalRef}>
+              <h2>{addProduct ? 'Thêm Sản Phẩm' : `Sửa Sản Phẩm: ${editProduct?.name}`}</h2>
               <form onSubmit={handleFormSubmit} className={styles.form}>
                 <div className={styles.formGroup}>
                   <TooltipButton
@@ -678,37 +730,39 @@ const ProductManagement = () => {
                     setActiveTooltip={setActiveTooltip}
                     guide={fieldGuides.images}
                   >
-                    Hình ảnh hiện tại
+                    {addProduct ? 'Hình ảnh' : 'Hình ảnh hiện tại'}
                   </TooltipButton>
-                  <div className={styles.imageContainer}>
-                    {oldImages.length > 0 ? (
-                      oldImages.map((image, index) => (
-                        <div key={index} className={styles.existingImageWrapper}>
-                          <img
-                            src={`${API_BASE}/${image}`}
-                            alt={`${editProduct.name} ${index + 1}`}
-                            className={styles.productImage}
-                          />
-                          <button
-                            type="button"
-                            onClick={() => deleteExistingImage(index)}
-                            className={styles.deleteExistingImageButton}
-                          >
-                            Xóa
-                          </button>
-                        </div>
-                      ))
-                    ) : (
-                      <span>Không có ảnh</span>
-                    )}
-                  </div>
+                  {!addProduct && (
+                    <div className={styles.imageContainer}>
+                      {oldImages.length > 0 ? (
+                        oldImages.map((image, index) => (
+                          <div key={index} className={styles.existingImageWrapper}>
+                            <img
+                              src={`${API_BASE}/${image}`}
+                              alt={`${editProduct?.name} ${index + 1}`}
+                              className={styles.productImage}
+                            />
+                            <button
+                              type="button"
+                              onClick={() => deleteExistingImage(index)}
+                              className={styles.deleteExistingImageButton}
+                            >
+                              Xóa
+                            </button>
+                          </div>
+                        ))
+                      ) : (
+                        <span>Không có ảnh</span>
+                      )}
+                    </div>
+                  )}
                 </div>
                 <div className={styles.formGroup}>
                   <TooltipButton
                     field="images_new"
                     activeTooltip={activeTooltip}
                     setActiveTooltip={setActiveTooltip}
-                    guide="Chọn thêm ảnh mới (tối đa 4 ảnh cho mỗi sản phẩm)"
+                    guide={`Chọn thêm ảnh mới (tối đa ${MAX_IMAGES} ảnh cho mỗi sản phẩm)`}
                   >
                     Thêm hình ảnh mới
                   </TooltipButton>
@@ -718,18 +772,18 @@ const ProductManagement = () => {
                     accept="image/*"
                     onChange={handleImageChange}
                     className={styles.input}
-                    disabled={(oldImages?.length || 0) + formData.images.length >= 4}
+                    disabled={(oldImages?.length || 0) + formData.images.length >= MAX_IMAGES}
                   />
-                  {(oldImages?.length || 0) + formData.images.length >= 4 && (
-                    <span className={styles.warning}>Đã đạt giới hạn 4 ảnh</span>
+                  {(oldImages?.length || 0) + formData.images.length >= MAX_IMAGES && (
+                    <span className={styles.warning}>Đã đạt giới hạn {MAX_IMAGES} ảnh</span>
                   )}
-                  {formErrors.images && <span className={styles.error}>{formErrors.images}</span>}
                 </div>
                 <div className={styles.formGroup}>
                   <TooltipButton
                     field="images_preview"
                     activeTooltip={activeTooltip}
                     setActiveTooltip={setActiveTooltip}
+                    guide="Xem trước các ảnh mới được chọn"
                   >
                     Xem trước ảnh mới
                   </TooltipButton>
@@ -771,8 +825,8 @@ const ProductManagement = () => {
                     value={formData.name}
                     onChange={handleFormChange}
                     className={styles.input}
+                    required
                   />
-                  {formErrors.name && <span className={styles.error}>{formErrors.name}</span>}
                 </div>
                 <div className={styles.formGroup}>
                   <TooltipButton
@@ -785,9 +839,10 @@ const ProductManagement = () => {
                   </TooltipButton>
                   <select
                     name="category"
-                    value={formData.category || ''}
+                    value={formData.category}
                     onChange={handleFormChange}
                     className={styles.select}
+                    required
                   >
                     <option value="">Chọn danh mục</option>
                     {categories.map((cat) => (
@@ -796,92 +851,64 @@ const ProductManagement = () => {
                       </option>
                     ))}
                   </select>
-                  {formErrors.category && <span className={styles.error}>{formErrors.category}</span>}
                 </div>
                 <div className={styles.formGroup}>
                   <TooltipButton
-                    field="price"
+                    field="option"
                     activeTooltip={activeTooltip}
                     setActiveTooltip={setActiveTooltip}
-                    guide={fieldGuides.price}
+                    guide={fieldGuides.option}
                   >
-                    Giá (VNĐ)
+                    Tùy chọn kích thước
                   </TooltipButton>
-                  <input
-                    type="number"
-                    name="price"
-                    value={formData.price}
-                    onChange={handleFormChange}
-                    className={styles.input}
-                  />
-                  {formErrors.price && <span className={styles.error}>{formErrors.price}</span>}
-                </div>
-                <div className={styles.formGroup}>
-                  <TooltipButton
-                    field="stock"
-                    activeTooltip={activeTooltip}
-                    setActiveTooltip={setActiveTooltip}
-                    guide={fieldGuides.stock}
-                  >
-                    Tổng số lượng tồn kho
-                  </TooltipButton>
-                  <input
-                    type="number"
-                    name="stock"
-                    value={formData.stock}
-                    onChange={handleFormChange}
-                    className={styles.input}
-                  />
-                  {formErrors.stock && <span className={styles.error}>{formErrors.stock}</span>}
-                </div>
-                <div className={styles.formGroup}>
-                  <TooltipButton
-                    field="sizes"
-                    activeTooltip={activeTooltip}
-                    setActiveTooltip={setActiveTooltip}
-                    guide={fieldGuides.sizes}
-                  >
-                    Kích thước
-                  </TooltipButton>
-                  {formData.size.map((size, index) => (
+                  {formData.option.map((opt, index) => (
                     <div key={index} className={styles.sizeGroup}>
                       <span>Kích thước:</span>
                       <input
                         type="text"
                         name="size_name"
                         placeholder="Kích thước (ví dụ, 12 cm)"
-                        value={size.size_name}
-                        onChange={(e) => handleSizeChange(index, e)}
+                        value={opt.size_name}
+                        onChange={(e) => handleOptionChange(index, e)}
                         className={styles.input}
+                        required
                       />
                       <span>Tồn kho:</span>
                       <input
                         type="number"
                         name="stock"
                         placeholder="Tồn kho"
-                        value={size.stock}
-                        onChange={(e) => handleSizeChange(index, e)}
+                        value={opt.stock}
+                        onChange={(e) => handleOptionChange(index, e)}
                         className={styles.input}
+                        min="0"
+                        required
                       />
-                      {formData.size.length > 1 && (
+                      <span>Giá (VNĐ):</span>
+                      <input
+                        type="number"
+                        name="price"
+                        placeholder="Giá tùy chọn"
+                        value={opt.price}
+                        onChange={(e) => handleOptionChange(index, e)}
+                        className={styles.input}
+                        min="0.01"
+                        step="0.01"
+                        required
+                      />
+                      {formData.option.length > 1 && (
                         <button
                           type="button"
-                          onClick={() => removeSize(index)}
+                          onClick={() => removeOption(index)}
                           className={styles.removeButton}
                         >
                           Xóa
                         </button>
                       )}
-                      {formErrors[`size_name_${index}`] && (
-                        <span className={styles.error}>{formErrors[`size_name_${index}`]}</span>
-                      )}
-                      {formErrors[`size_stock_${index}`] && (
-                        <span className={styles.error}>{formErrors[`size_stock_${index}`]}</span>
-                      )}
                     </div>
                   ))}
-                  <button type="button" onClick={addSize} className={styles.addSizeButton}>
-                    Thêm kích thước
+                  <button type="button" onClick={addOption} className={styles.addSizeButton}>
+                    Thêm tùy chọn
                   </button>
                 </div>
                 <div className={styles.formGroup}>
@@ -937,7 +964,6 @@ const ProductManagement = () => {
                     onChange={handleFormChange}
                     className={styles.select}
                   >
-                    <option value="">Chọn thẻ</option>
                     <option value="new">Mới (new)</option>
                     <option value="sale">Giảm giá (sale)</option>
                   </select>
@@ -1071,7 +1097,6 @@ const ProductManagement = () => {
                     data-placeholder="Nhập mô tả chi tiết..."
                     suppressContentEditableWarning={true}
                   />
-                  {formErrors.description && <span className={styles.error}>{formErrors.description}</span>}
                 </div>
                 <div className={styles.formGroup}>
                   <TooltipButton
@@ -1093,9 +1118,27 @@ const ProductManagement = () => {
                     <option value="sale">Sale</option>
                   </select>
                 </div>
+                <div className={styles.formGroup}>
+                  <TooltipButton
+                    field="purchases"
+                    activeTooltip={activeTooltip}
+                    setActiveTooltip={setActiveTooltip}
+                    guide={fieldGuides.purchases}
+                  >
+                    Số lượng đã bán
+                  </TooltipButton>
+                  <input
+                    type="number"
+                    name="purchases"
+                    value={formData.purchases}
+                    onChange={handleFormChange}
+                    className={styles.input}
+                    min="0"
+                  />
+                </div>
                 <div className={styles.formActions}>
                   <button type="submit" className={styles.submitButton}>
-                    Cập nhật
+                    {addProduct ? 'Thêm' : 'Cập nhật'}
                   </button>
                   <button
                     type="button"
@@ -1108,6 +1151,54 @@ const ProductManagement = () => {
               </form>
             </div>
           </div>
+        )}
+        {showDetailProduct && (
+          <div className={styles.modalOverlay}>
+            <div className={styles.modal}>
+              <h3>Chi tiết sản phẩm: {showDetailProduct.name}</h3>
+              <div className={styles.detailContainer}>
+                <p><strong>Cấp độ:</strong> {showDetailProduct.level || 'Chưa xác định'}</p>
+                <p><strong>Nguyên tố:</strong> {showDetailProduct.element || 'Chưa xác định'}</p>
+                <p><strong>Thẻ:</strong> {showDetailProduct.tag || 'Chưa xác định'}</p>
+                <p><strong>Mô tả ngắn:</strong> {showDetailProduct.short_description || 'Chưa có'}</p>
+                <p><strong>Mô tả chi tiết:</strong> <div dangerouslySetInnerHTML={{ __html: showDetailProduct.description || 'Chưa có' }} /></p>
+                <p><strong>Tùy chọn kích thước:</strong></p>
+                <ul>
+                  {(showDetailProduct.option || []).map((opt, index) => (
+                    <li key={opt._id || index}>
+                      {opt.size_name || 'Chưa xác định'}: {opt.stock || 0} đơn vị, Giá: {(opt.price || 0).toLocaleString('vi-VN')} VNĐ
+                    </li>
+                  ))}
+                </ul>
+                <p><strong>Lượt xem:</strong> {showDetailProduct.views || 0}</p>
+                <p><strong>Lượt mua:</strong> {showDetailProduct.purchases || 0}</p>
+                <p><strong>Ngày tạo:</strong> {new Date(showDetailProduct.createdAt).toLocaleDateString('vi-VN')}</p>
+                <p><strong>Hình ảnh:</strong></p>
+                <div className={styles.imageContainer}>
+                  {(showDetailProduct.images || []).map((image, index) => (
+                    <img
+                      key={index}
+                      src={`${API_BASE}/${image}`}
+                      alt={`${showDetailProduct.name} ${index + 1}`}
+                      className={styles.productImage}
+                    />
+                  ))}
+                </div>
+              </div>
+              <div className={styles.formActions}>
+                <button
+                  type="button"
+                  onClick={closeModal}
+                  className={styles.cancelButton}
+                >
+                  Đóng
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+        {showErrorPopup && (
+          <ErrorPopup errors={formErrors} onClose={closeErrorPopup} />
         )}
       </div>
     </div>
