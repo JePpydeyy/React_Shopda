@@ -506,6 +506,11 @@
   font-size: clamp(0.875rem, 2vw, 1rem);
   font-weight: 600;
   margin-bottom: 0.3125rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+  max-width: 100%;
 }
 
 .productItemText h5 {

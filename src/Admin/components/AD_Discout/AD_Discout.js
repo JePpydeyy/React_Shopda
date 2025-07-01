@@ -3,7 +3,8 @@ import axios from 'axios';
 import Sidebar from '../Sidebar/Sidebar';
 import styles from './Discount.module.css';
 
-const API_URL = 'https://api-tuyendung-cty.onrender.com/api/discount';
+// const API_URL = 'https://api-tuyendung-cty.onrender.com/api/discount';
+const API_URL = `${process.env.REACT_APP_API_URL}/discount`;
 
 const defaultForm = {
   code: '',

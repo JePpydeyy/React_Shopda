@@ -5,6 +5,7 @@ import styles from './Order.module.css';
 import axios from 'axios';
 
 const ORDERS_PER_PAGE = 10;
+const API_URL = process.env.REACT_APP_API_URL;
 
 const OrderManagement = () => {
   const [orders, setOrders] = useState([]);
@@ -23,7 +24,7 @@ const OrderManagement = () => {
       setError('');
       try {
         const token = localStorage.getItem('adminToken');
-        const res = await axios.get('https://api-tuyendung-cty.onrender.com/api/order', {
+        const res = await axios.get(`${API_URL}/order`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         // Sắp xếp đơn hàng mới nhất lên đầu
@@ -63,7 +64,7 @@ const OrderManagement = () => {
     try {
       const token = localStorage.getItem('adminToken');
       await axios.put(
-        `https://api-tuyendung-cty.onrender.com/api/order/${id}/toggle-status`,
+        `${API_URL}/order/${id}/toggle-status`,
         { status: newStatus },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -87,7 +88,7 @@ const OrderManagement = () => {
     setDetailLoading(true);
     try {
       const token = localStorage.getItem('adminToken');
-      const res = await axios.get(`https://api-tuyendung-cty.onrender.com/api/order/${id}`, {
+      const res = await axios.get(`${API_URL}/order/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setSelectedOrder(res.data);
@@ -103,7 +104,6 @@ const OrderManagement = () => {
     const printContent = `
       <div>
         <h2>Chi tiết đơn hàng</h2>
-        <p><strong>Mã đơn:</strong> ${order._id}</p>
         <p><strong>Khách hàng:</strong> ${order.fullName}</p>
         <p><strong>Ngày sinh:</strong> ${new Date(order.dateOfBirth).toLocaleDateString('vi-VN')}</p>
         <p><strong>SĐT:</strong> ${order.phoneNumber}</p>
@@ -209,7 +209,7 @@ const OrderManagement = () => {
               <thead>
                 <tr className={styles.tableHeader}>
                   <th>STT</th>
-                  <th>Mã đơn</th>
+                  {/* <th>Mã đơn</th> */}
                   <th>Khách hàng</th>
                   <th>Tổng tiền</th>
                   <th>Trạng thái</th>
@@ -225,7 +225,7 @@ const OrderManagement = () => {
                       onClick={() => handleView(order._id)}
                     >
                       <td>{(currentPage - 1) * ORDERS_PER_PAGE + idx + 1}</td>
-                      <td>{order._id}</td>
+                      {/* <td>{order._id}</td> */}
                       <td>{order.fullName}</td>
                       <td>{order.grandTotal?.toLocaleString() || order.totalAmount?.toLocaleString()} VNĐ</td>
                       <td>{order.status}</td>
@@ -253,7 +253,7 @@ const OrderManagement = () => {
                             <div className={styles.loading}>Đang tải chi tiết...</div>
                           ) : (
                             <div className={styles.detailContainer}>
-                              <p><strong>Mã đơn:</strong> {selectedOrder._id}</p>
+                              {/* <p><strong>Mã đơn:</strong> {selectedOrder._id}</p> */}
                               <p><strong>Khách hàng:</strong> {selectedOrder.fullName}</p>
                               <p><strong>Ngày sinh:</strong> {new Date(selectedOrder.dateOfBirth).toLocaleDateString('vi-VN')}</p>
                               <p><strong>SĐT:</strong> {selectedOrder.phoneNumber}</p>

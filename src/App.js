@@ -23,6 +23,7 @@ import AD_CategoryNew from './Admin/pages/Categorynew';
 import AD_Add_New from './Admin/pages/AD_Add_New';
 import AD_Contact from './Admin/pages/AD_Contact';
 import EditNews from './Admin/components/EditNews/EditNews'; // Sửa import để sử dụng EditNews
+import ProtectedRoute from './Admin/components/ProtectedRoute/ProtectedRoute';
 
 import './App.css';
 
@@ -44,20 +45,68 @@ function App() {
             <Route path="/Checkout" element={<Checkout />} />
 
             {/* Admin routes */}
-            <Route path="/admin" element={<Adminpage />} />
             <Route path="/admin/login" element={<AdminLogin />} />
-            <Route path="/admin/product" element={<AD_Product />} />
-            <Route path="/admin/order" element={<AD_Order />} />
-            <Route path="/admin/category" element={<AD_Category />} />
-            <Route path="/admin/new" element={<AD_New />} />
-            <Route path="/admin/add_product" element={<AddProductSite />} />
-            <Route path="/admin/add_category" element={<AddCategorySite />} />
-            <Route path="/admin/categorynew" element={<AD_CategoryNew />} />
-            <Route path="/admin/add_news" element={<AD_Add_New />} />
-            <Route path="/admin/contact" element={<AD_Contact />} />
-            <Route path="/admin/discout" element={<DiscoutPage />} />
-            <Route path="/admin/editnew/:slug" element={<EditNews />} /> {/* Sửa để sử dụng EditNews */}
-            <Route path="/admin/DiscoutPage" element={<DiscoutPage />} />
+
+            <Route path="/admin" element={
+              <ProtectedRoute>
+                <Adminpage />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/product" element={
+              <ProtectedRoute>
+                <AD_Product />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/order" element={
+              <ProtectedRoute>
+                <AD_Order />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/category" element={
+              <ProtectedRoute>
+                <AD_Category />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/new" element={
+              <ProtectedRoute>
+                <AD_New />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/add_product" element={
+              <ProtectedRoute>
+                <AddProductSite />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/add_category" element={
+              <ProtectedRoute>
+                <AddCategorySite />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/categorynew" element={
+              <ProtectedRoute>
+                <AD_CategoryNew />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/add_news" element={
+              <ProtectedRoute>
+                <AD_Add_New />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/contact" element={
+              <ProtectedRoute>
+                <AD_Contact />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/discout" element={
+              <ProtectedRoute>
+                <DiscoutPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/editnew/:slug" element={
+              <ProtectedRoute>
+                <EditNews />
+              </ProtectedRoute>
+            } />
           </Routes>
         </div>
       </Router>

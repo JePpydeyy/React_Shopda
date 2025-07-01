@@ -4,6 +4,9 @@ import axios from 'axios';
 import Sidebar from '../Sidebar/Sidebar';
 import styles from './Product.module.css';
 
+const API_URL = process.env.REACT_APP_API_URL || 'https://api-tuyendung-cty.onrender.com/api';
+const API_BASE = process.env.REACT_APP_API_BASE || 'https://api-tuyendung-cty.onrender.com';
+
 // Reusable TooltipButton component
 const TooltipButton = React.memo(({ field, children, activeTooltip, setActiveTooltip, guide }) => (
   <div className={styles.fieldWithTooltip}>
@@ -40,7 +43,6 @@ const fieldGuides = {
   tag: "Sale: Giảm giá | New: Sản phẩm mới",
   short_description: "Mô tả ngắn gọn (100-150 ký tự)",
   description: "Mô tả chi tiết: nguồn gốc, khối lượng, lợi ích, bảo quản...",
-  // weight: "Khối lượng sản phẩm (gram hoặc kg)",
   images: "Chọn tối đa 10 ảnh chất lượng cao (JPEG, PNG, GIF)",
   status: "Hiển thị: Hiện trên website | Ẩn: Không hiện | Sale: Đang giảm giá",
   purchases: "Số lượng đã bán (mặc định 0, không âm)",
@@ -69,7 +71,7 @@ const ProductManagement = () => {
     tag: '',
     short_description: '',
     description: '',
-    weight: '1', // <-- mặc định là 1
+    weight: '1',
     status: 'show',
     images: [],
   });
@@ -99,23 +101,18 @@ const ProductManagement = () => {
     );
   }, [filteredProducts, currentPage]);
 
-  // Fetch products and categories
+  // Fetch products
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
         const response = await axios.get(
-          `https://api-tuyendung-cty.onrender.com/api/product?limit=1000`,
+          `${API_URL}/product?limit=1000`,
           {
             headers: token ? { Authorization: `Bearer ${token}` } : {},
           }
         );
-        const productList = response.data;
-        setProducts(productList);
-        const uniqueCategories = [
-          ...new Map(productList.map((p) => [p.category.id, p.category])).values(),
-        ];
-        setCategories(uniqueCategories);
+        setProducts(response.data);
       } catch (err) {
         setError(err.response?.data?.message || 'Không thể tải dữ liệu sản phẩm');
       } finally {
@@ -123,6 +120,22 @@ const ProductManagement = () => {
       }
     };
     fetchData();
+  }, [token]);
+
+  // Fetch categories from API
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const res = await axios.get(`${API_URL}/category`, {
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
+        });
+        console.log('Fetched categories:', res.data); // Debug log
+        setCategories(res.data); // Expecting [{_id, category, status, createdAt, __v}]
+      } catch (err) {
+        setError(err.response?.data?.message || 'Không thể tải dữ liệu danh mục');
+      }
+    };
+    fetchCategories();
   }, [token]);
 
   // Update toolbar state
@@ -155,13 +168,12 @@ const ProductManagement = () => {
     return () => document.removeEventListener('selectionchange', handleSelectionChange);
   }, [updateToolbarState]);
 
-  // Sync editor content ONLY when opening modal (editProduct changes)
+  // Sync editor content when opening modal
   useEffect(() => {
     if (editProduct && editorRef.current) {
       editorRef.current.innerHTML = formData.description || '';
     }
-    // eslint-disable-next-line
-  }, [editProduct]);
+  }, [editProduct, formData.description]);
 
   // Form handling
   const handleFormChange = useCallback((e) => {
@@ -210,7 +222,10 @@ const ProductManagement = () => {
   }, []);
 
   const deleteExistingImage = useCallback((index) => {
-    setOldImages((prev) => prev.filter((_, i) => i !== index));
+    setFormData((prev) => ({
+      ...prev,
+      images: prev.images.filter((_, i) => i !== index),
+    }));
   }, []);
 
   const execCommand = useCallback((command, value = null) => {
@@ -279,8 +294,14 @@ const ProductManagement = () => {
     try {
       const formDataToSend = new FormData();
       formDataToSend.append('name', formData.name);
-      const categoryObj = categories.find((cat) => cat.id === formData.category);
-      formDataToSend.append('category', JSON.stringify(categoryObj));
+
+      // Find category object by _id
+      const categoryObj = categories.find((cat) => cat._id === formData.category);
+      formDataToSend.append('category', JSON.stringify({
+        id: categoryObj?._id,
+        name_categories: categoryObj?.category
+      }));
+
       formDataToSend.append('price', formData.price);
       formDataToSend.append('stock', formData.stock);
       formDataToSend.append('size', JSON.stringify(formData.size));
@@ -293,11 +314,11 @@ const ProductManagement = () => {
       formDataToSend.append('description', editorRef.current?.innerHTML || '');
 
       oldImages.forEach((img) => formDataToSend.append('images', img));
-      formDataToSend.append('oldImages', JSON.stringify(oldImages)); // Gửi danh sách ảnh cũ còn giữ lại
-      formData.images.forEach((image) => formDataToSend.append('images', image)); // Gửi file ảnh mới
+      formDataToSend.append('oldImages', JSON.stringify(oldImages));
+      formData.images.forEach((image) => formDataToSend.append('images', image));
 
       const response = await axios.put(
-        `https://api-tuyendung-cty.onrender.com/api/product/${editProduct.slug}`,
+        `${API_URL}/product/${editProduct.slug}`,
         formDataToSend,
         {
           headers: {
@@ -319,11 +340,17 @@ const ProductManagement = () => {
   }, [formData, editProduct, oldImages, categories, token, validateForm]);
 
   const handleEdit = useCallback((product) => {
+    console.log('Product category:', product.category); // Debug log
+    const categoryId = typeof product.category === 'object' && product.category?._id
+      ? product.category._id
+      : product.category || '';
+    console.log('Setting formData.category to:', categoryId); // Debug log
+
     setEditProduct(product);
     setOldImages(product.images || []);
     setFormData({
       name: product.name || '',
-      category: product.category?.id || '',
+      category: categoryId,
       price: product.price || '',
       stock: product.stock || 0,
       size:
@@ -337,10 +364,10 @@ const ProductManagement = () => {
       element: product.element || '',
       tag: product.tag || '',
       short_description: product.short_description || '',
-      weight: product.weight || '',
+      weight: product.weight || '1',
       status: product.status || 'show',
       description: product.description || '',
-      images: [], // Initialize with empty array to append new images
+      images: [],
     });
   }, []);
 
@@ -439,7 +466,7 @@ const ProductManagement = () => {
     if (window.confirm('Bạn có chắc muốn xóa sản phẩm này?')) {
       try {
         await axios.delete(
-          `https://api-tuyendung-cty.onrender.com/api/product/${id}`,
+          `${API_URL}/product/${id}`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }
@@ -455,7 +482,7 @@ const ProductManagement = () => {
     const newStatus = product.status === 'show' ? 'hidden' : 'show';
     try {
       await axios.patch(
-        `https://api-tuyendung-cty.onrender.com/api/product/${product.slug}/status`,
+        `${API_URL}/product/${product.slug}/status`,
         { status: newStatus },
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -496,8 +523,8 @@ const ProductManagement = () => {
           >
             <option value="all">Tất cả danh mục</option>
             {categories.map((cat) => (
-              <option key={cat.id} value={cat.name_categories}>
-                {cat.name_categories}
+              <option key={cat._id} value={cat.category}>
+                {cat.category}
               </option>
             ))}
           </select>
@@ -540,7 +567,7 @@ const ProductManagement = () => {
                     <td>
                       {product.images?.length > 0 ? (
                         <img
-                          src={`https://api-tuyendung-cty.onrender.com/${product.images[0]}`}
+                          src={`${API_BASE}/${product.images[0]}`}
                           alt={product.name}
                           className={styles.tableImage}
                         />
@@ -590,7 +617,6 @@ const ProductManagement = () => {
                           <p><strong>Thẻ:</strong> {product.tag}</p>
                           <p><strong>Mô tả ngắn:</strong> {product.short_description}</p>
                           <p><strong>Mô tả chi tiết:</strong> <div dangerouslySetInnerHTML={{ __html: product.description }} /></p>
-                          {/* <p><strong>Khối lượng:</strong> {product.weight}</p> */}
                           <p><strong>Tồn kho theo kích thước:</strong></p>
                           <ul>
                             {product.size.map((size, index) => (
@@ -607,7 +633,7 @@ const ProductManagement = () => {
                             {product.images.map((image, index) => (
                               <img
                                 key={index}
-                                src={`https://api-tuyendung-cty.onrender.com/${image}`}
+                                src={`${API_BASE}/${image}`}
                                 alt={`${product.name} ${index + 1}`}
                                 className={styles.productImage}
                               />
@@ -659,7 +685,7 @@ const ProductManagement = () => {
                       oldImages.map((image, index) => (
                         <div key={index} className={styles.existingImageWrapper}>
                           <img
-                            src={`https://api-tuyendung-cty.onrender.com/${image}`}
+                            src={`${API_BASE}/${image}`}
                             alt={`${editProduct.name} ${index + 1}`}
                             className={styles.productImage}
                           />
@@ -759,14 +785,14 @@ const ProductManagement = () => {
                   </TooltipButton>
                   <select
                     name="category"
-                    value={formData.category}
+                    value={formData.category || ''}
                     onChange={handleFormChange}
                     className={styles.select}
                   >
                     <option value="">Chọn danh mục</option>
                     {categories.map((cat) => (
-                      <option key={cat.id} value={cat.id}>
-                        {cat.name_categories}
+                      <option key={cat._id} value={cat._id}>
+                        {cat.category}
                       </option>
                     ))}
                   </select>
@@ -830,8 +856,8 @@ const ProductManagement = () => {
                       />
                       <span>Tồn kho:</span>
                       <input
-                        type="stock"
-                        name="number"
+                        type="number"
+                        name="stock"
                         placeholder="Tồn kho"
                         value={size.stock}
                         onChange={(e) => handleSizeChange(index, e)}
@@ -865,7 +891,7 @@ const ProductManagement = () => {
                     setActiveTooltip={setActiveTooltip}
                     guide={fieldGuides.level}
                   >
-                    Cấp độ
+                    Phân khúc sản phẩm
                   </TooltipButton>
                   <select
                     name="level"
@@ -873,7 +899,7 @@ const ProductManagement = () => {
                     onChange={handleFormChange}
                     className={styles.select}
                   >
-                    <option value="default">Chọn cấp độ</option>
+                    <option value="">Chọn phân khúc sản phẩm</option>
                     <option value="Cao cấp">Cao cấp</option>
                     <option value="Trung cấp">Trung cấp</option>
                     <option value="Phổ biến">Phổ biến</option>
@@ -1046,23 +1072,6 @@ const ProductManagement = () => {
                     suppressContentEditableWarning={true}
                   />
                   {formErrors.description && <span className={styles.error}>{formErrors.description}</span>}
-                </div>
-                <div className={styles.formGroup}>
-                  <TooltipButton
-                    field="weight"
-                    activeTooltip={activeTooltip}
-                    setActiveTooltip={setActiveTooltip}
-                    guide={fieldGuides.weight}
-                  >
-                    Khối lượng
-                  </TooltipButton>
-                  <input
-                    type="text"
-                    name="weight"
-                    value={formData.weight}
-                    onChange={handleFormChange}
-                    className={styles.input}
-                  />
                 </div>
                 <div className={styles.formGroup}>
                   <TooltipButton

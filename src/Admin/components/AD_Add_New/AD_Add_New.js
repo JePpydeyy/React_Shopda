@@ -3,6 +3,9 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import styles from './add_news.module.css';
 
+const API_URL = process.env.REACT_APP_API_URL;
+const API_BASE = process.env.REACT_APP_API_BASE;
+
 const AD_Add_New = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -57,24 +60,26 @@ const AD_Add_New = () => {
   }, [location.state]);
 
   useEffect(() => {
-    if (!isEditing && formData.title) {
-      setPreviewSlug(generateSlug(formData.title));
-    } else if (!isEditing) {
-      setPreviewSlug('');
-    }
-  }, [formData.title, isEditing]);
-
-  const handleChange = (e, index = null, field = null, formType = 'create') => {
-    if (isEditing && formType === 'edit') {
-      if (index !== null && field) {
-        const updatedBlocks = [...editForm.contentBlocks];
-        updatedBlocks[index] = {
-          ...updatedBlocks[index],
-          [field]: field === 'listItems' ? e.target.value.split('\n').filter(item => item.trim()) : e.target.value,
-        };
-        setEditForm({ ...editForm, contentBlocks: updatedBlocks });
-      } else {
-        setEditForm({ ...editForm, [e.target.name]: e.target.value });
+    const fetchCategories = async () => {
+      try {
+        const token = localStorage.getItem('adminToken');
+        if (!token) {
+          setError('Không tìm thấy token. Vui lòng đăng nhập lại.');
+          return;
+        }
+        const response = await axios.get('https://api-tuyendung-cty.onrender.com/api/new-category', {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        console.log('Danh mục đã tải:', response.data);
+        const categoryData = Array.isArray(response.data) ? response.data : [];
+        if (categoryData.length === 0) {
+          console.warn('Không tìm thấy danh mục trong phản hồi API');
+          setError('Không có danh mục nào được tải. Vui lòng kiểm tra API.');
+        }
+        setCategories(categoryData.filter(cat => cat.status === 'show'));
+      } catch (err) {
+        console.error('Lỗi khi tải danh mục:', err.response?.data, err.response?.status);
+        setError(`Không thể tải danh mục: ${err.response?.data?.message || err.message}`);
       }
     } else {
       const { name, value } = e.target;
@@ -322,7 +327,7 @@ const AD_Add_New = () => {
     }
 
     try {
-      const response = await axios.post(`${API_URL}/new`, formDataToSend, {
+      const response = await axios.post('https://api-tuyendung-cty.onrender.com/api/new/', formDataToSend, {
         headers: {
           'Content-Type': 'multipart/form-data',
           Authorization: `Bearer ${token}`,
