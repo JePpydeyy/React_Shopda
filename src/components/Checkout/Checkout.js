@@ -550,14 +550,18 @@ const Checkout = () => {
           <h2 className={`${styles.orderInfo} h2`}>THÔNG TIN ĐƠN HÀNG</h2>
           {cartItems.length > 0 && (
             <div className={styles.productList}>
-              {cartItems.map((item, index) => (
-                <div key={index} className={styles.productGroup}>
-                  <p className={styles.productName}>{item.name} x {item.quantity} - {formatPrice((parseFloat(item.price) || 0) * (parseInt(item.quantity) || 1))}</p>
-                  <p className={styles.productDetails}>
-                    Chất: {item.charm || 'N/A'}, Size Tay: {item.wristSize || 'N/A'}
-                  </p>
-                </div>
-              ))}
+         
+        {cartItems.map((item, index) => (
+          <div key={index} className={styles.productGroup}>
+            <p className={styles.productName}>
+              {item.name} x {item.quantity} - {formatPrice((parseFloat(item.price) || 0) * (parseInt(item.quantity) || 1))}
+            </p>
+            <p className={styles.productDetails}>
+              Size: {item.size_name || 'N/A'}
+            </p>
+          </div>
+        ))}
+
             </div>
           )}
           <div className={styles.order}>

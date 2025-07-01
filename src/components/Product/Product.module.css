@@ -496,8 +496,12 @@
 }
 
 .productItemText {
- 
-  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  height: 90px; /* hoặc giá trị phù hợp với thiết kế của bạn */
+  text-align: left;
   padding: 0.5rem 0;
 }
 
@@ -506,6 +510,13 @@
   font-size: clamp(0.875rem, 2vw, 1rem);
   font-weight: 600;
   margin-bottom: 0.3125rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 2; /* Giới hạn 2 dòng */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-height: 2.5em; /* Đảm bảo chiều cao cho 2 dòng */
+  width: 100%;
 }
 
 .productItemText h5 {
@@ -513,6 +524,7 @@
   font-weight: 700;
   font-size: clamp(0.875rem, 2vw, 1rem);
   margin: 0;
+  width: 100%;
 }
 
 /* === PAGINATION === */

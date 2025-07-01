@@ -70,9 +70,6 @@ function About() {
           Tịnh Lâm là đứa con tinh thần mà Huỳnh Lập tâm huyết nhất. Sở dĩ đặt tên thương hiệu là Tịnh Lâm bởi đây là một nhân vật rất quen thuộc với những ai là fan của Huỳnh Lập trong các tác phẩm như “Pháp Sư Mù”, “Ai Chết Giơ Tay”. Nhiều người khi theo dõi các series này quan tâm đến những phụ kiện đi kèm của nhân vật Tịnh Lâm, và vì thế Tịnh Lâm – Trang Sức Phong Thủy ra đời.
         </div>
       </div>
-
-      {/* Border */}
-      <div className={styles.border}></div>
     </div>
   );
 }

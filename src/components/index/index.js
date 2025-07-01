@@ -22,27 +22,32 @@ const Index = () => {
 
   // Add to cart function
   const handleAddToCart = (product) => {
+    // Lấy option đầu tiên còn hàng (nếu có)
+    let selectedOption = null;
+    if (Array.isArray(product.option) && product.option.length > 0) {
+      selectedOption = product.option.find(opt => opt.stock > 0) || product.option[0];
+    }
     const cart = JSON.parse(localStorage.getItem('cart_da') || '[]');
     const cartItem = {
       _id: product.id || product._id,
       name: product.name,
-      price: product.price,
+      price: selectedOption ? selectedOption.price : product.price,
       quantity: 1,
       charm: product.Collection || '',
       stoneSize: product.weight || '10,5 Li',
-      wristSize: '12', // Kích thước mặc định
+      size_name: selectedOption ? selectedOption.size_name : '',
       image: getImageUrl(product.images),
-      stock: 99 // Giả sử có stock
+      stock: selectedOption ? selectedOption.stock : 99 // Nếu không có option thì giả sử còn hàng
     };
 
-    const existIndex = cart.findIndex(item => item._id === cartItem._id && item.wristSize === cartItem.wristSize);
-    
+    const existIndex = cart.findIndex(item => item._id === cartItem._id && item.size_name === cartItem.size_name);
+
     if (existIndex !== -1) {
       cart[existIndex].quantity += 1;
     } else {
       cart.push(cartItem);
     }
-    
+
     localStorage.setItem('cart_da', JSON.stringify(cart));
     showToast('Đã thêm vào giỏ hàng!', 'success');
   };
@@ -61,8 +66,11 @@ const Index = () => {
         const newsResponse = await fetch(`${API_URL}/new`);
         const newsData = await newsResponse.json();
         
-        // Get latest 4 products and 3 news (sorted by createdAt)
-        const latestProducts = productsData.slice(0, 4);
+        // Get latest 4 products (sort by createdAt desc)
+        const latestProducts = productsData
+          .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+          .slice(0, 4);
+        // Get latest 3 news
         const latestNews = newsData.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 3);
         
         // Format news data to include slug
@@ -109,8 +117,12 @@ const Index = () => {
     return date.toLocaleDateString('vi-VN', options);
   };
 
-  // Format price
-  const formatPrice = (price) => {
+  // Format price (giá nhỏ nhất trong option nếu có)
+  const formatPrice = (product) => {
+    let price = product.price;
+    if (Array.isArray(product.option) && product.option.length > 0) {
+      price = Math.min(...product.option.map(opt => opt.price));
+    }
     return new Intl.NumberFormat('vi-VN', {
       style: 'currency',
       currency: 'VND'
@@ -118,9 +130,10 @@ const Index = () => {
   };
 
   // Get full image URL
-  const getImageUrl = (imagePath) => {
+  const getImageUrl = (images) => {
+    if (!images) return '/images/placeholder.jpg';
+    let imagePath = Array.isArray(images) ? images[0] : images;
     if (!imagePath) return '/images/placeholder.jpg';
-    if (Array.isArray(imagePath)) imagePath = imagePath[0];
     if (imagePath.startsWith('http')) return imagePath;
     return `${API_BASE}/${imagePath}`;
   };
@@ -174,7 +187,7 @@ const Index = () => {
                   </div>
                   <div className={styles.productInfo}>
                     <h3 className={styles.productName}>{product.name}</h3>
-                    <p className={styles.productPrice}>{formatPrice(product.price)}</p>
+                    <p className={styles.productPrice}>{formatPrice(product)}</p>
                   </div>
                 </div>
               ))}
@@ -193,7 +206,7 @@ const Index = () => {
                   phù hợp với từng mệnh, giúp gia tăng năng lượng tích cực và 
                   thu hút tài lộc trong cuộc sống.
                 </p>
-                <Link to="/product/show" className={styles.viewAllBtn}>
+                <Link to="/product" className={styles.viewAllBtn}>
                   Xem Tất Cả Sản Phẩm
                 </Link>
               </div>

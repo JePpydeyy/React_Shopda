@@ -33,7 +33,13 @@ const Product = () => {
       .then(res => res.json())
       .then(data => {
         setProducts(data);
-        const max = data.reduce((acc, cur) => (cur.price > acc ? cur.price : acc), 0);
+        // Lấy giá lớn nhất từ option nếu có, nếu không lấy price
+        const max = data.reduce((acc, cur) => {
+          const curMax = Array.isArray(cur.option) && cur.option.length > 0
+            ? Math.max(...cur.option.map(opt => opt.price))
+            : cur.price;
+          return curMax > acc ? curMax : acc;
+        }, 0);
         const roundedMax = Math.ceil(max / 1000000) * 1000000;
         setMaxPriceLimit(roundedMax);
         setMaxPrice(roundedMax);
@@ -57,11 +63,18 @@ const Product = () => {
     setSelectedCategories(params.category ? [params.category] : []);
   }, [location.search]);
 
+  // Lấy giá nhỏ nhất từ option nếu có, nếu không lấy price
+  const getMinOptionPrice = (p) =>
+    Array.isArray(p.option) && p.option.length > 0
+      ? Math.min(...p.option.map(opt => opt.price))
+      : p.price;
+
   const filteredProducts = products.filter(p => {
     const matchesSearch = p.name.toLowerCase().includes(search.toLowerCase()) ||
       p.category?.name_categories?.toLowerCase().includes(search.toLowerCase());
-    const matchesPrice = p.price >= minPrice && p.price <= maxPrice;
-    const matchesLevel = selectedLevels.length === 0 || selectedLevels.map(l => l.toLowerCase()).includes(p.level.toLowerCase());
+    const minOptionPrice = getMinOptionPrice(p);
+    const matchesPrice = minOptionPrice >= minPrice && minOptionPrice <= maxPrice;
+    const matchesLevel = selectedLevels.length === 0 || selectedLevels.map(l => l.toLowerCase()).includes(p.level?.toLowerCase());
     const matchesCategory = selectedCategories.length === 0 || 
       selectedCategories.some(selectedCat => 
         p.category?.name_categories?.toLowerCase().includes(selectedCat.toLowerCase()) ||
@@ -77,9 +90,9 @@ const Product = () => {
 
   let sortedProducts = filteredProducts;
   if (sortType === 'price-asc') {
-    sortedProducts = [...filteredProducts].sort((a, b) => a.price - b.price);
+    sortedProducts = [...filteredProducts].sort((a, b) => getMinOptionPrice(a) - getMinOptionPrice(b));
   } else if (sortType === 'price-desc') {
-    sortedProducts = [...filteredProducts].sort((a, b) => b.price - a.price);
+    sortedProducts = [...filteredProducts].sort((a, b) => getMinOptionPrice(b) - getMinOptionPrice(a));
   } else if (sortType === 'newest') {
     sortedProducts = [...filteredProducts].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
   }
@@ -321,7 +334,13 @@ const Product = () => {
                   </div>
                   <div className={styles.productItemText}>
                     <h6>{product.name}</h6>
-                    <h5>{formatPrice(product.price)} VND</h5>
+                    <h5>
+                      {formatPrice(
+                        Array.isArray(product.option) && product.option.length > 0
+                          ? Math.min(...product.option.map(opt => opt.price))
+                          : product.price
+                      )} VND
+                    </h5>
                   </div>
                 </div>
               ))}

@@ -125,10 +125,7 @@ const Header = () => {
               <FontAwesomeIcon icon={faCartShopping} className={styles.cartIcon} />
             </Link>
           </div>
-          <div className={styles.languageSelector}>
-            <span>Tiếng Việt</span>
-            <FontAwesomeIcon icon={faCaretDown} />
-          </div>
+         
           <div className={styles.hamburger} onClick={toggleMenu}>
             <FontAwesomeIcon icon={isMenuOpen ? faTimes : faBars} />
           </div>
@@ -159,7 +156,7 @@ const Navbar = ({ isMenuOpen, toggleMenu }) => {
           <li>
             <a href="/product" onClick={toggleMenu}>
               SẢN PHẨM
-              <FontAwesomeIcon icon={faCaretDown} className={styles.dropdownArrow} />
+            
             </a>
           </li>
           <li>

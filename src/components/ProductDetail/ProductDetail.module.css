@@ -1,6 +1,6 @@
 /* Base styles (already provided) */
 .container {
-  max-width: 1200px;
+  max-width: 1290px;
   margin: 0 auto;
   background-color: white;
   padding: 50px;
@@ -17,6 +17,7 @@
 }
 
 .nameProduct {
+  color :#3457a0;
   font-size: 24px;
   margin-left: 5px;
 }
@@ -161,7 +162,7 @@
   padding: 8px;
   border: 1px solid #ccc;
   border-radius: 4px;
-  margin-right: 10px;
+  margin-left: 10px;
 }
 
 .wristSize {
@@ -289,6 +290,8 @@
 .thumbnail:hover {
   transform: scale(1.1);
 }
+
+
 
 /* Responsive styles for iPad (768px–1024px) */
 @media (max-width: 1024px) {
