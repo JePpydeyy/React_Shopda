@@ -14,6 +14,13 @@
   color: #333;
 }
 
+.form {
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
 .formGroup {
   margin-bottom: 15px;
 }
@@ -25,7 +32,8 @@
   color: #555;
 }
 
-.inputField {
+.inputField,
+.formSelect {
   width: 100%;
   padding: 8px;
   border: 1px solid #ddd;
@@ -33,40 +41,11 @@
   font-size: 14px;
 }
 
-.inputField:focus {
+.inputField:focus,
+.formSelect:focus {
   border-color: #007bff;
   outline: none;
   box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
-}
-
-.quillEditor {
-  width: 100%;
-  margin-bottom: 10px;
-}
-
-.quillEditor .ql-container {
-  min-height: 200px;
-}
-
-.ql-snow .ql-editor img {
-  max-height: 25%;
-  max-width: 20%;
-  height: auto;
-  width: auto;
-  border-radius: 4px;
-  border: 1px solid #ddd;
-  object-fit: contain;
-}
-
-/* Thêm class riêng cho ảnh trong nội dung */
-.quillEditor .ql-editor img.quill-image {
-  max-width: 100%;
-  height: auto;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  margin: 10px 0;
-  display: block;
-  object-fit: contain;
 }
 
 .imagePreview {
@@ -75,9 +54,73 @@
 
 .previewImage {
   max-width: 250px;
-  height: 250px;
+  height: auto;
   border-radius: 4px;
   border: 1px solid #ddd;
+}
+
+.blockItem {
+  background: #f9f9f9;
+  border: 1px solid #ddd;
+  padding: 15px;
+  border-radius: 6px;
+  margin-bottom: 10px;
+}
+
+.blockTypeSelect {
+  width: 100%;
+  padding: 6px;
+  margin-bottom: 10px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.blockInput {
+  width: 100%;
+  padding: 8px;
+  margin-top: 5px;
+  margin-bottom: 10px;
+  font-size: 14px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.blockImagePreview img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 4px;
+  margin-top: 10px;
+  border: 1px solid #ccc;
+}
+
+.removeBlockButton {
+  padding: 5px 10px;
+  background-color: #dc3545;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.removeBlockButton:hover {
+  background-color: #c82333;
+}
+
+.addBlockButton {
+  padding: 8px 12px;
+  background-color: #007bff;
+  color: #fff;
+  font-size: 14px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.addBlockButton:hover {
+  background-color: #218838;
 }
 
 .saveButton {

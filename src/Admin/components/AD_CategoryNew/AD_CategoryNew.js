@@ -24,7 +24,8 @@ const CategoryNewsManagement = () => {
   const [editCategory, setEditCategory] = useState(null); // State cho popup chỉnh sửa/tạo mới
   const navigate = useNavigate();
 
-  const API_BASE_URL = 'https://api-tuyendung-cty.onrender.com';
+  // Lấy API_BASE_URL từ env, chỉ dùng env, không hardcode
+  const API_BASE_URL = process.env.REACT_APP_API_BASE;
 
   // Fetch categories
   const fetchCategories = async () => {
@@ -48,8 +49,6 @@ const CategoryNewsManagement = () => {
       }
 
       const result = await res.json();
-      console.log('Dữ liệu từ API:', result);
-
       const data = Array.isArray(result) ? result : [];
       const transformed = data.map(item => ({
         id: item._id || 'unknown',
@@ -61,7 +60,6 @@ const CategoryNewsManagement = () => {
 
       setCategories(transformed);
     } catch (err) {
-      console.error('Lỗi khi tải danh mục tin tức:', err);
       setError(err.message);
     } finally {
       setLoading(false);
@@ -84,8 +82,6 @@ const CategoryNewsManagement = () => {
         throw new Error('Không tìm thấy token xác thực. Vui lòng đăng nhập lại.');
       }
 
-      console.log(`Gửi yêu cầu toggle cho id: ${id}, status: ${newStatus}`);
-
       const res = await fetch(`${API_BASE_URL}/api/new-category/${id}/toggle-status`, {
         method: 'PUT',
         headers: {
@@ -97,15 +93,12 @@ const CategoryNewsManagement = () => {
 
       if (!res.ok) {
         const errorData = await res.json().catch(() => ({}));
-        console.error('Lỗi API chi tiết:', errorData);
         throw new Error(`Lỗi cập nhật trạng thái: ${errorData.message || res.statusText}`);
       }
 
-      console.log('Cập nhật trạng thái thành công:', await res.json());
       await fetchCategories();
       alert(`Đã cập nhật trạng thái: ${newStatus}`);
     } catch (err) {
-      console.error('Lỗi khi toggle trạng thái:', err);
       alert(`Lỗi cập nhật trạng thái: ${err.message}`);
     }
   };
@@ -129,13 +122,13 @@ const CategoryNewsManagement = () => {
       const slug = generateSlug(editCategory.name);
       const payload = {
         category: editCategory.name,
-        slug: editCategory.id ? editCategory.slug : slug, // Giữ slug cũ nếu chỉnh sửa, tạo mới nếu tạo
+        slug: editCategory.id ? editCategory.slug : slug,
         status: editCategory.status,
       };
 
       const url = editCategory.id
-        ? `${API_BASE_URL}/api/new-category/${editCategory.id}` // Cập nhật
-        : `${API_BASE_URL}/api/new-category`; // Tạo mới (giả định endpoint POST)
+        ? `${API_BASE_URL}/api/new-category/${editCategory.id}`
+        : `${API_BASE_URL}/api/new-category`;
 
       const method = editCategory.id ? 'PUT' : 'POST';
 
@@ -157,7 +150,6 @@ const CategoryNewsManagement = () => {
       setEditCategory(null);
       alert(`${editCategory.id ? 'Cập nhật' : 'Tạo'} danh mục thành công!`);
     } catch (err) {
-      console.error('Lỗi khi lưu chỉnh sửa/tạo:', err);
       alert(`Lỗi ${editCategory.id ? 'cập nhật' : 'tạo'} danh mục: ${err.message}`);
     }
   };
@@ -254,7 +246,7 @@ const CategoryNewsManagement = () => {
               <input
                 type="text"
                 value={editCategory.slug}
-                readOnly // Slug tự động tạo, không cho chỉnh sửa
+                readOnly
                 className={styles.inputField}
               />
               <select

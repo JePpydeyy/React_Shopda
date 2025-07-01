@@ -1,62 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Sidebar from '../Sidebar/Sidebar';
-import ReactQuill from 'react-quill';
-import 'react-quill/dist/quill.snow.css';
 import styles from './EditNews.module.css';
 
 const EditNew = () => {
   const { slug } = useParams();
   const navigate = useNavigate();
-  const [article, setArticle] = useState({
+  const [formData, setFormData] = useState({
     title: '',
-    content: '',
-    category_new: '',
-    thumbnailUrl: '',
+    thumbnail: null,
+    thumbnailPreview: null,
+    thumbnailCaption: '',
+    contentBlocks: [],
     status: 'show',
-    views: 0,
-    reviews: 0,
   });
-  const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [selectedFile, setSelectedFile] = useState(null);
-
+  const [error, setError] = useState('');
   const API_BASE_URL = process.env.REACT_APP_API_BASE || 'https://api-tuyendung-cty.onrender.com';
-
-  const preprocessContent = (html) => {
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(html, 'text/html');
-    const images = doc.getElementsByTagName('img');
-    for (let img of images) {
-      let src = img.getAttribute('src') || '';
-      if (src && !src.startsWith('http') && !src.startsWith('data:')) {
-        img.setAttribute('src', `${API_BASE_URL}/${src.replace(/^\/+/, '')}`);
-      }
-      // Đảm bảo giữ nguyên base64 nếu đã có
-      img.classList.add('quill-image');
-    }
-    return doc.body.innerHTML;
-  };
-
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const res = await fetch(`${API_BASE_URL}/api/new-category`, {
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('adminToken') || ''}`,
-          },
-        });
-        const result = await res.json();
-        setCategories(Array.isArray(result) ? result.filter(c => c.status === 'show') : []);
-      } catch (err) {
-        console.error('Lỗi tải danh mục:', err);
-        setCategories([]);
-      }
-    };
-    fetchCategories();
-  }, []);
+  const baseImageURL = `${API_BASE_URL}/`;
 
   useEffect(() => {
     const fetchArticle = async () => {
@@ -68,20 +29,34 @@ const EditNew = () => {
             'Authorization': `Bearer ${localStorage.getItem('adminToken') || ''}`,
           },
         });
-        if (!res.ok) throw new Error(`Lỗi HTTP: ${res.status} ${res.statusText}`);
-        const result = await res.json();
-        const processedContent = preprocessContent(result.content || '');
-        setArticle({
-          title: result.title || '',
-          content: processedContent,
-          category_new: result.category_new?._id || result.category_new || '',
-          thumbnailUrl: result.thumbnailUrl || '', // Giữ nguyên base64 nếu có
-          status: result.status || 'show',
-          views: result.views || 0,
-          reviews: result.reviews || 0,
+
+        const data = await res.json();
+        if (!res.ok) {
+          throw new Error(data.message || 'Lỗi tải bài viết.');
+        }
+
+        setFormData({
+          title: data.title || '',
+          thumbnail: null,
+          thumbnailPreview: data.thumbnailUrl
+            ? data.thumbnailUrl.startsWith('http')
+              ? data.thumbnailUrl
+              : baseImageURL + data.thumbnailUrl.replace(/^\/+/, '')
+            : null,
+          thumbnailCaption: data.thumbnailCaption || '',
+          contentBlocks: (data.contentBlocks || []).map(block => ({
+            ...block,
+            preview: block.type === 'image'
+              ? block.url?.startsWith('http')
+                ? block.url
+                : baseImageURL + block.url?.replace(/^\/+/, '')
+              : null,
+          })),
+          status: data.status || 'show',
         });
       } catch (err) {
-        setError(err.message);
+        console.error(err);
+        setError(err.message || 'Lỗi không xác định');
       } finally {
         setLoading(false);
       }
@@ -91,259 +66,213 @@ const EditNew = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setArticle((prev) => ({ ...prev, [name]: value }));
+    setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleContentChange = (value) => {
-    setArticle((prev) => ({ ...prev, content: value }));
-  };
-
-  const handleFileChange = (e) => {
+  const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setSelectedFile(file);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setArticle((prev) => ({ ...prev, thumbnailUrl: reader.result })); // Chuyển thành base64
-      };
-      reader.readAsDataURL(file);
+      setFormData(prev => ({
+        ...prev,
+        thumbnail: file,
+        thumbnailPreview: URL.createObjectURL(file),
+      }));
     }
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleBlockChange = (index, field, value) => {
+    const newBlocks = [...formData.contentBlocks];
+    if (field === 'url' && value instanceof File) {
+      newBlocks[index] = {
+        ...newBlocks[index],
+        [field]: value,
+        preview: URL.createObjectURL(value),
+        content: '',
+      };
+    } else {
+      newBlocks[index] = { ...newBlocks[index], [field]: value };
+    }
+    setFormData(prev => ({ ...prev, contentBlocks: newBlocks }));
+  };
+
+  const handleAddBlock = () => {
+    setFormData(prev => ({
+      ...prev,
+      contentBlocks: [
+        ...prev.contentBlocks,
+        {
+          _id: `temp_${Date.now()}`,
+          type: 'text',
+          content: '',
+          url: undefined,
+          caption: '',
+          preview: null,
+        },
+      ],
+    }));
+  };
+
+  const handleRemoveBlock = (index) => {
+    setFormData(prev => ({
+      ...prev,
+      contentBlocks: prev.contentBlocks.filter((_, i) => i !== index),
+    }));
+  };
+
+  const handleSubmit = async () => {
+    setLoading(true);
+    const token = localStorage.getItem('adminToken');
+    if (!token) return alert('Vui lòng đăng nhập lại.');
+
+    const formDataToSend = new FormData();
+    formDataToSend.append('title', formData.title);
+    if (formData.thumbnail) {
+      formDataToSend.append('thumbnail', formData.thumbnail);
+    }
+    formDataToSend.append('thumbnailCaption', formData.thumbnailCaption);
+    formDataToSend.append('status', formData.status);
+
+    const processedBlocks = formData.contentBlocks.map(block => ({
+      ...block,
+      preview: undefined,
+    }));
+
+    formDataToSend.append('contentBlocks', JSON.stringify(processedBlocks));
+
     try {
-      const token = localStorage.getItem('adminToken');
-      if (!token) {
-        navigate('/admin/login');
-        throw new Error('Không tìm thấy token xác thực. Vui lòng đăng nhập lại.');
-      }
-
-      const processedContent = preprocessContent(article.content);
-
-      let options = {
+      const res = await fetch(`${API_BASE_URL}/api/new/${slug}`, {
         method: 'PUT',
         headers: {
-          'Authorization': `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
-      };
-
-      if (selectedFile) {
-        const formData = new FormData();
-        formData.append('title', article.title);
-        formData.append('content', processedContent);
-        formData.append('category_new', article.category_new);
-        formData.append('views', article.views);
-        formData.append('reviews', article.reviews);
-        formData.append('status', article.status);
-        formData.append('thumbnail', selectedFile);
-        options.body = formData;
-      } else {
-        options.headers['Content-Type'] = 'application/json';
-        options.body = JSON.stringify({
-          title: article.title,
-          content: processedContent,
-          category_new: article.category_new,
-          views: article.views,
-          reviews: article.reviews,
-          status: article.status,
-          thumbnailUrl: article.thumbnailUrl, // Gửi base64 trực tiếp
-        });
-      }
-
-      const res = await fetch(`${API_BASE_URL}/api/new/${slug}`, options);
-
-      if (!res.ok) {
-        const errorData = await res.json().catch(() => ({}));
-        throw new Error(`Lỗi cập nhật bài viết: ${errorData.message || res.statusText}`);
-      }
-
-      alert('Cập nhật bài viết thành công');
-      navigate('/admin/new');
-    } catch (err) {
-      alert(`Lỗi khi cập nhật bài viết: ${err.message}`);
-    }
-  };
-
-  const handleDelete = async () => {
-    const confirmDelete = window.confirm('Bạn có chắc chắn muốn xoá bài viết này?');
-    if (!confirmDelete) return;
-
-    try {
-      const token = localStorage.getItem('adminToken');
-      if (!token) {
-        navigate('/admin/login');
-        throw new Error('Vui lòng đăng nhập để xoá bài viết');
-      }
-
-      const res = await fetch(`${API_BASE_URL}/api/new/${slug}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
+        body: formDataToSend,
       });
 
       if (!res.ok) {
-        const errorData = await res.json().catch(() => ({}));
-        throw new Error(errorData.message || 'Xoá bài viết thất bại');
+        const errData = await res.json();
+        throw new Error(errData.message || 'Cập nhật thất bại');
       }
 
-      alert('Bài viết đã được xoá thành công.');
+      alert('Cập nhật thành công');
       navigate('/admin/new');
     } catch (err) {
-      alert(`Lỗi khi xoá bài viết: ${err.message}`);
+      alert(`Lỗi cập nhật: ${err.message}`);
+    } finally {
+      setLoading(false);
     }
   };
 
-  if (loading) {
-    return (
-      <div className={styles.container}>
-        <Sidebar />
-        <div className={styles.loadingSpinner}>Đang tải...</div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className={styles.container}>
-        <Sidebar />
-        <div className={styles.errorMessage}>Lỗi: {error}</div>
-      </div>
-    );
-  }
-
-  const fullThumbnailUrl = article.thumbnailUrl; // Sử dụng trực tiếp base64
+  if (loading) return <div className={styles.container}><Sidebar /><div className={styles.loadingSpinner}>Đang tải...</div></div>;
+  if (error) return <div className={styles.container}><Sidebar /><div className={styles.errorMessage}>Lỗi: {error}</div></div>;
 
   return (
     <div className={styles.container}>
       <Sidebar />
       <div className={styles.content}>
         <h1 className={styles.title}>Chỉnh sửa bài viết</h1>
-        <form onSubmit={handleSubmit} className={styles.form}>
+        <div className={styles.form}>
           <div className={styles.formGroup}>
-            <label htmlFor="title">Tên miền</label>
-            <input
-              type="text"
-              id="title"
-              name="title"
-              value={article.title}
-              onChange={handleChange}
-              className={styles.inputField}
-              placeholder="Nhập tên miền (ví dụ: example.com)"
-              required
-            />
+            <label>Tiêu đề</label>
+            <input className={styles.inputField} name="title" value={formData.title} onChange={handleChange} />
           </div>
+
           <div className={styles.formGroup}>
-            <label htmlFor="category">Danh mục</label>
-            <select
-              id="category"
-              name="category_new"
-              value={article.category_new}
-              onChange={handleChange}
-              className={styles.inputField}
-            >
-              <option value="">Chọn danh mục</option>
-              {categories.map((c) => (
-                <option key={c._id} value={c._id}>
-                  {c.category}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className={styles.formGroup}>
-            <label htmlFor="thumbnail">Chọn hình ảnh chủ đạo</label>
-            <input
-              type="file"
-              id="thumbnail"
-              name="thumbnail"
-              accept="image/*"
-              onChange={handleFileChange}
-              className={styles.inputField}
-            />
-            {article.thumbnailUrl && (
+            <label>Hình ảnh chủ đạo</label>
+            <input type="file" accept="image/*" onChange={handleImageChange} className={styles.inputField} />
+            {formData.thumbnailPreview && (
               <div className={styles.imagePreview}>
-                <img src={fullThumbnailUrl} alt="Thumbnail Preview" className={styles.previewImage} />
+                <img src={formData.thumbnailPreview} alt="preview" className={styles.previewImage} />
               </div>
             )}
           </div>
+
           <div className={styles.formGroup}>
-            <label htmlFor="content">Nội dung</label>
-            <ReactQuill
-              value={article.content}
-              onChange={handleContentChange}
-              className={styles.quillEditor}
-              placeholder="Nhập mô tả tên miền..."
-              modules={EditNew.modules}
-              formats={EditNew.formats}
-            />
+            <label>Chú thích hình ảnh</label>
+            <input className={styles.inputField} name="thumbnailCaption" value={formData.thumbnailCaption} onChange={handleChange} />
           </div>
+
           <div className={styles.formGroup}>
-            <label htmlFor="views">Lượt xem</label>
-            <input
-              type="number"
-              id="views"
-              name="views"
-              value={article.views}
-              onChange={handleChange}
-              className={styles.inputField}
-              min={0}
-            />
+            <label>Nội dung bài viết</label>
+            {formData.contentBlocks.map((block, index) => (
+              <div key={block._id} className={styles.blockItem}>
+                <select
+                  value={block.type}
+                  onChange={(e) => handleBlockChange(index, 'type', e.target.value)}
+                  className={styles.blockTypeSelect}
+                >
+                  <option value="text">Text</option>
+                  <option value="heading">Heading</option>
+                  <option value="sub_heading">Sub Heading</option>
+                  <option value="image">Image</option>
+                  <option value="list">List</option>
+                </select>
+
+                {block.type !== 'image' && (
+                  <textarea
+                    className={styles.blockInput}
+                    value={block.content || ''}
+                    onChange={(e) => handleBlockChange(index, 'content', e.target.value)}
+                    placeholder={`Nhập nội dung ${block.type}`}
+                    rows={3}
+                  />
+                )}
+
+                {block.type === 'image' && (
+                  <>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => {
+                        const file = e.target.files[0];
+                        if (file) handleBlockChange(index, 'url', file);
+                      }}
+                      className={styles.blockInput}
+                    />
+                    <input
+                      type="text"
+                      value={block.caption || ''}
+                      onChange={(e) => handleBlockChange(index, 'caption', e.target.value)}
+                      className={styles.blockInput}
+                      placeholder="Chú thích ảnh"
+                    />
+                    {(block.preview || block.url) && (
+                      <div className={styles.blockImagePreview}>
+                        <img
+                          src={
+                            block.preview
+                              ? block.preview
+                              : block.url?.startsWith('http')
+                                ? block.url
+                                : `${baseImageURL}${block.url?.replace(/^\/+/, '')}`
+                          }
+                          alt="Block"
+                        />
+                      </div>
+                    )}
+                  </>
+                )}
+                <button type="button" onClick={() => handleRemoveBlock(index)} className={styles.removeBlockButton}>Xoá Block</button>
+              </div>
+            ))}
+            <button type="button" onClick={handleAddBlock} className={styles.addBlockButton}>+ Thêm Block</button>
           </div>
+
           <div className={styles.formGroup}>
-            <label htmlFor="reviews">Lượt đánh giá</label>
-            <input
-              type="number"
-              id="reviews"
-              name="reviews"
-              value={article.reviews}
-              onChange={handleChange}
-              className={styles.inputField}
-              min={0}
-            />
-          </div>
-          <div className={styles.formGroup}>
-            <label htmlFor="status">Trạng thái</label>
-            <select
-              id="status"
-              name="status"
-              value={article.status}
-              onChange={handleChange}
-              className={styles.inputField}
-            >
+            <label>Trạng thái</label>
+            <select name="status" className={styles.inputField} value={formData.status} onChange={handleChange}>
               <option value="show">Hiển thị</option>
-              <option value="hide">Ẩn</option>
+              <option value="hidden">Ẩn</option>
             </select>
           </div>
+
           <div className={styles.formGroup}>
-            <button type="submit" className={styles.saveButton}>Lưu thay đổi</button>
-            <button type="button" className={styles.cancelButton} onClick={() => navigate('/admin/new')}>Hủy</button>
-            <button type="button" className={styles.deleteButton} onClick={handleDelete}>
-              <i className="fa-solid fa-trash"></i> Xoá bài viết
-            </button>
+            <button onClick={handleSubmit} className={styles.saveButton}>Lưu</button>
+            <button onClick={() => navigate('/admin/new')} className={styles.cancelButton}>Huỷ</button>
           </div>
-        </form>
+        </div>
       </div>
     </div>
   );
 };
-
-EditNew.modules = {
-  toolbar: [
-    [{ header: '1' }, { header: '2' }, { header: '3' }, { header: '4' }, { header: '5' }, { font: [] }],
-    [{ size: [] }],
-    ['bold', 'italic', 'underline', 'strike', 'blockquote'],
-    [{ list: 'ordered' }, { list: 'bullet' }, { indent: '-1' }, { indent: '+1' }],
-    ['link', 'image'],
-    ['clean'],
-  ],
-};
-
-EditNew.formats = [
-  'header', 'font', 'size',
-  'bold', 'italic', 'underline', 'strike', 'blockquote',
-  'list', 'bullet', 'indent',
-  'link', 'image',
-];
 
 export default EditNew;

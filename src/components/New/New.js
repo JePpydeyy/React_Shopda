@@ -2,6 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import styles from './New.module.css';
 
+// Font Awesome import
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCalendarAlt } from '@fortawesome/free-solid-svg-icons';
+
 const New = () => {
   const [newsItems, setNewsItems] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -124,7 +128,7 @@ const New = () => {
                   </div>
                   <div className={styles.postContent}>
                     <p>
-                      <i className="fas fa-calendar-alt" style={{ marginRight: 5 }}></i>
+                      <FontAwesomeIcon icon={faCalendarAlt} style={{ marginRight: 5 }} />
                       {item.date}
                     </p>
                     <h3>{item.title}</h3>

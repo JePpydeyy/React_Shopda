@@ -2,6 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import styles from './postdetails.module.css';
 
+// Font Awesome
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCalendarAlt } from '@fortawesome/free-solid-svg-icons';
+
 const PostDetail = () => {
   const { slug } = useParams();
   const navigate = useNavigate();
@@ -14,8 +18,7 @@ const PostDetail = () => {
 
   const transformImageSrc = (html) => {
     if (!html) return '';
-    const imgClass = styles.postImage || 'post-image'; // fallback nếu có lỗi
-
+    const imgClass = styles.postImage || 'post-image';
     return html.replace(
       /<img([^>]+?)src=["']?(?!http|https:\/\/|data:)([^"'>]+)["']?([^>]*)>/gi,
       (match, before, src, after) => {
@@ -49,7 +52,6 @@ const PostDetail = () => {
 
     try {
       setIsDeleting(true);
-
       const res = await fetch(`${API_BASE_URL}/api/new/${article._id}`, {
         method: 'DELETE',
       });
@@ -76,10 +78,9 @@ const PostDetail = () => {
     <div className={styles.container}>
       <div className={styles.postContent}>
         <h1 className={styles.postTitle}>{article.title}</h1>
-        <p>
-          <em>
-            Ngày đăng: {new Date(article.publishedAt).toLocaleDateString('vi-VN')} | Lượt xem: {article.views}
-          </em>
+        <p className={styles.dateLine}>
+          <FontAwesomeIcon icon={faCalendarAlt} style={{ marginRight: 6 }} />
+          Ngày đăng: {new Date(article.publishedAt).toLocaleDateString('vi-VN')} | Lượt xem: {article.views}
         </p>
 
         <div
