@@ -215,7 +215,7 @@ const Product = () => {
               </div>
               <div className={styles.filterSection}>
                 <h6>
-                  Giá sản phẩm <span style={{ float: 'right' }}>–</span>
+                  Giá sản phẩm <span style={{ float: 'right' }}></span>
                 </h6>
                 <div className={styles['price-filter']}>
                   <div className={styles['price-slider-container']}>

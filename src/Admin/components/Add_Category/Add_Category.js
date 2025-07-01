@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import Sidebar from '../Sidebar/Sidebar'; // Assuming Sidebar is in the same directory
+import Sidebar from '../Sidebar/Sidebar';
 import styles from './AddCategory.module.css';
+import axios from 'axios';
+
+const API_URL = process.env.REACT_APP_API_URL;
 
 const AddCategory = () => {
   const [formData, setFormData] = useState({
@@ -10,6 +13,8 @@ const AddCategory = () => {
   });
 
   const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState('');
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -23,12 +28,29 @@ const AddCategory = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (validateForm()) {
-      // Simulate API call
-      console.log('Form data:', formData);
-      // Reset form or redirect after successful submission
+    if (!validateForm()) return;
+    setLoading(true);
+    setSuccess('');
+    try {
+      const token = localStorage.getItem('adminToken');
+      await axios.post(
+        `${API_URL}/category`,
+        { category: formData.name_categories, description: formData.description },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+      setSuccess('Thêm danh mục thành công!');
+      setFormData({ name_categories: '', description: '' });
+    } catch (err) {
+      setErrors({ api: err.response?.data?.message || 'Có lỗi xảy ra. Vui lòng thử lại.' });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -60,9 +82,12 @@ const AddCategory = () => {
             />
           </div>
 
+          {errors.api && <div className={styles.error}>{errors.api}</div>}
+          {success && <div className={styles.success}>{success}</div>}
+
           <div className={styles.formActions}>
-            <button type="submit" className={styles.submitButton}>
-              Thêm Danh Mục
+            <button type="submit" className={styles.submitButton} disabled={loading}>
+              {loading ? 'Đang thêm...' : 'Thêm Danh Mục'}
             </button>
             <Link to="/admin/categories" className={styles.cancelButton}>
               Hủy
