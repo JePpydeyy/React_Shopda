@@ -1,146 +1,145 @@
 .container {
-  max-width: 1240px;
-  margin: 20px auto;
-  padding: 0 20px;
-  font-family: 'Segoe UI', sans-serif;
-}
-
-.postTitle {
-  font-size: 2rem;
-  font-weight: bold;
-  margin-bottom: 20px;
-  color: #333;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  display: flex;
+  justify-content: center;
 }
 
 .postContent {
-  text-align: left;
-  font-size: 1rem;
-  line-height: 1.7;
+  max-width: 1420px;
+}
+
+.postTitle {
+  font-size: 28px;
   color: #333;
-}
-
-.postContent p {
   margin-bottom: 15px;
+  line-height: 1.3;
 }
 
-.postContent h2 {
-  font-size: 1.5rem;
-  margin-top: 30px;
-  margin-bottom: 15px;
-  font-weight: bold;
+.dateLine {
+  color: #666;
+  font-size: 14px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
 }
 
-.postContent h4 {
-  font-size: 1.25rem;
-  margin-top: 20px;
-  margin-bottom: 10px;
-  font-weight: bold;
+/* ✅ Thumbnail: Căn giữa + giới hạn 350px */
+.thumbnailWrapper {
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-.postContent ul {
-  list-style: disc;
-  padding-left: 20px;
-  margin-bottom: 15px;
-}
-
-.postContent ul li {
-  margin-bottom: 8px;
-}
-
-.postContent a {
-  color: #1e90ff;
-  text-decoration: none;
-}
-.postContent a:hover {
-  text-decoration: underline;
-}
-
-/* Ảnh được gắn qua transformImageSrc */
-.postImage {
-  max-width: 100%;
+.thumbnailImage {
+  max-width: 350px;
+  max-height: 350px;
+  width: 100%;
   height: auto;
-  display: block;
-  margin: 0 auto 12px;
-  border-radius: 8px;
   object-fit: cover;
+  border-radius: 8px;
 }
 
-/* Nút quay lại */
+.thumbnailCaption {
+  font-size: 14px;
+  color: #666;
+  margin-top: 10px;
+  text-align: center;
+}
+
+.contentBlocks {
+  margin-bottom: 20px;
+}
+
+.contentText {
+  font-size: 16px;
+  color: #333;
+  line-height: 1.6;
+  margin-bottom: 15px;
+}
+
+.contentHeading {
+  font-size: 22px;
+  color: #333;
+  margin: 20px 0 10px;
+}
+
+.contentSubHeading {
+  font-size: 18px;
+  color: #333;
+  margin: 15px 0 10px;
+}
+
+/* ✅ Content Image: Căn giữa + giới hạn 350px */
+.contentImageWrapper {
+  margin: 20px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.contentImage {
+  max-width: 350px;
+  max-height: 350px;
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.imageCaption {
+  font-size: 14px;
+  color: #666;
+  margin-top: 10px;
+  text-align: center;
+}
+
 .navigation {
-  margin-top: 30px;
-  margin-bottom: 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 20px;
 }
 
 .navigation button {
-  background-color: #1e90ff;
+  padding: 10px 20px;
+  background: #007bff;
   color: white;
-  font-size: 1rem;
-  font-weight: 500;
   border: none;
-  padding: 12px 24px;
-  border-radius: 8px;
+  border-radius: 4px;
   cursor: pointer;
-  transition: background-color 0.25s ease, transform 0.15s ease;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  font-size: 14px;
+  transition: background-color 0.2s;
 }
 
 .navigation button:hover {
-  background-color: #0d6efd;
-  transform: translateY(-2px);
+  background: #0056b3;
 }
 
-.navigation button:active {
-  transform: scale(0.97);
-  background-color: #0b5ed7;
+.deleteButton {
+  background: #dc3545;
 }
 
-/* Responsive */
-@media (max-width: 600px) {
-  .container {
-    max-width: 100%;
-    padding: 0 8px;
-  }
-
-  .postTitle {
-    font-size: 1.3rem;
-    margin-bottom: 14px;
-  }
-
-  .postContent {
-    font-size: 0.95rem;
-    line-height: 1.5;
-  }
-
-  .postContent h2 {
-    font-size: 1.1rem;
-    margin-top: 18px;
-    margin-bottom: 10px;
-  }
-
-  .postContent h4 {
-    font-size: 1rem;
-    margin-top: 12px;
-    margin-bottom: 6px;
-  }
-
-  .navigation button {
-    font-size: 0.95rem;
-    padding: 10px 16px;
-  }
-
-  .postImage {
-    max-width: 100%;
-    height: auto;
-  }
+.deleteButton:hover {
+  background: #b02a37;
 }
 
-@media (max-width: 400px) {
-  .postTitle {
-    font-size: 1.05rem;
-  }
+.deleteButton:disabled {
+  background: #cccccc;
+  cursor: not-allowed;
+}
 
-  .navigation button {
-    font-size: 0.85rem;
-    padding: 8px 10px;
-  }
+.loading,
+.error,
+.noContent {
+  text-align: center;
+  padding: 20px;
+  font-size: 16px;
+  color: #333;
+}
+
+.error {
+  color: #dc3545;
 }
