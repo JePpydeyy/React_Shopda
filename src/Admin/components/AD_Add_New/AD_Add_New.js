@@ -1,16 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+import Sidebar from '../Sidebar/Sidebar';
 import styles from './add_news.module.css';
 
-const API_URL = process.env.REACT_APP_API_URL;
-const API_BASE = process.env.REACT_APP_API_BASE;
-
-const AD_Add_New = () => {
+const AddNews = () => {
   const navigate = useNavigate();
-  const location = useLocation();
-  const [isEditing, setIsEditing] = useState(false);
-  const [editForm, setEditForm] = useState(null);
   const [formData, setFormData] = useState({
     title: '',
     thumbnail: null,
@@ -18,200 +12,43 @@ const AD_Add_New = () => {
     thumbnailCaption: '',
     contentBlocks: [],
     status: 'show',
+    views: 0,
+    'category-new': '', // Thay category bằng category-new
   });
+  const [categories, setCategories] = useState([]); // State cho danh mục
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [previewSlug, setPreviewSlug] = useState('');
-  const [previewUrls, setPreviewUrls] = useState([]);
 
-  const API_URL = 'https://api-tuyendung-cty.onrender.com/api';
-  const API_BASE = 'https://api-tuyendung-cty.onrender.com';
-
-  // Kiểm tra chế độ chỉnh sửa
-  useEffect(() => {
-    const newsItem = location.state?.newsItem;
-    if (newsItem) {
-      setIsEditing(true);
-      setEditForm({
-        id: newsItem.id,
-        title: newsItem.title || '',
-        slug: newsItem.slug || '',
-        thumbnailUrl: newsItem.thumbnailUrl || '',
-        thumbnailFile: null,
-        thumbnailCaption: newsItem.thumbnailCaption || '',
-        publishedAt: newsItem.publishedAt
-          ? new Date(newsItem.publishedAt).toISOString().split('T')[0]
-          : new Date().toISOString().split('T')[0],
-        views: newsItem.views || 0,
-        status: newsItem.status === 'show' ? 'Hiển thị' : 'Ẩn',
-        contentBlocks: Array.isArray(newsItem.contentBlocks)
-          ? newsItem.contentBlocks.map(block => ({
-              type: block.type || 'text',
-              content: block.content || '',
-              url: block.url || '',
-              caption: block.caption || '',
-              file: null,
-              listItems: block.type === 'list' ? (block.content ? block.content.split('\n').filter(item => item.trim()) : []) : [],
-            }))
-          : [],
+  // Lấy danh sách danh mục
+  const fetchCategories = async () => {
+    try {
+      const res = await fetch(`${process.env.REACT_APP_API_BASE}/api/new-category`, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('adminToken') || ''}`,
+        },
       });
-      setPreviewSlug(newsItem.slug || generateSlug(newsItem.title));
+      const result = await res.json();
+      const data = result.data || result || [];
+      setCategories(data.filter(category => category.status === 'show')); // Chỉ lấy danh mục hiển thị
+    } catch (err) {
+      setError(err.message);
     }
-  }, [location.state]);
+  };
 
   useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const token = localStorage.getItem('adminToken');
-        if (!token) {
-          setError('Không tìm thấy token. Vui lòng đăng nhập lại.');
-          return;
-        }
-        const response = await axios.get('https://api-tuyendung-cty.onrender.com/api/new-category', {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        console.log('Danh mục đã tải:', response.data);
-        const categoryData = Array.isArray(response.data) ? response.data : [];
-        if (categoryData.length === 0) {
-          console.warn('Không tìm thấy danh mục trong phản hồi API');
-          setError('Không có danh mục nào được tải. Vui lòng kiểm tra API.');
-        }
-        setCategories(categoryData.filter(cat => cat.status === 'show'));
-      } catch (err) {
-        console.error('Lỗi khi tải danh mục:', err.response?.data, err.response?.status);
-        setError(`Không thể tải danh mục: ${err.response?.data?.message || err.message}`);
+    fetchCategories();
+    return () => {
+      if (formData.thumbnailPreview) {
+        URL.revokeObjectURL(formData.thumbnailPreview);
       }
-    } else {
-      const { name, value } = e.target;
-      setFormData((prev) => ({ ...prev, [name]: value }));
-    }
-  };
-
-  const handleImageChange = (e, index = null, formType = 'create') => {
-    const file = e.target.files[0];
-    if (!file) {
-      setError('Không có file nào được chọn.');
-      return;
-    }
-    const allowedTypes = ['image/jpeg', 'image/png'];
-    const maxSize = 5 * 1024 * 1024;
-    if (!allowedTypes.includes(file.type)) {
-      setError('Vui lòng chọn tệp JPEG hoặc PNG.');
-      return;
-    }
-    if (file.size > maxSize) {
-      setError('Kích thước tệp vượt quá 5MB.');
-      return;
-    }
-    const newUrl = URL.createObjectURL(file);
-    setPreviewUrls(prev => [...prev, newUrl]);
-    if (isEditing && formType === 'edit') {
-      if (index !== null) {
-        const updatedBlocks = [...editForm.contentBlocks];
-        updatedBlocks[index] = {
-          ...updatedBlocks[index],
-          file,
-          url: newUrl,
-        };
-        setEditForm({ ...editForm, contentBlocks: updatedBlocks });
-      } else {
-        setEditForm({
-          ...editForm,
-          thumbnailFile: file,
-          thumbnailUrl: newUrl,
-        });
-      }
-    } else {
-      setFormData((prev) => ({
-        ...prev,
-        thumbnail: file,
-        thumbnailPreview: newUrl,
-      }));
-    }
-  };
-
-  const handleBlockChange = (index, field, value) => {
-    setFormData((prev) => {
-      const newBlocks = [...prev.contentBlocks];
-      if (field === 'url' && value instanceof File) {
-        const allowedTypes = ['image/jpeg', 'image/png'];
-        const maxSize = 5 * 1024 * 1024;
-        if (!allowedTypes.includes(value.type)) {
-          setError(`Block ${index + 1}: Vui lòng chọn tệp JPEG hoặc PNG.`);
-          return prev;
+      formData.contentBlocks.forEach(block => {
+        if (block.preview) {
+          URL.revokeObjectURL(block.preview);
         }
-        if (value.size > maxSize) {
-          setError(`Block ${index + 1}: Kích thước tệp vượt quá 5MB.`);
-          return prev;
-        }
-        newBlocks[index] = {
-          ...newBlocks[index],
-          [field]: value,
-          preview: URL.createObjectURL(value),
-          content: '',
-          caption: newBlocks[index].caption || '',
-        };
-      } else if (field === 'listItems') {
-        const items = value.split('\n').map((item) => item.trim()).filter((item) => item);
-        newBlocks[index] = { ...newBlocks[index], [field]: items, content: items.join('\n') };
-      } else {
-        newBlocks[index] = { ...newBlocks[index], [field]: value };
-      }
-      return { ...prev, contentBlocks: newBlocks };
-    });
-  };
-
-  const handleAddBlock = (type = 'text', formType = 'create') => {
-    if (isEditing && formType === 'edit') {
-      setEditForm({
-        ...editForm,
-        contentBlocks: [
-          ...editForm.contentBlocks,
-          { type, content: '', url: '', caption: '', file: null, listItems: type === 'list' ? [] : [] },
-        ],
       });
-    } else {
-      setFormData((prev) => ({
-        ...prev,
-        contentBlocks: [
-          ...prev.contentBlocks,
-          {
-            _id: `temp_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-            type,
-            content: '',
-            url: '',
-            caption: '',
-            preview: null,
-            listItems: type === 'list' ? [] : [],
-          },
-        ],
-      }));
-    }
-  };
-
-  const handleRemoveBlock = (index, formType = 'create') => {
-    if (isEditing && formType === 'edit') {
-      const block = editForm.contentBlocks[index];
-      if (block.url && block.url.startsWith('blob:')) {
-        URL.revokeObjectURL(block.url);
-        setPreviewUrls(prev => prev.filter(url => url !== block.url));
-      }
-      setEditForm({
-        ...editForm,
-        contentBlocks: editForm.contentBlocks.filter((_, i) => i !== index),
-      });
-    } else {
-      const block = formData.contentBlocks[index];
-      if (block.preview) {
-        URL.revokeObjectURL(block.preview);
-        setPreviewUrls(prev => prev.filter(url => url !== block.preview));
-      }
-      setFormData((prev) => ({
-        ...prev,
-        contentBlocks: prev.contentBlocks.filter((_, i) => i !== index),
-      }));
-    }
-  };
+    };
+  }, [formData.thumbnailPreview, formData.contentBlocks]);
 
   const generateSlug = (title) => {
     return title
@@ -224,523 +61,398 @@ const AD_Add_New = () => {
       .replace(/-+/g, '-');
   };
 
-  const checkSlugAvailability = async (slug) => {
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleImageChange = (e) => {
+    setError('');
+    const files = e.target.files;
+    if (!files || files.length === 0) {
+      setError('Không có tệp hình ảnh nào được chọn.');
+      return;
+    }
+    const file = files[0];
+    if (!['image/jpeg', 'image/png'].includes(file.type)) {
+      setError('Vui lòng chọn tệp JPEG hoặc PNG.');
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      setError('Kích thước tệp vượt quá 5MB.');
+      return;
+    }
+    if (formData.thumbnailPreview) {
+      URL.revokeObjectURL(formData.thumbnailPreview);
+    }
+    console.log('Thumbnail file selected:', file.name);
     try {
-      await axios.get(`${API_URL}/new/${slug}`);
-      return false; // Slug đã tồn tại
+      const previewUrl = URL.createObjectURL(file);
+      setFormData(prev => ({
+        ...prev,
+        thumbnail: file,
+        thumbnailPreview: previewUrl,
+      }));
     } catch (err) {
-      if (err.response?.status === 404) return true; // Slug khả dụng
-      setError(`Lỗi kiểm tra slug: ${err.message}`);
-      throw err;
+      setError('Không thể tạo URL xem trước cho hình ảnh chủ đạo.');
+      console.error('Error creating thumbnail preview:', err);
     }
   };
 
-  const revokePreviewUrls = () => {
-    previewUrls.forEach(url => URL.revokeObjectURL(url));
-    setPreviewUrls([]);
+  const handleBlockChange = (index, field, value) => {
+    setError('');
+    const newBlocks = [...formData.contentBlocks];
+    if (field === 'url' && value instanceof File) {
+      if (!['image/jpeg', 'image/png'].includes(value.type)) {
+        setError('Vui lòng chọn tệp JPEG hoặc PNG cho khối hình ảnh.');
+        return;
+      }
+      if (value.size > 5 * 1024 * 1024) {
+        setError('Kích thước tệp hình ảnh vượt quá 5MB.');
+        return;
+      }
+      if (newBlocks[index].preview) {
+        URL.revokeObjectURL(newBlocks[index].preview);
+      }
+      console.log('Block image file selected:', value.name);
+      try {
+        const previewUrl = URL.createObjectURL(value);
+        newBlocks[index] = {
+          ...newBlocks[index],
+          url: value,
+          preview: previewUrl,
+          content: '',
+        };
+      } catch (err) {
+        setError(`Không thể tạo URL xem trước cho hình ảnh khối ${index + 1}.`);
+        console.error(`Error creating block preview for index ${index}:`, err);
+        return;
+      }
+    } else if (field === 'url' && !value) {
+      if (newBlocks[index].preview) {
+        URL.revokeObjectURL(newBlocks[index].preview);
+      }
+      newBlocks[index] = {
+        ...newBlocks[index],
+        url: undefined,
+        preview: null,
+        content: '',
+      };
+    } else {
+      newBlocks[index] = { ...newBlocks[index], [field]: value };
+    }
+    setFormData(prev => ({ ...prev, contentBlocks: newBlocks }));
   };
 
-  const getImageUrl = (url) => {
-    if (!url || typeof url !== 'string') return 'https://via.placeholder.com/150?text=Hình+ảnh+không+có';
-    if (url.startsWith('http') || url.startsWith('blob:')) return url;
-    return `${API_BASE}/${url.replace(/^\/+/, '')}`;
+  const handleAddBlock = () => {
+    setFormData(prev => ({
+      ...prev,
+      contentBlocks: [
+        ...prev.contentBlocks,
+        {
+          _id: `temp_${Date.now()}`,
+          type: 'text',
+          content: '',
+          url: undefined,
+          caption: '',
+          preview: null,
+        },
+      ],
+    }));
+  };
+
+  const handleRemoveBlock = (index) => {
+    const blockToRemove = formData.contentBlocks[index];
+    if (blockToRemove.preview) {
+      URL.revokeObjectURL(blockToRemove.preview);
+    }
+    setFormData(prev => ({
+      ...prev,
+      contentBlocks: prev.contentBlocks.filter((_, i) => i !== index),
+    }));
   };
 
   const handleSubmit = async () => {
     setLoading(true);
     setError('');
 
-    // Kiểm tra dữ liệu đầu vào
     if (!formData.title.trim()) {
-      setError('Tiêu đề không được để trống.');
+      setError('Vui lòng nhập tiêu đề.');
       setLoading(false);
       return;
     }
+
     if (!formData.thumbnail) {
-      setError('Hình ảnh chủ đạo là bắt buộc.');
+      setError('Vui lòng chọn hình ảnh chủ đạo.');
       setLoading(false);
       return;
     }
-    if (formData.contentBlocks.length === 0 || formData.contentBlocks.every(block => !block.content && !block.url && !block.listItems?.length)) {
-      setError('Vui lòng thêm ít nhất một khối nội dung hợp lệ.');
+
+    if (!formData.contentBlocks.length) {
+      setError('Vui lòng thêm ít nhất một khối nội dung.');
+      setLoading(false);
+      return;
+    }
+
+    if (!formData['category-new']) {
+      setError('Vui lòng chọn danh mục.');
       setLoading(false);
       return;
     }
 
     const token = localStorage.getItem('adminToken');
     if (!token) {
-      setError('Không tìm thấy token. Vui lòng đăng nhập lại.');
+      setError('Vui lòng đăng nhập lại.');
       setLoading(false);
       return;
     }
 
-    const currentDate = new Date().toISOString();
-    let slug = generateSlug(formData.title);
-
-    // Kiểm tra slug
     try {
-      const isSlugAvailable = await checkSlugAvailability(slug);
-      if (!isSlugAvailable) {
-        slug = `${slug}-${Date.now()}`;
-        const isNewSlugAvailable = await checkSlugAvailability(slug);
-        if (!isNewSlugAvailable) {
-          setError('Không thể tạo slug duy nhất. Vui lòng thử lại.');
-          setLoading(false);
-          return;
+      const processedBlocks = formData.contentBlocks.map((block, index) => {
+        if (block.type === 'image' && !block.url && !block.preview) {
+          throw new Error(`Khối hình ảnh tại vị trí ${index + 1} thiếu tệp hoặc URL.`);
         }
+        if (block.type !== 'image' && (!block.content || typeof block.content !== 'string')) {
+          throw new Error(`Khối ${block.type} tại vị trí ${index + 1} có nội dung không hợp lệ.`);
+        }
+        return {
+          type: block.type,
+          content: block.content || '',
+          caption: block.caption || '',
+          url: block.url instanceof File ? '' : block.url || '',
+        };
+      });
+
+      const formDataToSend = new FormData();
+      formDataToSend.append('title', formData.title.trim());
+      formDataToSend.append('slug', generateSlug(formData.title));
+      formDataToSend.append('thumbnail', formData.thumbnail);
+      formDataToSend.append('thumbnailCaption', formData.thumbnailCaption);
+      formDataToSend.append('status', formData.status);
+      formDataToSend.append('publishedAt', new Date().toISOString());
+      formDataToSend.append('views', formData.views.toString());
+      formDataToSend.append('contentBlocks', JSON.stringify(processedBlocks));
+      formDataToSend.append('category-new', formData['category-new']); // Gửi category-new với tên danh mục
+
+      console.log('FormData contents:');
+      for (const [key, value] of formDataToSend.entries()) {
+        console.log(`${key}:`, value instanceof File ? value.name : value);
       }
-    } catch (err) {
-      setLoading(false);
-      return;
-    }
 
-    // Tạo FormData
-    const formDataToSend = new FormData();
-    formDataToSend.append('title', formData.title.trim());
-    formDataToSend.append('slug', slug);
-    formDataToSend.append('thumbnail', formData.thumbnail);
-    
-    formDataToSend.append('thumbnailCaption', formData.thumbnailCaption || '');
-    formDataToSend.append('publishedAt', currentDate);
-    formDataToSend.append('status', formData.status);
+      formData.contentBlocks.forEach((block, index) => {
+        if (block.type === 'image' && block.url instanceof File) {
+          formDataToSend.append(`contentImages`, block.url);
+        }
+      });
 
-    const processedBlocks = formData.contentBlocks.map((block, index) => {
-      const blockData = {
-        type: block.type,
-        content: block.type === 'list' ? (block.listItems || []).join('\n') : block.content || '',
-        url: block.url instanceof File ? '' : block.url || '',
-        caption: block.caption || '',
-        listItems: block.type === 'list' ? block.listItems || [] : [],
-      };
-      if (block.url instanceof File) {
-        formDataToSend.append(`contentImages[${index}]`, block.url);
-      }
-      return blockData;
-    });
-
-    formDataToSend.append('contentBlocks', JSON.stringify(processedBlocks));
-
-    // Ghi log dữ liệu gửi đi
-    console.log('FormData gửi đi:');
-    for (let [key, value] of formDataToSend.entries()) {
-      console.log(`${key}: ${value instanceof File ? value.name : value}`);
-    }
-
-    try {
-      const response = await axios.post('https://api-tuyendung-cty.onrender.com/api/new/', formDataToSend, {
+      const res = await fetch(`${process.env.REACT_APP_API_URL}/new/`, {
+        method: 'POST',
         headers: {
-          'Content-Type': 'multipart/form-data',
           Authorization: `Bearer ${token}`,
         },
+        body: formDataToSend,
       });
-      if (response.status >= 200 && response.status < 300) {
-        alert('Thêm bài viết thành công!');
-        navigate('/admin/new');
+
+      const data = await res.json();
+      console.log('API response:', data);
+      if (!res.ok) {
+        throw new Error(data.error || `Lỗi từ server: ${res.status} ${res.statusText}`);
       }
+
+      alert('Thêm bài viết thành công');
+      navigate('/admin/new');
     } catch (err) {
-      console.error('Lỗi từ server:', err.response?.data);
-      setError(`Thêm bài viết thất bại. ${err.response?.data?.message || err.message}`);
+      setError(`Lỗi thêm bài viết: ${err.message}`);
+      console.error('Submit error:', err);
     } finally {
       setLoading(false);
     }
   };
 
-  const saveNews = async () => {
-    setLoading(true);
-    setError('');
-
-    // Kiểm tra dữ liệu đầu vào
-    if (!editForm.title.trim()) {
-      setError('Tiêu đề không được để trống.');
-      setLoading(false);
-      return;
-    }
-    if (!editForm.thumbnailUrl && !editForm.thumbnailFile) {
-      setError('Hình ảnh chủ đạo là bắt buộc.');
-      setLoading(false);
-      return;
-    }
-    if (editForm.contentBlocks.length === 0 || editForm.contentBlocks.every(block => !block.content && !block.url && !block.listItems?.length)) {
-      setError('Vui lòng thêm ít nhất một khối nội dung hợp lệ.');
-      setLoading(false);
-      return;
-    }
-
-    const token = localStorage.getItem('adminToken');
-    if (!token) {
-      setError('Không tìm thấy token. Vui lòng đăng nhập lại.');
-      setLoading(false);
-      return;
-    }
-
-    const formDataToSend = new FormData();
-    formDataToSend.append('title', editForm.title.trim());
-    formDataToSend.append('slug', editForm.slug);
-    formDataToSend.append('thumbnailUrl', editForm.thumbnailUrl || '');
-    if (editForm.thumbnailFile) {
-      formDataToSend.append('thumbnail', editForm.thumbnailFile);
-    }
-    formDataToSend.append('thumbnailCaption', editForm.thumbnailCaption || '');
-    formDataToSend.append('publishedAt', new Date(editForm.publishedAt).toISOString());
-    formDataToSend.append('views', editForm.views.toString());
-    formDataToSend.append('status', editForm.status === 'Hiển thị' ? 'show' : 'hidden');
-
-    const contentBlocksForSubmission = editForm.contentBlocks.map((block, index) => {
-      const blockData = {
-        type: block.type,
-        content: block.type === 'list' ? (block.listItems || []).join('\n') : block.content || '',
-        url: block.file ? '' : block.url || '',
-        caption: block.caption || '',
-        listItems: block.type === 'list' ? block.listItems || [] : [],
-      };
-      if (block.file) {
-        formDataToSend.append(`contentImages[${index}]`, block.file);
-      }
-      return blockData;
-    });
-    formDataToSend.append('contentBlocks', JSON.stringify(contentBlocksForSubmission));
-
-    // Ghi log dữ liệu gửi đi
-    console.log('FormData chỉnh sửa gửi đi:');
-    for (let [key, value] of formDataToSend.entries()) {
-      console.log(`${key}: ${value instanceof File ? value.name : value}`);
-    }
-
-    try {
-      const response = await axios.put(`${API_URL}/new/${editForm.id}`, formDataToSend, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      if (response.status >= 200 && response.status < 300) {
-        alert('Cập nhật bài viết thành công!');
-        revokePreviewUrls();
-        setIsEditing(false);
-        navigate('/admin/new');
-      }
-    } catch (err) {
-      console.error('Lỗi từ server:', err.response?.data);
-      setError(`Cập nhật bài viết thất bại. ${err.response?.data?.message || err.message}`);
-    } finally {
-      setLoading(false);
-    }
-  };
+  if (loading) return (
+    <div className={styles.container}>
+      <Sidebar />
+      <div className={styles.loadingSpinner}>Đang tải...</div>
+    </div>
+  );
 
   return (
     <div className={styles.container}>
-      {isEditing && editForm ? (
-        <div className={styles.modal} onClick={(e) => {
-          if (e.target.className === styles.modal) {
-            setIsEditing(false);
-            revokePreviewUrls();
-            navigate('/admin/new');
-          }
-        }}>
-          <div className={styles.modalContent}>
-            <span className={styles.close} onClick={() => {
-              setIsEditing(false);
-              revokePreviewUrls();
-              navigate('/admin/new');
-            }}>×</span>
-            <h3>Chỉnh Sửa Tin Tức: {editForm.title}</h3>
-            {error && <div className={styles.error}>{error}</div>}
-            <div className={styles.editForm}>
-              <div className={styles.detailGroup}>
-                <label>Tiêu đề:</label>
-                <input
-                  type="text"
-                  name="title"
-                  value={editForm.title}
-                  onChange={(e) => handleChange(e, null, null, 'edit')}
+      <Sidebar />
+      <div className={styles.content}>
+        <h1 className={styles.title}>Thêm bài viết</h1>
+        <div className={styles.form}>
+          <div className={styles.formGroup}>
+            <label>Tiêu đề</label>
+            <input
+              className={styles.inputField}
+              name="title"
+              value={formData.title}
+              onChange={handleChange}
+              placeholder="Nhập tiêu đề"
+            />
+            {formData.title && (
+              <div className={styles.slugPreview}>
+                Slug dự kiến: <strong>{generateSlug(formData.title)}</strong>
+              </div>
+            )}
+          </div>
+
+          <div className={styles.formGroup}>
+            <label>Hình ảnh chủ đạo</label>
+            <input
+              type="file"
+              accept="image/jpeg,image/png"
+              onChange={handleImageChange}
+              className={styles.inputField}
+            />
+            {formData.thumbnailPreview && (
+              <div className={styles.imagePreview}>
+                <img
+                  src={formData.thumbnailPreview}
+                  alt="Thumbnail preview"
+                  className={styles.previewImage}
+                  onError={() => setError('Không thể tải hình ảnh chủ đạo.')}
                 />
-                {previewSlug && (
-                  <div className={styles.slugPreview}>
-                    Slug: <strong>{previewSlug}</strong>
+              </div>
+            )}
+          </div>
+
+          <div className={styles.formGroup}>
+            <label>Chú thích hình ảnh</label>
+            <input
+              className={styles.inputField}
+              name="thumbnailCaption"
+              value={formData.thumbnailCaption}
+              onChange={handleChange}
+              placeholder="Nhập chú thích hình ảnh"
+            />
+          </div>
+
+          <div className={styles.formGroup}>
+            <label>Danh mục</label>
+            <select
+              name="category-new"
+              className={styles.formSelectCategory}
+              value={formData['category-new']}
+              onChange={handleChange}
+            >
+              <option value="">Chọn danh mục</option>
+              {categories.map(category => (
+                <option key={category._id} value={category.category}>
+                  {category.category}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className={styles.formGroup}>
+            <label>Lượt xem</label>
+            <input
+              type="number"
+              className={styles.inputField}
+              name="views"
+              value={formData.views}
+              onChange={handleChange}
+              min="0"
+            />
+          </div>
+
+          <div className={styles.formGroup}>
+            <label>Nội dung bài viết</label>
+            <div className={styles.scrollableBlocks}>
+              {formData.contentBlocks.map((block, index) => (
+                <div key={block._id} className={styles.blockItem}>
+                  <div className={styles.blockHeader}>
+                    <p className={styles.numberblock}>{index + 1}</p>
                   </div>
-                )}
-              </div>
-              <div className={styles.detailGroup}>
-                <label>Slug:</label>
-                <input
-                  type="text"
-                  name="slug"
-                  value={editForm.slug}
-                  onChange={(e) => handleChange(e, null, null, 'edit')}
-                />
-              </div>
-              <div className={styles.detailGroup}>
-                <label>Thumbnail:</label>
-                <input
-                  type="file"
-                  accept="image/jpeg,image/png"
-                  onChange={(e) => handleImageChange(e, null, 'edit')}
-                />
-                {editForm.thumbnailUrl && (
-                  <div className={styles.thumbnailPreview}>
-                    <p>Xem trước:</p>
-                    <img
-                      src={editForm.thumbnailUrl.startsWith('blob:') ? editForm.thumbnailUrl : getImageUrl(editForm.thumbnailUrl)}
-                      alt="Thumbnail Preview"
-                      className={styles.imagePreview}
-                      onError={(e) => {
-                        e.target.style.display = 'none';
-                        e.target.nextSibling.style.display = 'block';
-                      }}
-                    />
-                    <span style={{ display: 'none', color: 'red' }}>Hình ảnh không tải được</span>
-                  </div>
-                )}
-              </div>
-              <div className={styles.detailGroup}>
-                <label>Thumbnail Caption:</label>
-                <input
-                  type="text"
-                  name="thumbnailCaption"
-                  value={editForm.thumbnailCaption}
-                  onChange={(e) => handleChange(e, null, null, 'edit')}
-                />
-              </div>
-              <div className={styles.detailGroup}>
-                <label>Ngày đăng:</label>
-                <input
-                  type="date"
-                  name="publishedAt"
-                  value={editForm.publishedAt}
-                  onChange={(e) => handleChange(e, null, null, 'edit')}
-                />
-              </div>
-              <div className={styles.detailGroup}>
-                <label>Lượt xem:</label>
-                <input
-                  type="number"
-                  name="views"
-                  value={editForm.views}
-                  onChange={(e) => handleChange(e, null, null, 'edit')}
-                />
-              </div>
-              <div className={styles.detailGroup}>
-                <label>Trạng thái:</label>
-                <select
-                  name="status"
-                  value={editForm.status}
-                  onChange={(e) => handleChange(e, null, null, 'edit')}
-                >
-                  <option value="Hiển thị">Hiển thị</option>
-                  <option value="Ẩn">Ẩn</option>
-                </select>
-              </div>
-              <div className={`${styles.detailGroup} ${styles.full}`}>
-                <label>Nội dung:</label>
-                {editForm.contentBlocks.map((block, index) => (
-                  <div key={index} className={styles.contentBlock}>
-                    <select
-                      value={block.type}
-                      onChange={(e) => handleChange({ target: { value: e.target.value } }, index, 'type', 'edit')}
-                    >
-                      <option value="text">Text</option>
-                      <option value="heading">Heading</option>
-                      <option value="sub_heading">Sub Heading</option>
-                      <option value="image">Image</option>
-                      <option value="list">List</option>
-                    </select>
-                    {block.type === 'text' || block.type === 'heading' || block.type === 'sub_heading' ? (
-                      <input
-                        type="text"
-                        value={block.content}
-                        onChange={(e) => handleChange(e, index, 'content', 'edit')}
-                        className={styles.blockInput}
-                      />
-                    ) : block.type === 'image' ? (
-                      <>
-                        <input
-                          type="file"
-                          accept="image/jpeg,image/png"
-                          onChange={(e) => handleImageChange(e, index, 'edit')}
-                        />
-                        {(block.url || block.file) && (
-                          <img
-                            src={block.url && block.url.startsWith('blob:') ? block.url : getImageUrl(block.url)}
-                            alt="Image Preview"
-                            className={styles.imagePreview}
-                            onError={(e) => {
-                              e.target.style.display = 'none';
-                              e.target.nextSibling.style.display = 'block';
-                            }}
-                          />
-                        )}
-                        {(block.url || block.file) && (
-                          <span style={{ display: 'none', color: 'red' }}>Hình ảnh không tải được</span>
-                        )}
-                        <input
-                          type="text"
-                          value={block.caption}
-                          onChange={(e) => handleChange(e, index, 'caption', 'edit')}
-                          placeholder="Chú thích hình ảnh"
-                        />
-                      </>
-                    ) : block.type === 'list' ? (
+                  <select
+                    value={block.type}
+                    onChange={(e) => handleBlockChange(index, 'type', e.target.value)}
+                    className={styles.blockTypeSelect}
+                  >
+                    <option value="text">Text</option>
+                    <option value="image">Image</option>
+                    <option value="list">List</option>
+                  </select>
+
+                  {block.type !== 'image' ? (
+                    block.type === 'list' ? (
                       <>
                         <textarea
-                          value={block.listItems ? block.listItems.join('\n') : ''}
-                          onChange={(e) => handleChange(e, index, 'listItems', 'edit')}
                           className={styles.blockInput}
-                          rows={4}
+                          value={block.content || ''}
+                          onChange={(e) => handleBlockChange(index, 'content', e.target.value)}
                           placeholder="Mỗi dòng là một mục danh sách"
+                          rows={4}
                         />
                         <ul>
-                          {block.listItems.map((item, i) => (
+                          {(block.content || '').split('\n').filter(item => item.trim()).map((item, i) => (
                             <li key={i}>{item}</li>
                           ))}
                         </ul>
                       </>
-                    ) : null}
-                    <button
-                      className={styles.removeBlock}
-                      onClick={() => handleRemoveBlock(index, 'edit')}
-                    >
-                      Xóa khối
-                    </button>
-                  </div>
-                ))}
-                <div className={styles.addBlockButtons}>
-                  <button onClick={() => handleAddBlock('text', 'edit')}>Thêm khối văn bản</button>
-                  <button onClick={() => handleAddBlock('heading', 'edit')}>Thêm tiêu đề</button>
-                  <button onClick={() => handleAddBlock('sub_heading', 'edit')}>Thêm tiêu đề phụ</button>
-                  <button onClick={() => handleAddBlock('image', 'edit')}>Thêm khối hình ảnh</button>
-                  <button onClick={() => handleAddBlock('list', 'edit')}>Thêm danh sách</button>
+                    ) : (
+                      <textarea
+                        className={styles.blockInput}
+                        value={block.content || ''}
+                        onChange={(e) => handleBlockChange(index, 'content', e.target.value)}
+                        placeholder="Nhập nội dung văn bản"
+                        rows={3}
+                      />
+                    )
+                  ) : (
+                    <>
+                      <input
+                        type="file"
+                        accept="image/jpeg,image/png"
+                        onChange={(e) => {
+                          const file = e.target.files && e.target.files[0] ? e.target.files[0] : null;
+                          handleBlockChange(index, 'url', file);
+                        }}
+                        className={styles.blockInput}
+                      />
+                      <input
+                        type="text"
+                        value={block.caption || ''}
+                        onChange={(e) => handleBlockChange(index, 'caption', e.target.value)}
+                        className={styles.blockInput}
+                        placeholder="Chú thích ảnh"
+                      />
+                      {block.preview && (
+                        <div className={styles.blockImagePreview}>
+                          <img
+                            src={block.preview}
+                            alt={`Block ${index + 1}`}
+                            className={styles.previewImage}
+                            onError={() => setError(`Không thể tải hình ảnh khối ${index + 1}.`)}
+                          />
+                        </div>
+                      )}
+                    </>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveBlock(index)}
+                    className={styles.removeBlockButton}
+                  >
+                    Xóa Block
+                  </button>
                 </div>
-              </div>
-              <div className={styles.detailAction}>
-                <button className={styles.save} onClick={saveNews} disabled={loading}>
-                  {loading ? 'Đang lưu...' : 'Lưu'}
-                </button>
-                <button className={styles.cancel} onClick={() => {
-                  setIsEditing(false);
-                  revokePreviewUrls();
-                  navigate('/admin/new');
-                }}>Hủy</button>
-              </div>
+              ))}
             </div>
-          </div>
-        </div>
-      ) : (
-        <div className={styles.content}>
-          <h1 className={styles.title}>Thêm Bài Viết</h1>
-          {error && <div className={styles.error}>{error}</div>}
-
-          <div className={styles.inputSection}>
-            <label className={styles.formLabel}>Tiêu đề</label>
-            <input name="title" type="text" className={styles.formInput} value={formData.title} onChange={handleChange} />
-            {previewSlug && (
-              <div className={styles.slugPreview}>
-                Slug dự kiến: <strong>{previewSlug}</strong>
-              </div>
-            )}
+            <button
+              type="button"
+              onClick={handleAddBlock}
+              className={styles.addBlockButton}
+            >
+              + Thêm Block
+            </button>
+            {error && <div className={styles.errorMessage}>{error}</div>}
           </div>
 
-          <div className={styles.inputSection}>
-            <label className={styles.formLabel}>Hình ảnh chủ đạo của bài viết</label>
-            <input
-              name="thumbnail"
-              type="file"
-              accept="image/jpeg,image/png"
-              className={styles.mainImageInput}
-              onChange={handleImageChange}
-            />
-            {formData.thumbnailPreview && (
-              <div className={styles.imagePreview}>
-                <img src={formData.thumbnailPreview} alt="Preview" />
-              </div>
-            )}
-          </div>
-
-          <div className={styles.inputSection}>
-            <label className={styles.formLabel}>Chú thích hình ảnh</label>
-            <input
-              name="thumbnailCaption"
-              type="text"
-              className={styles.formInput}
-              value={formData.thumbnailCaption}
-              onChange={handleChange}
-            />
-          </div>
-
-          <div className={styles.inputSection}>
-            <label className={styles.formLabel}>Nội dung</label>
-            {formData.contentBlocks.map((block, index) => (
-              <div key={block._id} className={styles.blockItem}>
-                <select
-                  value={block.type}
-                  onChange={(e) => handleBlockChange(index, 'type', e.target.value)}
-                  className={styles.blockTypeSelect}
-                >
-                  <option value="text">Text</option>
-                  <option value="heading">Heading</option>
-                  <option value="sub_heading">Sub Heading</option>
-                  <option value="image">Image</option>
-                  <option value="list">List</option>
-                </select>
-                {block.type === 'text' || block.type === 'heading' || block.type === 'sub_heading' ? (
-                  <input
-                    type="text"
-                    value={block.content}
-                    onChange={(e) => handleBlockChange(index, 'content', e.target.value)}
-                    className={styles.blockInput}
-                  />
-                ) : block.type === 'image' ? (
-                  <>
-                    <input
-                      type="file"
-                      accept="image/jpeg,image/png"
-                      onChange={(e) => handleBlockChange(index, 'url', e.target.files[0])}
-                      className={styles.blockInput}
-                    />
-                    <input
-                      type="text"
-                      value={block.caption}
-                      onChange={(e) => handleBlockChange(index, 'caption', e.target.value)}
-                      className={styles.blockInput}
-                      placeholder="Chú thích ảnh"
-                    />
-                    {block.preview && (
-                      <div className={styles.blockImagePreview}>
-                        <img src={block.preview} alt="Block Preview" />
-                      </div>
-                    )}
-                  </>
-                ) : block.type === 'list' ? (
-                  <>
-                    <textarea
-                      value={block.listItems ? block.listItems.join('\n') : ''}
-                      onChange={(e) => handleBlockChange(index, 'listItems', e.target.value)}
-                      className={styles.blockInput}
-                      rows={4}
-                      placeholder="Mỗi dòng là một mục danh sách"
-                    />
-                    <ul>
-                      {block.listItems.map((item, i) => (
-                        <li key={i}>{item}</li>
-                      ))}
-                    </ul>
-                  </>
-                ) : null}
-                <button onClick={() => handleRemoveBlock(index)} className={styles.removeBlockButton}>
-                  Xóa
-                </button>
-              </div>
-            ))}
-            <div className={styles.addBlockButtons}>
-              <button onClick={() => handleAddBlock('text')}>Thêm khối văn bản</button>
-              <button onClick={() => handleAddBlock('heading')}>Thêm tiêu đề</button>
-              <button onClick={() => handleAddBlock('sub_heading')}>Thêm tiêu đề phụ</button>
-              <button onClick={() => handleAddBlock('image')}>Thêm khối hình ảnh</button>
-              <button onClick={() => handleAddBlock('list')}>Thêm danh sách</button>
-            </div>
-          </div>
-
-          <div className={styles.inputSection}>
-            <label className={styles.formLabel}>Trạng thái</label>
+          <div className={styles.formGroup}>
+            <label>Trạng thái</label>
             <select
               name="status"
               className={styles.formSelect}
@@ -752,18 +464,21 @@ const AD_Add_New = () => {
             </select>
           </div>
 
-          <div className={styles.formButtons}>
-            <button onClick={handleSubmit} disabled={loading} className={styles.submitButton}>
+          <div className={styles.formGroup}>
+            <button onClick={handleSubmit} className={styles.saveButton} disabled={loading}>
               {loading ? 'Đang lưu...' : 'Thêm bài viết'}
             </button>
-            <button onClick={() => navigate('/admin/new')} className={styles.cancelButton}>
+            <button
+              onClick={() => navigate('/admin/new')}
+              className={styles.cancelButton}
+            >
               Hủy
             </button>
           </div>
         </div>
-      )}
+      </div>
     </div>
   );
 };
 
-export default AD_Add_New;
+export default AddNews;
