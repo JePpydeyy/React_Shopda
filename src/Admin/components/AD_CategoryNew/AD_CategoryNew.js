@@ -3,17 +3,16 @@ import { useNavigate } from 'react-router-dom';
 import Sidebar from '../Sidebar/Sidebar';
 import styles from './categorynew.module.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPenToSquare, faEye, faEyeSlash, faPlus } from '@fortawesome/free-solid-svg-icons';
+import { faPenToSquare, faEye, faEyeSlash, faPlus, faTrash } from '@fortawesome/free-solid-svg-icons';
 
-// Function to convert name to slug
 const generateSlug = (name) => {
   return name
     .toLowerCase()
     .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "") // Remove accents
-    .replace(/[^a-z0-9\s-]/g, "") // Remove special characters except spaces and hyphens
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9\s-]/g, "")
     .trim()
-    .replace(/\s+/g, "-"); // Replace spaces with hyphens
+    .replace(/\s+/g, "-");
 };
 
 const CategoryNewsManagement = () => {
@@ -21,21 +20,17 @@ const CategoryNewsManagement = () => {
   const [statusFilter, setStatusFilter] = useState('all');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [editCategory, setEditCategory] = useState(null); // State cho popup chỉnh sửa/tạo mới
+  const [editCategory, setEditCategory] = useState(null);
   const navigate = useNavigate();
 
-  // Lấy API_BASE_URL từ env, chỉ dùng env, không hardcode
   const API_BASE_URL = process.env.REACT_APP_API_BASE;
 
-  // Fetch categories
   const fetchCategories = async () => {
     try {
       setLoading(true);
       setError(null);
       const token = localStorage.getItem('adminToken');
-      if (!token) {
-        throw new Error('Không tìm thấy token xác thực. Vui lòng đăng nhập lại.');
-      }
+      if (!token) throw new Error('Không tìm thấy token xác thực. Vui lòng đăng nhập lại.');
 
       const res = await fetch(`${API_BASE_URL}/api/new-category`, {
         headers: {
@@ -44,9 +39,7 @@ const CategoryNewsManagement = () => {
         },
       });
 
-      if (!res.ok) {
-        throw new Error(`Lỗi HTTP: ${res.status} ${res.statusText}`);
-      }
+      if (!res.ok) throw new Error(`Lỗi HTTP: ${res.status} ${res.statusText}`);
 
       const result = await res.json();
       const data = Array.isArray(result) ? result : [];
@@ -70,7 +63,6 @@ const CategoryNewsManagement = () => {
     fetchCategories();
   }, []);
 
-  // Toggle show/hide
   const handleToggleStatus = async (id, currentStatus) => {
     const newStatus = currentStatus === 'Hiển thị' ? 'Ẩn' : 'Hiển thị';
     if (!window.confirm(`Bạn có chắc muốn ${newStatus.toLowerCase()} danh mục tin tức này?`)) return;
@@ -79,7 +71,7 @@ const CategoryNewsManagement = () => {
       const token = localStorage.getItem('adminToken');
       if (!token) {
         navigate('/admin/login');
-        throw new Error('Không tìm thấy token xác thực. Vui lòng đăng nhập lại.');
+        throw new Error('Không tìm thấy token xác thực.');
       }
 
       const res = await fetch(`${API_BASE_URL}/api/new-category/${id}/toggle-status`, {
@@ -103,21 +95,45 @@ const CategoryNewsManagement = () => {
     }
   };
 
-  // Handle edit
-  const handleEdit = (category) => {
-    setEditCategory({ ...category, status: category.status === 'Hiển thị' ? 'show' : 'hide' });
-  };
-
-  // Save edited or new category
-  const handleSaveEdit = async () => {
-    if (!editCategory || !editCategory.name) return;
+  const handleDelete = async (id) => {
+    if (!window.confirm('Bạn có chắc muốn xoá danh mục tin tức này?')) return;
 
     try {
       const token = localStorage.getItem('adminToken');
       if (!token) {
         navigate('/admin/login');
-        throw new Error('Không tìm thấy token xác thực. Vui lòng đăng nhập lại.');
+        throw new Error('Không tìm thấy token xác thực.');
       }
+
+      const res = await fetch(`${API_BASE_URL}/api/new-category/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(`Lỗi xoá danh mục: ${errorData.message || res.statusText}`);
+      }
+
+      await fetchCategories();
+      alert('Đã xoá danh mục thành công!');
+    } catch (err) {
+      alert(`Lỗi xoá danh mục: ${err.message}`);
+    }
+  };
+
+  const handleEdit = (category) => {
+    setEditCategory({ ...category, status: category.status === 'Hiển thị' ? 'show' : 'hide' });
+  };
+
+  const handleSaveEdit = async () => {
+    if (!editCategory || !editCategory.name) return;
+
+    try {
+      const token = localStorage.getItem('adminToken');
+      if (!token) throw new Error('Không tìm thấy token xác thực.');
 
       const slug = generateSlug(editCategory.name);
       const payload = {
@@ -129,11 +145,10 @@ const CategoryNewsManagement = () => {
       const url = editCategory.id
         ? `${API_BASE_URL}/api/new-category/${editCategory.id}`
         : `${API_BASE_URL}/api/new-category`;
-
       const method = editCategory.id ? 'PUT' : 'POST';
 
       const res = await fetch(url, {
-        method: method,
+        method,
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
@@ -150,11 +165,10 @@ const CategoryNewsManagement = () => {
       setEditCategory(null);
       alert(`${editCategory.id ? 'Cập nhật' : 'Tạo'} danh mục thành công!`);
     } catch (err) {
-      alert(`Lỗi ${editCategory.id ? 'cập nhật' : 'tạo'} danh mục: ${err.message}`);
+      alert(`Lỗi: ${err.message}`);
     }
   };
 
-  // Filtered categories
   const filteredCategories = categories.filter(category =>
     statusFilter === 'all' || category.status === statusFilter
   );
@@ -168,7 +182,6 @@ const CategoryNewsManagement = () => {
       <div className={styles.content}>
         <h1 className={styles.title}>Quản Lý Danh Mục Tin Tức</h1>
 
-        {/* Filter & Create */}
         <div className={styles.searchFilter}>
           <select
             className={styles.filterSelect}
@@ -184,7 +197,6 @@ const CategoryNewsManagement = () => {
           </button>
         </div>
 
-        {/* Table */}
         <div className={styles.tableContainer}>
           <table className={styles.table}>
             <thead className={styles.tableHeader}>
@@ -206,32 +218,26 @@ const CategoryNewsManagement = () => {
                     </span>
                   </td>
                   <td>
-                    <button
-                      className={styles.iconButton}
-                      title="Chỉnh sửa"
-                      onClick={() => handleEdit(category)}
-                    >
+                    <button className={styles.iconButton} onClick={() => handleEdit(category)} title="Chỉnh sửa">
                       <FontAwesomeIcon icon={faPenToSquare} />
                     </button>
-                    <button
-                      className={styles.iconButton}
-                      title={category.status === 'Hiển thị' ? 'Ẩn danh mục tin tức' : 'Hiển thị danh mục tin tức'}
-                      onClick={() => handleToggleStatus(category.id, category.status)}
-                    >
+                    <button className={styles.iconButton} onClick={() => handleToggleStatus(category.id, category.status)} title="Ẩn/Hiện">
                       <FontAwesomeIcon icon={category.status === 'Hiển thị' ? faEyeSlash : faEye} />
+                    </button>
+                    <button className={styles.iconButton} onClick={() => handleDelete(category.id)} title="Xoá">
+                      <FontAwesomeIcon icon={faTrash} />
                     </button>
                   </td>
                 </tr>
               )) : (
                 <tr>
-                  <td colSpan="4" className={styles.noData}>Không có danh mục tin tức để hiển thị.</td>
+                  <td colSpan="4" className={styles.noData}>Không có danh mục để hiển thị.</td>
                 </tr>
               )}
             </tbody>
           </table>
         </div>
 
-        {/* Popup Edit/Create Category */}
         {editCategory && (
           <div className={styles.popupOverlay}>
             <div className={styles.popupContent}>
