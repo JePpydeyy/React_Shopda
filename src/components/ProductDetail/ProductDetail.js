@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import ImageGallery from '../ImageGallery/ImageGallery';
-import ProductOptions from '../ProductOptions/ProductOptions';
 import ToastNotification from '../ToastNotification/ToastNotification';
 import styles from './ProductDetail.module.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -40,7 +39,7 @@ const ProductDetail = () => {
   const { slug } = useParams();
   const [product, setProduct] = useState(null);
   const [quantity, setQuantity] = useState(1);
-  const [wristSize, setWristSize] = useState(null);
+  const [selectedOptionId, setSelectedOptionId] = useState('');
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [activeTab, setActiveTab] = useState('delivery');
   const [error, setError] = useState(null);
@@ -55,15 +54,11 @@ const ProductDetail = () => {
         }
         const data = await response.json();
         setProduct(data);
-        const availableSizes = data.size?.filter(item => item.stock > 0) || [];
-        const defaultSize = availableSizes.length > 0
-          ? availableSizes.reduce((min, current) => {
-              const minSize = parseFloat(min.size_name.replace(/[^0-9.]/g, ''));
-              const currentSize = parseFloat(current.size_name.replace(/[^0-9.]/g, ''));
-              return minSize < currentSize ? min : current;
-            }).size_name
-          : null;
-        setWristSize(defaultSize);
+        // Chọn option đầu tiên còn hàng mặc định
+        if (data.option && data.option.length > 0) {
+          const firstAvailable = data.option.find(opt => opt.stock > 0);
+          setSelectedOptionId(firstAvailable ? firstAvailable._id : data.option[0]._id);
+        }
       } catch (err) {
         setError(err.message);
         setProduct(null);
@@ -88,24 +83,9 @@ const ProductDetail = () => {
   const handleIncreaseQuantity = () => setQuantity(quantity + 1);
   const handleDecreaseQuantity = () => quantity > 1 && setQuantity(quantity - 1);
 
-  const availableSizes = product.size?.filter(item => item.stock > 0).map(item => item.size_name) || [];
-  const currentSizeStock = product.size?.find(item => item.size_name === wristSize)?.stock || 0;
-  const handleIncreaseWristSize = () => {
-    const currentIndex = availableSizes.indexOf(wristSize);
-    if (currentIndex < availableSizes.length - 1) {
-      setWristSize(availableSizes[currentIndex + 1]);
-    }
-  };
-  const handleDecreaseWristSize = () => {
-    const currentIndex = availableSizes.indexOf(wristSize);
-    if (currentIndex > 0) {
-      setWristSize(availableSizes[currentIndex - 1]);
-    }
-  };
+  // Lấy option đang chọn
+  const selectedOption = product.option?.find(opt => opt._id === selectedOptionId);
 
-  const handleNextImage = () => setCurrentImageIndex((currentImageIndex + 1) % images.length);
-  const handlePrevImage = () => setCurrentImageIndex((currentImageIndex - 1 + images.length) % images.length);
-  const handleThumbnailClick = (index) => setCurrentImageIndex(index);
   const formatPrice = (price) => new Intl.NumberFormat('vi-VN').format(price);
 
   const showToast = (message, type) => {
@@ -113,27 +93,31 @@ const ProductDetail = () => {
   };
 
   const handleAddToCart = () => {
+    if (!selectedOption) {
+      showToast('Vui lòng chọn size!', 'error');
+      return;
+    }
     const cart = JSON.parse(localStorage.getItem('cart_da') || '[]');
     const cartItem = {
       _id: product._id,
       name: product.name,
-      price: product.price,
+      price: selectedOption.price,
       quantity,
-      charm: product.Collection || 'Phong thủy',
-      stoneSize: product.weight || '10,5 Li',
-      wristSize: wristSize || '12',
+      size_name: selectedOption.size_name,
       image: product.images && product.images.length > 0
         ? `${process.env.REACT_APP_API_BASE}/${product.images[0]}`
         : 'https://via.placeholder.com/300',
-      stock: currentSizeStock,
+      stock: selectedOption.stock,
     };
-    const existIndex = cart.findIndex(item => item._id === cartItem._id && item.wristSize === cartItem.wristSize);
+    const existIndex = cart.findIndex(
+      item => item._id === cartItem._id && item.size_name === cartItem.size_name
+    );
     let totalQuantity = quantity;
     if (existIndex !== -1) {
       totalQuantity += cart[existIndex].quantity;
     }
-    if (totalQuantity > currentSizeStock) {
-      showToast(`Số lượng vượt quá tồn kho (${currentSizeStock})!`, 'error');
+    if (totalQuantity > selectedOption.stock) {
+      showToast(`Số lượng vượt quá tồn kho (${selectedOption.stock})!`, 'error');
       return;
     }
     if (existIndex !== -1) {
@@ -161,9 +145,9 @@ const ProductDetail = () => {
         <ImageGallery
           images={images}
           currentImageIndex={currentImageIndex}
-          onNext={handleNextImage}
-          onPrev={handlePrevImage}
-          onThumbnailClick={handleThumbnailClick}
+          onNext={() => setCurrentImageIndex((currentImageIndex + 1) % images.length)}
+          onPrev={() => setCurrentImageIndex((currentImageIndex - 1 + images.length) % images.length)}
+          onThumbnailClick={index => setCurrentImageIndex(index)}
         />
         <div className={styles.rightColumn}>
           {product.tag === 'sale' && (
@@ -171,22 +155,44 @@ const ProductDetail = () => {
           )}
           <p><strong>NỘI DUNG SẢN PHẨM:</strong></p>
           <p>{product.short_description || 'Không có mô tả'}</p>
-          <p><strong>MẠNG PHÙ HỢP: {product.element || 'Hỏa - Thổ'}</strong></p>
-          <div>
-            <b>số lượng sản phẩm còn trong kho:</b> {currentSizeStock}
+     
+        <p className={styles.compatibleElement}>
+          <strong>MẠNG PHÙ HỢP: {product.element || 'Hỏa - Thổ'}</strong>
+        </p>
+        <div>
+          <b>Số lượng sản phẩm còn trong kho:</b> {selectedOption ? selectedOption.stock : 0}
+        </div>
+        <hr />
+        <p className={styles.priceHighlight}>
+          <strong>Giá: {selectedOption ? formatPrice(selectedOption.price) : 0} VND</strong>
+        </p>
+
+
+          <div style={{ marginBottom: 12 }}>
+            <label>
+              <b>Chọn size:</b>
+              <select
+                className={styles.select}
+                value={selectedOptionId}
+                onChange={e => setSelectedOptionId(e.target.value)}
+              >
+                {product.option && product.option.length > 0 ? (
+                  product.option.map(opt => (
+                    <option key={opt._id} value={opt._id} disabled={opt.stock === 0}>
+                      {opt.size_name} {opt.stock === 0 ? '(Hết hàng)' : ''}
+                    </option>
+                  ))
+                ) : (
+                  <option value="">Không có size</option>
+                )}
+              </select>
+            </label>
           </div>
-          <hr />
-          <p><strong>Giá: {formatPrice(product.price)} VND</strong></p>
-          <ProductOptions
-            quantity={quantity}
-            wristSize={wristSize}
-            onIncreaseQuantity={handleIncreaseQuantity}
-            onDecreaseQuantity={handleDecreaseQuantity}
-            onIncreaseWristSize={handleIncreaseWristSize}
-            onDecreaseWristSize={handleDecreaseWristSize}
-            weight={product.weight}
-            size={availableSizes}
-          />
+          <div className={styles.quantity}>
+            <button type="button" onClick={handleDecreaseQuantity}>-</button>
+            <span className={styles.quantitySpan}>{quantity}</span>
+            <button type="button" onClick={handleIncreaseQuantity}>+</button>
+          </div>
           <button className={styles.addToCart} onClick={handleAddToCart}>
             Thêm vào giỏ hàng
           </button>

@@ -17,7 +17,7 @@ const Header = () => {
   // Lấy gợi ý khi người dùng nhập
   useEffect(() => {
     if (searchQuery.trim().length > 0) {
-      fetch(`${API_BASE_URL}/product`)
+      fetch(`${API_BASE_URL}/product/show`)
         .then(res => res.json())
         .then(data => {
           const filteredSuggestions = data
@@ -77,58 +77,62 @@ const Header = () => {
         </a>
         <div className={styles.headerRight}>
           <div className={styles.searchCart}>
-            <form ref={searchFormRef} onSubmit={handleSearchSubmit} className={styles.searchForm}>
-              <input
-                type="text"
-                placeholder="Tìm kiếm sản phẩm..."
-                value={searchQuery}
-                onChange={e => setSearchQuery(e.target.value)}
-                className={styles.searchInput}
+<form ref={searchFormRef} onSubmit={handleSearchSubmit} className={styles.searchForm}>
+  <input
+    type="text"
+    placeholder="Tìm kiếm sản phẩm..."
+    value={searchQuery}
+    onChange={e => setSearchQuery(e.target.value)}
+    className={styles.searchInput}
+    autoComplete="off"
+  />
+  <button type="submit" className={styles.searchButton}>
+    <FontAwesomeIcon icon={faMagnifyingGlass} className={styles.searchIcon} />
+  </button>
+  {suggestions.length > 0 && (
+    <ul className={styles.suggestionsDropdown}>
+      {suggestions.map(product => {
+        // Lấy giá nhỏ nhất trong option nếu có
+        const minPrice = Array.isArray(product.option) && product.option.length > 0
+          ? Math.min(...product.option.map(opt => opt.price))
+          : product.price;
+        return (
+          <li key={product._id} className={styles.suggestionItem}>
+            <Link
+              to={`/detail/${product.slug}`}
+              onClick={() => {
+                setSearchQuery('');
+                setSuggestions([]);
+              }}
+              className={styles.suggestionLink}
+            >
+              <img
+                src={
+                  product.images && product.images.length > 0
+                    ? `${process.env.REACT_APP_API_BASE}/${product.images[0]}`
+                    : 'https://via.placeholder.com/50'
+                }
+                alt={product.name}
+                className={styles.suggestionImage}
               />
-              <button type="submit" className={styles.searchButton}>
-                <FontAwesomeIcon icon={faMagnifyingGlass} className={styles.searchIcon} />
-              </button>
-              {suggestions.length > 0 && (
-                <ul className={styles.suggestionsDropdown}>
-                 {suggestions.map(product => (
-  <li key={product._id} className={styles.suggestionItem}>
-    <Link
-      to={`/detail/${product.slug}`} // <-- ĐỔI _id thành slug
-      onClick={() => {
-        setSearchQuery('');
-        setSuggestions([]);
-      }}
-      className={styles.suggestionLink}
-    >
-      <img
-        src={
-          product.images && product.images.length > 0
-            ? `${process.env.REACT_APP_API_BASE}/${product.images[0]}`
-            : 'https://via.placeholder.com/50'
-        }
-        alt={product.name}
-        className={styles.suggestionImage}
-      />
-      <div className={styles.suggestionInfo}>
-        <span className={styles.suggestionName}>{product.name}</span>
-        <span className={styles.suggestionPrice}>
-          {new Intl.NumberFormat('vi-VN').format(product.price)} VND
-        </span>
-      </div>
-    </Link>
-  </li>
-))}
-                </ul>
-              )}
-            </form>
+              <div className={styles.suggestionInfo}>
+                <span className={styles.suggestionName}>{product.name}</span>
+                <span className={styles.suggestionPrice}>
+                  {new Intl.NumberFormat('vi-VN').format(minPrice)} VND
+                </span>
+              </div>
+            </Link>
+          </li>
+        );
+      })}
+    </ul>
+  )}
+</form>
             <Link to="/cart" className={styles.cartContainer}>
               <FontAwesomeIcon icon={faCartShopping} className={styles.cartIcon} />
             </Link>
           </div>
-          <div className={styles.languageSelector}>
-            <span>Tiếng Việt</span>
-            <FontAwesomeIcon icon={faCaretDown} />
-          </div>
+         
           <div className={styles.hamburger} onClick={toggleMenu}>
             <FontAwesomeIcon icon={isMenuOpen ? faTimes : faBars} />
           </div>
@@ -159,7 +163,7 @@ const Navbar = ({ isMenuOpen, toggleMenu }) => {
           <li>
             <a href="/product" onClick={toggleMenu}>
               SẢN PHẨM
-              <FontAwesomeIcon icon={faCaretDown} className={styles.dropdownArrow} />
+            
             </a>
           </li>
           <li>

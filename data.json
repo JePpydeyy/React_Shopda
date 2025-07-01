@@ -1,0 +1,846 @@
+[
+  {
+    "category": {
+      "id": "684f9ce9398a8acfc7ee1495",
+      "name_categories": "Phong thủy"
+    },
+    "level": "Trung Cấp",
+    "element": "Kim - Thủy",
+    "name": "VÒNG MOONSTONE",
+    "slug": "vong-moonstone",
+    "images": [
+      "images/moonstone-vuon-may-bac-1.jpg",
+      "images/moonstone-vuon-may-bac-2.jpg",
+      "images/moonstone-vuon-may-bac-3.jpg",
+      "images/moonstone-vuon-may-bac-4.jpg",
+      "images/moonstone-vuon-may-bac-5.jpg"
+    ],
+    "status": "show",
+    "tag": "sale",
+    "short_description": "Đá mặt trăng (Moonstone) là loại đá quý thuộc nhóm Fenspat Kali, phát ánh sáng trắng xanh mờ ảo giống như vầng trăng.",
+    "option": [
+      {
+        "size_name": "12 cm",
+        "stock": 12,
+        "price": 2240000
+      },
+      {
+        "size_name": "13 cm",
+        "stock": 12,
+        "price": 2352000
+      },
+      {
+        "size_name": "14 cm",
+        "stock": 12,
+        "price": 2469600
+      },
+      {
+        "size_name": "15 cm",
+        "stock": 12,
+        "price": 2587200
+      },
+      {
+        "size_name": "16 cm",
+        "stock": 12,
+        "price": 2704800
+      },
+      {
+        "size_name": "17 cm",
+        "stock": 12,
+        "price": 2822400
+      },
+      {
+        "size_name": "18 cm",
+        "stock": 12,
+        "price": 2940000
+      },
+      {
+        "size_name": "19 cm",
+        "stock": 12,
+        "price": 3057600
+      },
+      {
+        "size_name": "20 cm",
+        "stock": 12,
+        "price": 3175200
+      },
+      {
+        "size_name": "21 cm",
+        "stock": 12,
+        "price": 3292800
+      }
+    ],
+    "description": "Vòng tay được chế tác từ <strong>Chất liệu</strong>: Đá mặt trăng (Moonstone) - loại đá quý thuộc nhóm Fenspat Kali, phát ánh sáng trắng xanh mờ ảo giống như vầng trăng. Hiện tượng quang học lung linh của đá mặt trăng được các nhà khoa học đặt tên là “Adulares Age” – Ánh xà cừ. Moonstone là viên đá thiêng liêng của người Ấn Độ. Người La Mã cổ đại thì tin mỗi viên đá Moonstone tượng trưng cho 1 hình ảnh của Nữ thần mặt trăng – Diana.<br><strong>Nguồn gốc</strong>: Srilanka, Ấn Độ, Brazil, Myanmar, Madagascar, Mexico, Na Uy, Thụy Sĩ, Tanzania, Hoa Kỳ.<br><strong>Lợi ích tâm linh</strong>: Giúp phá tan tiêu cực, cởi mở tâm trí. Giúp hai người hiểu nhau hơn, để tình cảm càng thêm hòa hợp, đằm thắm hạnh phúc. Tăng thêm sự nhận thức sâu sắc khi kết hợp với thiền, nó giúp con người đi vào thế giới nội tâm của mình, cảm nhận rõ ràng sự thay đổi của cảm xúc bản thân. Tác động tới luân xa vương miện – Sahasrara, giúp con người củng cố tinh thần, có thái độ bình tĩnh khi đối mặt với thất bại trong cuộc sống.<br><strong>Lợi ích sức khỏe</strong>: Có lợi cho sức khỏe sinh sản của nữ giới, giảm các vấn đề về chu kỳ kinh nguyệt, giúp cân bằng nội tiết tố. Cực kỳ hiệu quả và phù hợp với phụ nữ đang mang thai và mới sinh nở. Giúp dễ ngủ, phòng ngừa mộng du, cải thiện làn da và tinh thần. Hỗ trợ quá trình giảm béo.<br><strong>Hướng dẫn bảo quản</strong>: Tránh xịt nước hoa hoặc keo cứng tóc lên vòng tay. Luôn cởi vòng tay khi tập thể thao hoặc làm việc nặng nhọc. Bảo quản riêng, không để chung với các loại trang sức đá quý khác. Bọc bằng vải mềm và cho vào hộp. Cần nạp lại năng lượng cho Moonstone bằng cách phơi dưới đêm trăng rằm để nó có thể hấp thu tinh hoa của mặt trăng và đất trời.<br><strong>Độ cứng</strong>: 6.0 - 6.5/10.",
+    "views": 204,
+    "purchases": 7,
+    "createdAt": "2025-06-16T03:11:34.702Z"
+  },
+  {
+    "category": {
+      "id": "684f9ce9398a8acfc7ee1495",
+      "name_categories": "Phong thủy"
+    },
+    "level": "phổ thông",
+    "element": "Kim - Thổ",
+    "name": "VÒNG MẮT HỔ NÂU - PHỐI ƯU LINH",
+    "slug": "vong-mat-ho-nau-phoi-uu-linh",
+    "images": [
+      "images/mat-ho-phoi-uu-linh-1.jpg",
+      "images/mat-ho-phoi-uu-linh-2.jpg",
+      "images/mat-ho-phoi-uu-linh-3.jpg",
+      "images/mat-ho-phoi-uu-linh-4.jpg",
+      "images/mat-ho-phoi-uu-linh-5.jpg"
+    ],
+    "status": "show",
+    "tag": "sale",
+    "short_description": "Đá mắt hổ (Tiger Eye) là một biến thể thuộc đá thạch anh, có hiệu ứng mắt mèo và ánh lụa rất đẹp, được sử dụng từ thời La Mã cổ đại.",
+    "option": [
+      {
+        "size_name": "12 cm",
+        "stock": 12,
+        "price": 1254000
+      },
+      {
+        "size_name": "13 cm",
+        "stock": 12,
+        "price": 1316700
+      },
+      {
+        "size_name": "14 cm",
+        "stock": 12,
+        "price": 1379400
+      },
+      {
+        "size_name": "15 cm",
+        "stock": 12,
+        "price": 1442100
+      },
+      {
+        "size_name": "16 cm",
+        "stock": 12,
+        "price": 1504800
+      },
+      {
+        "size_name": "17 cm",
+        "stock": 12,
+        "price": 1567500
+      },
+      {
+        "size_name": "18 cm",
+        "stock": 12,
+        "price": 1630200
+      },
+      {
+        "size_name": "19 cm",
+        "stock": 12,
+        "price": 1692900
+      },
+      {
+        "size_name": "20 cm",
+        "stock": 12,
+        "price": 1755600
+      },
+      {
+        "size_name": "21 cm",
+        "stock": 12,
+        "price": 1818300
+      }
+    ],
+    "description": "Vòng tay được chế tác từ <strong>Chất liệu</strong>: Đá mắt hổ đỏ nâu (Tiger Eye) - một biến thể thuộc đá thạch anh, có hiệu ứng mắt mèo và ánh lụa rất đẹp, được sử dụng từ thời La Mã cổ đại. Các chiến binh thường đeo bùa hộ mệnh được khắc từ đá mắt hổ, giúp thân chủ bình tĩnh, can đảm, tập trung và kiên trì. Đá mắt hổ đỏ nâu là loại đá thánh cao quý của người Ấn Độ. <br><strong>Nguồn gốc</strong>: Australia, Trung Quốc, Namibia, Nam Phi, Anh, Mỹ, miền Trung (Việt Nam). <br><strong>Lợi ích tâm linh</strong>: Là viên đá mang lại may mắn tốt cho các doanh nhân hoặc những người mới bước vào thế giới kinh doanh lần đầu tiên. Xóa bỏ sợ hãi, lo lắng và chứng mắc bệnh hoang tưởng, mang đến sự minh mẫn, kích thích lòng tin, dũng khí, nâng cao năng lực hành động, dám đương đầu với khó khăn thử thách. Hỗ trợ điều trị bệnh tâm lý, giúp con người cân bằng được cảm xúc, tâm lý luôn ổn định, cảm xúc cân bằng trong cuộc sống. Tác động trực tiếp đến luân xa 6 (luân xa thái dương), giúp đầu óc luôn minh mẫn. <br><strong>Lợi ích sức khỏe</strong>: Ổn định huyết áp, tăng cường hệ miễn dịch, cân bằng hệ nội tiết. Giúp cho luân xa thái dương có được nguồn năng lượng mạnh. <br><strong>Hướng dẫn bảo quản</strong>: Đá mắt hổ đỏ khá bền và có khả năng chống hao mòn. Nhạy cảm với một số axit. Tránh xịt nước hoa hoặc keo cứng tóc lên vòng tay. Bảo quản vòng tay thì hãy để riêng, không để chung với các loại trang sức đá quý khác. Vệ sinh vòng tay bằng cách dùng khăn mềm (không đổ lông) thấm nước muối tự nhiên (muối hột, muối đá, muối mỏ,…) lau nhẹ nhàng vòng đá. Tiếp thêm năng lượng cho đá bằng cách phơi dưới ánh nắng mặt trời hoặc ánh trăng 24h → 72h. <br><strong>Độ cứng</strong>: 5 - 7/10.",
+    "views": 56,
+    "purchases": 19,
+    "createdAt": "2025-06-16T03:11:34.702Z"
+  },
+  {
+    "category": {
+      "id": "684f9cde398a8acfc7ee1492",
+      "name_categories": "Thời trang"
+    },
+    "level": "Trung Cấp",
+    "element": "Mộc - Thủy",
+    "name": "VÒNG APATITE BIỂN XANH",
+    "slug": "vong-apatite-bien-xanh",
+    "images": [
+      "images/apatite-charm-tho-1.png",
+      "images/apatite-charm-tho-2.png",
+      "images/apatite-charm-tho-3.png",
+      "images/apatite-charm-tho-4.png",
+      "images/apatite-charm-tho-5.png"
+    ],
+    "status": "show",
+    "tag": "sale",
+    "short_description": "",
+    "option": [
+      {
+        "size_name": "12 cm",
+        "stock": 12,
+        "price": 2740000
+      },
+      {
+        "size_name": "13 cm",
+        "stock": 12,
+        "price": 2877000
+      },
+      {
+        "size_name": "14 cm",
+        "stock": 12,
+        "price": 3014000
+      },
+      {
+        "size_name": "15 cm",
+        "stock": 12,
+        "price": 3151000
+      },
+      {
+        "size_name": "16 cm",
+        "stock": 12,
+        "price": 3288000
+      },
+      {
+        "size_name": "17 cm",
+        "stock": 12,
+        "price": 3425000
+      },
+      {
+        "size_name": "18 cm",
+        "stock": 12,
+        "price": 3562000
+      },
+      {
+        "size_name": "19 cm",
+        "stock": 12,
+        "price": 3699000
+      },
+      {
+        "size_name": "20 cm",
+        "stock": 12,
+        "price": 3836000
+      },
+      {
+        "size_name": "21 cm",
+        "stock": 12,
+        "price": 3973000
+      }
+    ],
+    "description": "Vòng tay được chế tác từ <strong>Chất liệu</strong>: Đá Apatite biển xanh - được coi là đá quý dùng trong chế tác đồ kim hoàn. Chúng có thể tìm thấy trong tự nhiên với màu vàng, xanh dương, xanh lá cây, xám hay không màu… Apatite được mệnh danh là “Viên Đá Của Tham Vọng” do nó có tác dụng thúc đẩy sự tiến bộ cá nhân nhằm đạt được những mục tiêu quan trọng. Nó đồng thời tăng cường sự sáng tạo và kích thích phát triển các yếu tố tự thân nội tại. <br><strong>Nguồn gốc</strong>: Myanmar, Ấn Độ, Kenya, Brazil, Na Uy, Sri Lanka, Nam Phi, Mexico, Canada và Hoa Kỳ. <br><strong>Lợi ích tâm linh</strong>: Đá này hoạt động mạnh mẽ trong chakra cổ họng và luôn xa mắt thứ ba. Apatite được coi như là đá của học vấn và cảm hứng. Nó có một khả năng mạnh mẽ để kích thích sự phát triển khả năng nhìn xa trông rộng. Apatite xanh là một loại đá mạnh mẽ để hỗ trợ sự phát triển của những món quà tâm linh, và năng lượng của nó cũng giúp cho sự tinh thần tâm linh. <br><strong>Lợi ích sức khỏe</strong>: Cải thiện vấn đề về cân nặng, vì Apatite làm tăng tỷ lệ trao đổi chất. Chữa lành cả các tuyến và các cơ quan của cơ thể. Ức chế sự thèm ăn. Hỗ trợ hệ thống miễn dịch, giúp mắt nhìn rõ hơn. <br><strong>Hướng dẫn bảo quản</strong>: Apatite nhạy cảm với nhiệt và sốc, nên tránh không dùng thiết bị siêu âm và hơi nước khi làm sạch, nhạy cảm với acid. Lau bụi lâu dần cũng làm cho apatite mất đi độ bóng và phát triển vết xước trên bề mặt. Giữ trong một hộp lót vải lót và không lưu trữ chung với các loại trang sức khác. <br><strong>Độ cứng</strong>: 7/10.",
+    "views": 68,
+    "purchases": 12,
+    "createdAt": "2025-06-16T03:11:34.702Z"
+  },
+  {
+    "category": {
+      "id": "684f9cde398a8acfc7ee1492",
+      "name_categories": "Thời trang"
+    },
+    "level": "Phổ thông",
+    "element": "Mộc - Thủy",
+    "name": "VÒNG MẮT DIỀU HÂU - PHỐI MOONSTONE",
+    "slug": "vong-mat-dieu-hau-phoi-moonstone",
+    "images": [
+      "images/mat-dieu-hau-phoi-moonstone-1.jpg",
+      "images/mat-dieu-hau-phoi-moonstone-2.jpg",
+      "images/mat-dieu-hau-phoi-moonstone-3.jpg",
+      "images/mat-dieu-hau-phoi-moonstone-4.jpg",
+      "images/mat-dieu-hau-phoi-moonstone-5.jpg"
+    ],
+    "status": "show",
+    "tag": "sale",
+    "short_description": "Đá mắt diều hâu có gốc từ đá mắt hổ màu xanh xám hoặc xanh lam, với nhiều lớp thạch anh mịn bên trong, mang vẻ ngoài mượt mà.",
+    "option": [
+      {
+        "size_name": "12 cm",
+        "stock": 12,
+        "price": 1491000
+      },
+      {
+        "size_name": "13 cm",
+        "stock": 12,
+        "price": 1565550
+      },
+      {
+        "size_name": "14 cm",
+        "stock": 12,
+        "price": 1640100
+      },
+      {
+        "size_name": "15 cm",
+        "stock": 12,
+        "price": 1714650
+      },
+      {
+        "size_name": "16 cm",
+        "stock": 12,
+        "price": 1789200
+      },
+      {
+        "size_name": "17 cm",
+        "stock": 12,
+        "price": 1863750
+      },
+      {
+        "size_name": "18 cm",
+        "stock": 12,
+        "price": 1938300
+      },
+      {
+        "size_name": "19 cm",
+        "stock": 12,
+        "price": 2012850
+      },
+      {
+        "size_name": "20 cm",
+        "stock": 12,
+        "price": 2087400
+      },
+      {
+        "size_name": "21 cm",
+        "stock": 12,
+        "price": 2161950
+      }
+    ],
+    "description": "Vòng tay được chế tác từ <strong>Chất liệu</strong>: Đá mắt diều hâu - có gốc từ đá mắt hổ màu xanh xám hoặc xanh lam, với nhiều lớp thạch anh mịn bên trong, mang vẻ ngoài mượt mà. Các xung đột nội tâm được giải quyết mang đến cuộc sống bình yên, các vấn đề về cảm xúc và tinh thần được chữa lành. Đá này thiên về chủ nghĩa tâm linh, giúp con người có động lực tiếp tục hướng thượng và hướng thiện. <br><strong>Nguồn gốc</strong>: Nam Phi, Ấn Độ, Hoa Kỳ, Sri Lanka, Tây Úc, Brazil, Trung Quốc, Canada, Hàn Quốc, Myanmar, Namibia, Tây Ban Nha, Thái Lan. <br><strong>Lợi ích tâm linh</strong>: Kích hoạt kỹ năng tiềm ẩn trong giao tiếp, giúp giao tiếp hiệu quả hơn. Kích thích sự hiểu biết tâm linh, là loại đá quý ma thuật, là lá bùa hộ thân, chống lại các mối đe dọa trong cuộc sống. Giúp tự tin trước công chúng, mang lại may mắn. Kích thích tập trung tinh thần, năng lượng kích hoạt luân xa mắt thứ ba, đem lại sự sáng suốt, tăng cường trực giác. Khách du lịch mang vòng tay mắt diều hâu để tự bảo vệ bản thân không bị ảnh hưởng bởi các năng lượng tiêu cực từ người xa lạ. <br><strong>Lợi ích sức khỏe</strong>: Hỗ trợ điều trị gãy xương, chuột rút và đau nhức cơ bắp, suy nhược cơ thể, thiếu máu, xoang, cột sống và cổ. Hấp thụ chất dinh dưỡng và vitamin tốt hơn. Rất tốt cho thị giác, cải thiện độ tập trung. <br><strong>Hướng dẫn bảo quản</strong>: Đá mắt diều hâu khá bền và có khả năng chống hao mòn. Nhạy cảm với một số axit. Tránh xịt nước hoa hoặc keo cứng tóc lên vòng tay. Giữ trong một hộp lót vải lót và không lưu trữ chung với các loại trang sức khác. <br><strong>Độ cứng</strong>: 7.5 - 8/10.",
+    "views": 10,
+    "purchases": 5,
+    "createdAt": "2025-06-16T03:11:34.702Z"
+  },
+  {
+    "category": {
+      "id": "684f9ce9398a8acfc7ee1495",
+      "name_categories": "Phong thủy"
+    },
+    "level": "Trung Cấp",
+    "element": "Hỏa - Thổ",
+    "name": "VÒNG MẮT HỔ ĐỎ - PHỐI DIOPSIDE",
+    "slug": "vong-mat-ho-nau-phoi-diopside",
+    "images": [
+      "images/mat-ho-phoi-diopside-1.jpg",
+      "images/mat-ho-phoi-diopside-2.jpg",
+      "images/mat-ho-phoi-diopside-3.jpg",
+      "images/mat-ho-phoi-diopside-4.jpg",
+      "images/mat-ho-phoi-diopside-5.jpg"
+    ],
+    "status": "show",
+    "tag": "sale",
+    "short_description": "Đá mắt hổ (Tiger Eye) là một biến thể thuộc đá thạch anh, có hiệu ứng mắt mèo và ánh lụa rất đẹp, được sử dụng từ thời La Mã cổ đại.",
+    "option": [
+      {
+        "size_name": "12 cm",
+        "stock": 12,
+        "price": 1540000
+      },
+      {
+        "size_name": "13 cm",
+        "stock": 12,
+        "price": 1617000
+      },
+      {
+        "size_name": "14 cm",
+        "stock": 12,
+        "price": 1694000
+      },
+      {
+        "size_name": "15 cm",
+        "stock": 12,
+        "price": 1771000
+      },
+      {
+        "size_name": "16 cm",
+        "stock": 12,
+        "price": 1848000
+      },
+      {
+        "size_name": "17 cm",
+        "stock": 12,
+        "price": 1925000
+      },
+      {
+        "size_name": "18 cm",
+        "stock": 12,
+        "price": 2002000
+      },
+      {
+        "size_name": "19 cm",
+        "stock": 12,
+        "price": 2079000
+      },
+      {
+        "size_name": "20 cm",
+        "stock": 12,
+        "price": 2156000
+      },
+      {
+        "size_name": "21 cm",
+        "stock": 12,
+        "price": 2233000
+      }
+    ],
+    "description": "Vòng tay được chế tác từ <strong>Chất liệu</strong>: Đá mắt hổ đỏ (Tiger Eye) phối hợp với Diopside - một biến thể thuộc đá thạch anh, có hiệu ứng mắt mèo và ánh lụa rất đẹp, được sử dụng từ thời La Mã cổ đại. Các chiến binh thường đeo bùa hộ mệnh được khắc từ đá mắt hổ, giúp thân chủ bình tĩnh, can đảm, tập trung và kiên trì. Đá mắt hổ đỏ nâu là loại đá thánh cao quý của người Ấn Độ. <br><strong>Nguồn gốc</strong>: Australia, Trung Quốc, Namibia, Nam Phi, Anh, Mỹ, miền Trung (Việt Nam). <br><strong>Lợi ích tâm linh</strong>: Là viên đá mang lại may mắn tốt cho các doanh nhân hoặc những người mới bước vào thế giới kinh doanh lần đầu tiên. Xóa bỏ sợ hãi, lo lắng và chứng mắc bệnh hoang tưởng, mang đến sự minh mẫn, kích thích lòng tin, dũng khí, nâng cao năng lực hành động, dám đương đầu với khó khăn thử thách. Hỗ trợ điều trị bệnh tâm lý, giúp con người cân bằng được cảm xúc, tâm lý luôn ổn định, cảm xúc cân bằng trong cuộc sống. Tác động trực tiếp đến luân xa 6 (luân xa thái dương), giúp đầu óc luôn minh mẫn. <br><strong>Lợi ích sức khỏe</strong>: Ổn định huyết áp, tăng cường hệ miễn dịch, cân bằng hệ nội tiết. Giúp cho luân xa thái dương có được nguồn năng lượng mạnh. <br><strong>Hướng dẫn bảo quản</strong>: Đá mắt hổ đỏ khá bền và có khả năng chống hao mòn. Nhạy cảm với một số axit. Tránh xịt nước hoa hoặc keo cứng tóc lên vòng tay. Bảo quản vòng tay thì hãy để riêng, không để chung với các loại trang sức đá quý khác. Vệ sinh vòng tay bằng cách dùng khăn mềm (không đổ lông) thấm nước muối tự nhiên (muối hột, muối đá, muối mỏ,…) lau nhẹ nhàng vòng đá. Tiếp thêm năng lượng cho đá bằng cách phơi dưới ánh nắng mặt trời hoặc ánh trăng 24h. <br><strong>Độ cứng</strong>: 5 - 7/10.",
+    "views": 30,
+    "purchases": 33,
+    "createdAt": "2025-06-16T01:50:14.701Z"
+  },
+  {
+    "category": {
+      "id": "684f9ce9398a8acfc7ee1495",
+      "name_categories": "Phong thủy"
+    },
+    "level": "Cao Cấp",
+    "element": "Thổ - Hỏa",
+    "name": "TẢNG ĐÁ THẠCH ANH HỒNG",
+    "slug": "tang-da-thach-anh-hong",
+    "images": [
+      "images/thach-anh-hong-block-1.jpg",
+      "images/thach-anh-hong-block-2.jpg",
+      "images/thach-anh-hong-block-3.jpg",
+      "images/thach-anh-hong-block-4.jpg",
+      "images/thach-anh-hong-block-5.jpg"
+    ],
+    "status": "show",
+    "tag": "premium",
+    "short_description": "Đá thạch anh hồng (Rose Quartz) là loại đá quý mang năng lượng tình yêu, giúp cân bằng cảm xúc và thu hút may mắn trong tình duyên.",
+    "option": [
+      {
+        "size_name": "50 x 30 x 20 cm",
+        "stock": 5,
+        "price": 5000000
+      },
+      {
+        "size_name": "60 x 40 x 30 cm",
+        "stock": 5,
+        "price": 5250000
+      },
+      {
+        "size_name": "70 x 50 x 40 cm",
+        "stock": 3,
+        "price": 5512500
+      }
+    ],
+    "description": "Tảng đá được chế tác từ <strong>Chất liệu</strong>: Đá thạch anh hồng (Rose Quartz) - loại đá quý nổi tiếng với màu hồng phấn dịu dàng, mang năng lượng tình yêu và sự bình yên. <br><strong>Kích thước và trọng lượng</strong>: Có các kích thước 50 x 30 x 20 cm, 60 x 40 x 30 cm, 70 x 50 x 40 cm, với trọng lượng trung bình khoảng 50 kg. <br><strong>Nguồn gốc</strong>: Brazil, Madagascar, Nam Phi, Ấn Độ. <br><strong>Lợi ích tâm linh</strong>: Kích thích luân xa tim (Anahata), giúp cân bằng cảm xúc, xoa dịu căng thẳng và tăng cường sự tự tin trong tình yêu. Đặt tảng đá trong phòng khách hoặc phòng ngủ để thu hút năng lượng tích cực và hòa hợp. <br><strong>Lợi ích sức khỏe</strong>: Hỗ trợ giảm căng thẳng, cải thiện giấc ngủ và tăng cường sức khỏe tim mạch. <br><strong>Hướng dẫn bảo quản</strong>: Tránh để đá tiếp xúc với hóa chất mạnh. Vệ sinh bằng khăn mềm thấm nước muối loãng và phơi dưới ánh trăng rằm để nạp năng lượng. <br><strong>Độ cứng</strong>: 7/10.",
+    "views": 120,
+    "purchases": 4,
+    "createdAt": "2025-07-01T10:25:00.000Z"
+  },
+  {
+    "category": {
+      "id": "684f9ce9398a8acfc7ee1495",
+      "name_categories": "Phong thủy"
+    },
+    "level": "Cao Cấp",
+    "element": "Kim - Thổ",
+    "name": "TẢNG ĐÁ NGỌC BÍCH",
+    "slug": "tang-da-ngoc-bich",
+    "images": [
+      "images/ngoc-bich-block-1.jpg",
+      "images/ngoc-bich-block-2.jpg",
+      "images/ngoc-bich-block-3.jpg",
+      "images/ngoc-bich-block-4.jpg",
+      "images/ngoc-bich-block-5.jpg"
+    ],
+    "status": "show",
+    "tag": "premium",
+    "short_description": "Đá ngọc bích (Jade) là biểu tượng của sự thịnh vượng, sức khỏe và trường thọ, thường được dùng để thu hút tài lộc.",
+    "option": [
+      {
+        "size_name": "50 x 30 x 20 cm",
+        "stock": 6,
+        "price": 6000000
+      },
+      {
+        "size_name": "60 x 40 x 30 cm",
+        "stock": 4,
+        "price": 6300000
+      }
+    ],
+    "description": "Tảng đá được chế tác từ <strong>Chất liệu</strong>: Đá ngọc bích (Jade) - loại đá quý mang màu xanh lục đặc trưng, biểu tượng của sự thịnh vượng và trường thọ. <br><strong>Kích thước và trọng lượng</strong>: Có các kích thước 50 x 30 x 20 cm, 60 x 40 x 30 cm, với trọng lượng trung bình khoảng 45 kg. <br><strong>Nguồn gốc</strong>: Myanmar, Trung Quốc, Canada, New Zealand. <br><strong>Lợi ích tâm linh</strong>: Kích thích luân xa tim và luân xa cổ họng, giúp gia tăng sự thịnh vượng, bảo vệ sức khỏe và mang lại sự bình an. Đặt tảng đá ở hướng Đông Nam của ngôi nhà để tăng cường tài lộc. <br><strong>Lợi ích sức khỏe</strong>: Hỗ trợ hệ miễn dịch, cải thiện tuần hoàn máu và giảm căng thẳng. <br><strong>Hướng dẫn bảo quản</strong>: Lau sạch bằng khăn mềm, tránh tiếp xúc với nhiệt độ cao hoặc hóa chất. Nạp năng lượng bằng cách đặt dưới ánh nắng nhẹ hoặc ánh trăng. <br><strong>Độ cứng</strong>: 6.5 - 7/10.",
+    "views": 95,
+    "purchases": 3,
+    "createdAt": "2025-07-01T10:25:00.000Z"
+  },
+  {
+    "category": {
+      "id": "684f9ce9398a8acfc7ee1495",
+      "name_categories": "Phong thủy"
+    },
+    "level": "Cao Cấp",
+    "element": "Thủy - Mộc",
+    "name": "TẢNG ĐÁ AQUAMARINE",
+    "slug": "tang-da-aquamarine",
+    "images": [
+      "images/aquamarine-block-1.jpg",
+      "images/aquamarine-block-2.jpg",
+      "images/aquamarine-block-3.jpg",
+      "images/aquamarine-block-4.jpg",
+      "images/aquamarine-block-5.jpg"
+    ],
+    "status": "show",
+    "tag": "premium",
+    "short_description": "Đá aquamarine mang màu xanh biển dịu mát, tượng trưng cho sự bình yên và giao tiếp hiệu quả, thường dùng trong thiền định.",
+    "option": [
+      {
+        "size_name": "40 x 25 x 15 cm",
+        "stock": 7,
+        "price": 4500000
+      },
+      {
+        "size_name": "50 x 30 x 20 cm",
+        "stock": 5,
+        "price": 4725000
+      },
+      {
+        "size_name": "60 x 35 x 25 cm",
+        "stock": 3,
+        "price": 4961250
+      }
+    ],
+    "description": "Tảng đá được chế tác từ <strong>Chất liệu</strong>: Đá aquamarine - loại đá quý có màu xanh biển nhạt, tượng trưng cho sự bình yên và giao tiếp rõ ràng. <br><strong>Kích thước và trọng lượng</strong>: Có các kích thước 40 x 25 x 15 cm, 50 x 30 x 20 cm, 60 x 35 x 25 cm, với trọng lượng trung bình khoảng 40 kg. <br><strong>Nguồn gốc</strong>: Brazil, Madagascar, Pakistan, Nigeria. <br><strong>Lợi ích tâm linh</strong>: Kích thích luân xa cổ họng (Vishuddha), giúp cải thiện giao tiếp, tăng cường sự tự tin và mang lại sự bình tĩnh trong các tình huống căng thẳng. Đặt tảng đá ở hướng Bắc để tăng cường năng lượng Thủy. <br><strong>Lợi ích sức khỏe</strong>: Hỗ trợ giảm căng thẳng, cải thiện hô hấp và tăng cường sự tập trung. <br><strong>Hướng dẫn bảo quản</strong>: Tránh tiếp xúc với ánh nắng trực tiếp kéo dài để giữ màu sắc. Vệ sinh bằng nước sạch và khăn mềm, nạp năng lượng dưới ánh trăng. <br><strong>Độ cứng</strong>: 7.5 - 8/10.",
+    "views": 80,
+    "purchases": 2,
+    "createdAt": "2025-07-01T10:25:00.000Z"
+  },
+  {
+    "category": {
+      "id": "684f9ce9398a8acfc7ee1495",
+      "name_categories": "Phong thủy"
+    },
+    "level": "Cao Cấp",
+    "element": "Thủy - Mộc",
+    "name": "VÒNG CỔ AQUAMARINE BIỂN SÂU",
+    "slug": "vong-co-aquamarine-bien-sau",
+    "images": [
+      "images/aquamarine-necklace-1.jpg",
+      "images/aquamarine-necklace-2.jpg",
+      "images/aquamarine-necklace-3.jpg",
+      "images/aquamarine-necklace-4.jpg",
+      "images/aquamarine-necklace-5.jpg"
+    ],
+    "status": "show",
+    "tag": "premium",
+    "short_description": "Vòng cổ aquamarine với màu xanh biển dịu mát, mang năng lượng bình yên và hỗ trợ giao tiếp hiệu quả.",
+    "option": [
+      {
+        "size_name": "20 cm",
+        "stock": 8,
+        "price": 3200000
+      },
+      {
+        "size_name": "25 cm",
+        "stock": 6,
+        "price": 3360000
+      },
+      {
+        "size_name": "30 cm",
+        "stock": 4,
+        "price": 3528000
+      }
+    ],
+    "description": "Vòng cổ được chế tác từ <strong>Chất liệu</strong>: Đá aquamarine - loại đá quý có màu xanh biển nhạt, tượng trưng cho sự bình yên và giao tiếp rõ ràng. <br><strong>Kích thước</strong>: Có các kích thước chu vi 20 cm, 25 cm, 30 cm, phù hợp với nhiều phong cách đeo. <br><strong>Nguồn gốc</strong>: Brazil, Madagascar, Pakistan, Nigeria. <br><strong>Lợi ích tâm linh</strong>: Kích thích luân xa cổ họng (Vishuddha), giúp cải thiện giao tiếp, tăng cường sự tự tin và mang lại sự bình tĩnh trong các tình huống căng thẳng. Đeo vòng cổ để thu hút năng lượng Thủy, hỗ trợ thiền định và sáng suốt. <br><strong>Lợi ích sức khỏe</strong>: Hỗ trợ giảm căng thẳng, cải thiện hô hấp và tăng cường sự tập trung. <br><strong>Hướng dẫn bảo quản</strong>: Tránh tiếp xúc với ánh nắng trực tiếp kéo dài để giữ màu sắc. Vệ sinh bằng nước sạch và khăn mềm, nạp năng lượng dưới ánh trăng. <br><strong>Độ cứng</strong>: 7.5 - 8/10.",
+    "views": 90,
+    "purchases": 5,
+    "createdAt": "2025-07-01T10:29:00.000Z"
+  },
+  {
+    "category": {
+      "id": "684f9ce9398a8acfc7ee1495",
+      "name_categories": "Phong thủy"
+    },
+    "level": "Trung Cấp",
+    "element": "Kim - Thổ",
+    "name": "VÒNG CỔ MẮT HỔ VÀNG",
+    "slug": "vong-co-mat-ho-vang",
+    "images": [
+      "images/tiger-eye-necklace-1.jpg",
+      "images/tiger-eye-necklace-2.jpg",
+      "images/tiger-eye-necklace-3.jpg",
+      "images/tiger-eye-necklace-4.jpg",
+      "images/tiger-eye-necklace-5.jpg"
+    ],
+    "status": "show",
+    "tag": "sale",
+    "short_description": "Vòng cổ đá mắt hổ vàng với hiệu ứng mắt mèo, mang lại sự tự tin và may mắn cho người đeo.",
+    "option": [
+      {
+        "size_name": "20 cm",
+        "stock": 10,
+        "price": 1800000
+      },
+      {
+        "size_name": "25 cm",
+        "stock": 8,
+        "price": 1890000
+      }
+    ],
+    "description": "Vòng cổ được chế tác từ <strong>Chất liệu</strong>: Đá mắt hổ vàng (Tiger Eye) - một biến thể thuộc đá thạch anh, có hiệu ứng mắt mèo và ánh lụa rực rỡ. <br><strong>Kích thước</strong>: Có các kích thước chu vi 20 cm, 25 cm, phù hợp với nhiều phong cách đeo. <br><strong>Nguồn gốc</strong>: Australia, Trung Quốc, Nam Phi, Mỹ, Việt Nam. <br><strong>Lợi ích tâm linh</strong>: Mang lại sự minh mẫn, kích thích lòng tin, dũng khí và khả năng đương đầu với khó khăn. Tác động đến luân xa thái dương, giúp đầu óc luôn sáng suốt. <br><strong>Lợi ích sức khỏe</strong>: Ổn định huyết áp, tăng cường hệ miễn dịch và cân bằng hệ nội tiết. <br><strong>Hướng dẫn bảo quản</strong>: Tránh xịt nước hoa hoặc keo cứng tóc lên vòng cổ. Bảo quản riêng, không để chung với các loại trang sức đá quý khác. Vệ sinh bằng khăn mềm thấm nước muối tự nhiên và phơi dưới ánh trăng để nạp năng lượng. <br><strong>Độ cứng</strong>: 5 - 7/10.",
+    "views": 75,
+    "purchases": 6,
+    "createdAt": "2025-07-01T10:29:00.000Z"
+  },
+  {
+    "category": {
+      "id": "684f9ce9398a8acfc7ee1495",
+      "name_categories": "Phong thủy"
+    },
+    "level": "Cao Cấp",
+    "element": "Thổ - Hỏa",
+    "name": "VÒNG CỔ THẠCH ANH TÍM",
+    "slug": "vong-co-thach-anh-tim",
+    "images": [
+      "images/amethyst-necklace-1.jpg",
+      "images/amethyst-necklace-2.jpg",
+      "images/amethyst-necklace-3.jpg",
+      "images/amethyst-necklace-4.jpg",
+      "images/amethyst-necklace-5.jpg"
+    ],
+    "status": "show",
+    "tag": "premium",
+    "short_description": "Vòng cổ thạch anh tím với màu tím sang trọng, mang lại sự bình an và trí tuệ cho người đeo.",
+    "option": [
+      {
+        "size_name": "22 cm",
+        "stock": 7,
+        "price": 2800000
+      },
+      {
+        "size_name": "27 cm",
+        "stock": 5,
+        "price": 2940000
+      },
+      {
+        "size_name": "30 cm",
+        "stock": 3,
+        "price": 3087000
+      }
+    ],
+    "description": "Vòng cổ được chế tác từ <strong>Chất liệu</strong>: Đá thạch anh tím (Amethyst) - loại đá quý với màu tím đặc trưng, tượng trưng cho sự bình an và trí tuệ. <br><strong>Kích thước</strong>: Có các kích thước chu vi 22 cm, 27 cm, 30 cm, phù hợp với nhiều phong cách đeo. <br><strong>Nguồn gốc</strong>: Brazil, Uruguay, Zambia, Nam Phi. <br><strong>Lợi ích tâm linh</strong>: Kích thích luân xa vương miện (Sahasrara), giúp tăng cường trực giác, sự tập trung và bảo vệ khỏi năng lượng tiêu cực. Đeo vòng cổ để hỗ trợ thiền định và mang lại sự bình tĩnh. <br><strong>Lợi ích sức khỏe</strong>: Hỗ trợ giảm căng thẳng, cải thiện giấc ngủ và tăng cường sự tập trung. <br><strong>Hướng dẫn bảo quản</strong>: Tránh tiếp xúc với hóa chất mạnh. Vệ sinh bằng khăn mềm thấm nước muối loãng và nạp năng lượng dưới ánh trăng rằm. <br><strong>Độ cứng</strong>: 7/10.",
+    "views": 85,
+    "purchases": 4,
+    "createdAt": "2025-07-01T10:29:00.000Z"
+  },
+  {
+    "category": {
+      "id": "684f9ce9398a8acfc7ee1495",
+      "name_categories": "Phong thủy"
+    },
+    "level": "Cao Cấp",
+    "element": "Thủy - Mộc",
+    "name": "VÒNG CỔ MẶT ĐÁ AQUAMARINE",
+    "slug": "vong-co-mat-da-aquamarine",
+    "images": [
+      "images/aquamarine-pendant-necklace-1.jpg",
+      "images/aquamarine-pendant-necklace-2.jpg",
+      "images/aquamarine-pendant-necklace-3.jpg",
+      "images/aquamarine-pendant-necklace-4.jpg",
+      "images/aquamarine-pendant-necklace-5.jpg"
+    ],
+    "status": "show",
+    "tag": "premium",
+    "short_description": "Vòng cổ với mặt đá aquamarine, mang màu xanh biển dịu mát, tượng trưng cho sự bình yên và giao tiếp hiệu quả.",
+    "option": [
+      {
+        "size_name": "Mặt đá 2 cm - Chu vi 20 cm",
+        "stock": 8,
+        "price": 3500000
+      },
+      {
+        "size_name": "Mặt đá 2 cm - Chu vi 22 cm",
+        "stock": 8,
+        "price": 3500000
+      },
+      {
+        "size_name": "Mặt đá 2 cm - Chu vi 25 cm",
+        "stock": 7,
+        "price": 3500000
+      },
+      {
+        "size_name": "Mặt đá 2 cm - Chu vi 30 cm",
+        "stock": 6,
+        "price": 3500000
+      },
+      {
+        "size_name": "Mặt đá 3 cm - Chu vi 20 cm",
+        "stock": 6,
+        "price": 3850000
+      },
+      {
+        "size_name": "Mặt đá 3 cm - Chu vi 22 cm",
+        "stock": 6,
+        "price": 3850000
+      },
+      {
+        "size_name": "Mặt đá 3 cm - Chu vi 25 cm",
+        "stock": 5,
+        "price": 3850000
+      },
+      {
+        "size_name": "Mặt đá 3 cm - Chu vi 30 cm",
+        "stock": 4,
+        "price": 3850000
+      },
+      {
+        "size_name": "Mặt đá 4 cm - Chu vi 20 cm",
+        "stock": 4,
+        "price": 4235000
+      },
+      {
+        "size_name": "Mặt đá 4 cm - Chu vi 22 cm",
+        "stock": 4,
+        "price": 4235000
+      },
+      {
+        "size_name": "Mặt đá 4 cm - Chu vi 25 cm",
+        "stock": 3,
+        "price": 4235000
+      },
+      {
+        "size_name": "Mặt đá 4 cm - Chu vi 30 cm",
+        "stock": 3,
+        "price": 4235000
+      }
+    ],
+    "description": "Vòng cổ được chế tác từ <strong>Chất liệu</strong>: Mặt đá aquamarine - loại đá quý có màu xanh biển nhạt, được đính trên dây đeo bạc cao cấp. <br><strong>Kích thước</strong>: Mặt đá có kích thước cao 2 cm, 3 cm, hoặc 4 cm; chu vi vòng cổ có các kích thước 20 cm, 22 cm, 25 cm, 30 cm, phù hợp với nhiều phong cách đeo. <br><strong>Nguồn gốc</strong>: Brazil, Madagascar, Pakistan, Nigeria. <br><strong>Lợi ích tâm linh</strong>: Kích thích luân xa cổ họng (Vishuddha), giúp cải thiện giao tiếp, tăng cường sự tự tin và mang lại sự bình tĩnh trong các tình huống căng thẳng. Đeo vòng cổ để thu hút năng lượng Thủy, hỗ trợ thiền định và sáng suốt. <br><strong>Lợi ích sức khỏe</strong>: Hỗ trợ giảm căng thẳng, cải thiện hô hấp và tăng cường sự tập trung. <br><strong>Hướng dẫn bảo quản</strong>: Tránh tiếp xúc với ánh nắng trực tiếp kéo dài để giữ màu sắc mặt đá. Vệ sinh bằng nước sạch và khăn mềm, nạp năng lượng dưới ánh trăng. <br><strong>Độ cứng</strong>: 7.5 - 8/10.",
+    "views": 100,
+    "purchases": 6,
+    "createdAt": "2025-07-01T10:33:00.000Z"
+  },
+  {
+    "category": {
+      "id": "684f9ce9398a8acfc7ee1495",
+      "name_categories": "Phong thủy"
+    },
+    "level": "Trung Cấp",
+    "element": "Kim - Thổ",
+    "name": "VÒNG CỔ MẶT ĐÁ MẮT HỔ VÀNG",
+    "slug": "vong-co-mat-da-mat-ho-vang",
+    "images": [
+      "images/tiger-eye-pendant-necklace-1.jpg",
+      "images/tiger-eye-pendant-necklace-2.jpg",
+      "images/tiger-eye-pendant-necklace-3.jpg",
+      "images/tiger-eye-pendant-necklace-4.jpg",
+      "images/tiger-eye-pendant-necklace-5.jpg"
+    ],
+    "status": "show",
+    "tag": "sale",
+    "short_description": "Vòng cổ với mặt đá mắt hổ vàng, mang hiệu ứng mắt mèo rực rỡ, đem lại sự tự tin và may mắn.",
+    "option": [
+      {
+        "size_name": "Mặt đá 2 cm - Chu vi 20 cm",
+        "stock": 10,
+        "price": 2000000
+      },
+      {
+        "size_name": "Mặt đá 2 cm - Chu vi 22 cm",
+        "stock": 10,
+        "price": 2000000
+      },
+      {
+        "size_name": "Mặt đá 2 cm - Chu vi 25 cm",
+        "stock": 9,
+        "price": 2000000
+      },
+      {
+        "size_name": "Mặt đá 3 cm - Chu vi 20 cm",
+        "stock": 8,
+        "price": 2200000
+      },
+      {
+        "size_name": "Mặt đá 3 cm - Chu vi 22 cm",
+        "stock": 8,
+        "price": 2200000
+      },
+      {
+        "size_name": "Mặt đá 3 cm - Chu vi 25 cm",
+        "stock": 7,
+        "price": 2200000
+      },
+      {
+        "size_name": "Mặt đá 4 cm - Chu vi 20 cm",
+        "stock": 6,
+        "price": 2420000
+      },
+      {
+        "size_name": "Mặt đá 4 cm - Chu vi 22 cm",
+        "stock": 6,
+        "price": 2420000
+      },
+      {
+        "size_name": "Mặt đá 4 cm - Chu vi 25 cm",
+        "stock": 5,
+        "price": 2420000
+      }
+    ],
+    "description": "Vòng cổ được chế tác từ <strong>Chất liệu</strong>: Mặt đá mắt hổ vàng (Tiger Eye) - một biến thể thuộc đá thạch anh, có hiệu ứng mắt mèo và ánh lụa rực rỡ, được đính trên dây đeo bạc cao cấp. <br><strong>Kích thước</strong>: Mặt đá có kích thước cao 2 cm, 3 cm, hoặc 4 cm; chu vi vòng cổ có các kích thước 20 cm, 22 cm, 25 cm, phù hợp với nhiều phong cách đeo. <br><strong>Nguồn gốc</strong>: Australia, Trung Quốc, Nam Phi, Mỹ, Việt Nam. <br><strong>Lợi ích tâm linh</strong>: Mang lại sự minh mẫn, kích thích lòng tin, dũng khí và khả năng đương đầu với khó khăn. Tác động đến luân xa thái dương, giúp đầu óc luôn sáng suốt. <br><strong>Lợi ích sức khỏe</strong>: Ổn định huyết áp, tăng cường hệ miễn dịch và cân bằng hệ nội tiết. <br><strong>Hướng dẫn bảo quản</strong>: Tránh xịt nước hoa hoặc keo cứng tóc lên mặt đá. Vệ sinh bằng khăn mềm thấm nước muối tự nhiên và phơi dưới ánh trăng để nạp năng lượng. <br><strong>Độ cứng</strong>: 5 - 7/10.",
+    "views": 75,
+    "purchases": 6,
+    "createdAt": "2025-07-01T10:33:00.000Z"
+  },
+  {
+    "category": {
+      "id": "684f9ce9398a8acfc7ee1495",
+      "name_categories": "Phong thủy"
+    },
+    "level": "Cao Cấp",
+    "element": "Thổ - Hỏa",
+    "name": "VÒNG CỔ MẶT ĐÁ THẠCH ANH TÍM",
+    "slug": "vong-co-mat-da-thach-anh-tim",
+    "images": [
+      "images/amethyst-pendant-necklace-1.jpg",
+      "images/amethyst-pendant-necklace-2.jpg",
+      "images/amethyst-pendant-necklace-3.jpg",
+      "images/amethyst-pendant-necklace-4.jpg",
+      "images/amethyst-pendant-necklace-5.jpg"
+    ],
+    "status": "show",
+    "tag": "premium",
+    "short_description": "Vòng cổ với mặt đá thạch anh tím, mang màu tím sang trọng, đem lại sự bình an và trí tuệ.",
+    "option": [
+      {
+        "size_name": "Mặt đá 2 cm - Chu vi 22 cm",
+        "stock": 7,
+        "price": 2800000
+      },
+      {
+        "size_name": "Mặt đá 2 cm - Chu vi 25 cm",
+        "stock": 7,
+        "price": 2800000
+      },
+      {
+        "size_name": "Mặt đá 2 cm - Chu vi 30 cm",
+        "stock": 6,
+        "price": 2800000
+      },
+      {
+        "size_name": "Mặt đá 3 cm - Chu vi 22 cm",
+        "stock": 5,
+        "price": 3080000
+      },
+      {
+        "size_name": "Mặt đá 3 cm - Chu vi 25 cm",
+        "stock": 5,
+        "price": 3080000
+      },
+      {
+        "size_name": "Mặt đá 3 cm - Chu vi 30 cm",
+        "stock": 4,
+        "price": 3080000
+      },
+      {
+        "size_name": "Mặt đá 4 cm - Chu vi 22 cm",
+        "stock": 4,
+        "price": 3388000
+      },
+      {
+        "size_name": "Mặt đá 4 cm - Chu vi 25 cm",
+        "stock": 4,
+        "price": 3388000
+      },
+      {
+        "size_name": "Mặt đá 4 cm - Chu vi 30 cm",
+        "stock": 3,
+        "price": 3388000
+      }
+    ],
+    "description": "Vòng cổ được chế tác từ <strong>Chất liệu</strong>: Mặt đá thạch anh tím (Amethyst) - loại đá quý với màu tím đặc trưng, tượng trưng cho sự bình an và trí tuệ, được đính trên dây đeo bạc cao cấp. <br><strong>Kích thước</strong>: Mặt đá có kích thước cao 2 cm, 3 cm, hoặc 4 cm; chu vi vòng cổ có các kích thước 22 cm, 25 cm, 30 cm, phù hợp với nhiều phong cách đeo. <br><strong>Nguồn gốc</strong>: Brazil, Uruguay, Zambia, Nam Phi. <br><strong>Lợi ích tâm linh</strong>: Kích thích luân xa vương miện (Sahasrara), giúp tăng cường trực giác, sự tập trung và bảo vệ khỏi năng lượng tiêu cực. Đeo vòng cổ để hỗ trợ thiền định và mang lại sự bình tĩnh. <br><strong>Lợi ích sức khỏe</strong>: Hỗ trợ giảm căng thẳng, cải thiện giấc ngủ và tăng cường sự tập trung. <br><strong>Hướng dẫn bảo quản</strong>: Tránh tiếp xúc với hóa chất mạnh. Vệ sinh bằng khăn mềm thấm nước muối loãng và nạp năng lượng dưới ánh trăng rằm. <br><strong>Độ cứng</strong>: 7/10.",
+    "views": 85,
+    "purchases": 4,
+    "createdAt": "2025-07-01T10:33:00.000Z"
+  }
+]

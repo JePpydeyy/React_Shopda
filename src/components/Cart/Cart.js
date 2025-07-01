@@ -16,8 +16,8 @@ const Cart = () => {
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   const [toastType, setToastType] = useState('success');
-  const [showPopup, setShowPopup] = useState(false); // State cho popup
-  const [itemToRemove, setItemToRemove] = useState(null); // Lưu index sản phẩm cần xóa
+  const [showPopup, setShowPopup] = useState(false);
+  const [itemToRemove, setItemToRemove] = useState(null);
   const navigate = useNavigate();
 
   // Fetch cart items from localStorage
@@ -25,7 +25,6 @@ const Cart = () => {
     const cart = JSON.parse(localStorage.getItem('cart_da')) || [];
     setCartItems(cart);
 
-    // Xóa mã giảm giá khi tải lại trang
     setAppliedDiscount(null);
     localStorage.removeItem('applied_discount');
     setErrorMessage('');
@@ -220,7 +219,7 @@ const Cart = () => {
                             <h3>{item.name}</h3>
                             <div className={styles.charmInfo}>Charm: {item.charm}</div>
                             {/* <div className={styles.sizeInfo}>Size Viên Đá: {item.stoneSize}</div> */}
-                            <div className={styles.sizeInfo}>Size Tay: {item.wristSize}</div>
+                            <div className={styles.sizeInfo}>Size: {item.size_name}</div>
                           </div>
                         </div>
                       </td>
@@ -280,7 +279,7 @@ const Cart = () => {
                         <h3>{item.name}</h3>
                         <div className={styles.charmInfo}>Charm: {item.charm}</div>
                         {/* <div className={styles.sizeInfo}>Size Viên Đá: {item.stoneSize}</div> */}
-                        <div className={styles.sizeInfo}>Size Tay: {item.wristSize}</div>
+                        <div className={styles.sizeInfo}>Size: {item.size_name}</div>
                       </div>
                     </div>
                     <button

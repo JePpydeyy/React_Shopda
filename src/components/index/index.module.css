@@ -136,11 +136,11 @@
 }
 
 .collectionCard:hover .shopNowBtn {
-  color:#3457a0;
+  
   opacity: 1;
   transform: translateY(0);
 }
-
+  
 .shopNowBtn:hover {
   color:#3457a0;
   background: #f8f9fa;

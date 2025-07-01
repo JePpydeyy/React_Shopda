@@ -27,7 +27,6 @@ const OrderManagement = () => {
         const res = await axios.get(`${API_URL}/order`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        // Sắp xếp đơn hàng mới nhất lên đầu
         const sortedOrders = res.data.sort(
           (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
         );
@@ -56,8 +55,29 @@ const OrderManagement = () => {
     currentPage * ORDERS_PER_PAGE
   );
 
-  // Lấy danh sách trạng thái duy nhất
-  const statuses = Array.from(new Set(orders.map((o) => o.status)));
+  // Danh sách trạng thái
+  const statuses = [
+    'Chờ xử lý',
+    'Đang giao',
+    'Đã giao',
+    'Đã hủy',
+    'Đang hoàn',
+    'Đã hoàn',
+  ];
+
+  // Logic xác định trạng thái tiếp theo hợp lệ
+  const getNextStatuses = (currentStatus) => {
+    switch (currentStatus) {
+      case 'Chờ xử lý':
+        return ['Đang giao', 'Đã hủy'];
+      case 'Đang giao':
+        return ['Đã giao'];
+      case 'Đã giao':
+        return ['Đang hoàn', 'Đã hoàn'];
+      default:
+        return [];
+    }
+  };
 
   // Đổi trạng thái đơn hàng
   const handleUpdateStatus = async (id, newStatus) => {
@@ -81,10 +101,6 @@ const OrderManagement = () => {
 
   // Xem chi tiết đơn hàng
   const handleView = async (id) => {
-    if (selectedOrder?._id === id) {
-      setSelectedOrder(null); // Toggle ẩn nếu đã chọn
-      return;
-    }
     setDetailLoading(true);
     try {
       const token = localStorage.getItem('adminToken');
@@ -97,6 +113,11 @@ const OrderManagement = () => {
     } finally {
       setDetailLoading(false);
     }
+  };
+
+  // Đóng popup
+  const closePopup = () => {
+    setSelectedOrder(null);
   };
 
   // In đơn hàng
@@ -117,6 +138,7 @@ const OrderManagement = () => {
           <thead>
             <tr style="border-bottom: 1px solid #ccc;">
               <th style="text-align: left; padding: 8px;">Tên sản phẩm</th>
+              <th style="text-align: left; padding: 8px;">Kích thước</th>
               <th style="text-align: left; padding: 8px;">Số lượng</th>
               <th style="text-align: left; padding: 8px;">Đơn giá</th>
               <th style="text-align: left; padding: 8px;">Thành tiền</th>
@@ -128,6 +150,7 @@ const OrderManagement = () => {
                 (item) => `
               <tr style="border-bottom: 1px solid #ccc;">
                 <td style="padding: 8px;">${item.productName}</td>
+                <td style="padding: 8px;">${item.size_name}</td>
                 <td style="padding: 8px;">${item.quantity}</td>
                 <td style="padding: 8px;">${item.price.toLocaleString()} VNĐ</td>
                 <td style="padding: 8px;">${(item.price * item.quantity).toLocaleString()} VNĐ</td>
@@ -166,7 +189,7 @@ const OrderManagement = () => {
   // Xử lý chuyển trang
   const handlePageChange = (page) => {
     setCurrentPage(page);
-    setSelectedOrder(null); // Reset selected order when changing page
+    setSelectedOrder(null);
   };
 
   return (
@@ -209,7 +232,6 @@ const OrderManagement = () => {
               <thead>
                 <tr className={styles.tableHeader}>
                   <th>STT</th>
-                  {/* <th>Mã đơn</th> */}
                   <th>Khách hàng</th>
                   <th>Tổng tiền</th>
                   <th>Trạng thái</th>
@@ -219,89 +241,96 @@ const OrderManagement = () => {
               </thead>
               <tbody>
                 {paginatedOrders.map((order, idx) => (
-                  <React.Fragment key={order._id}>
-                    <tr
-                      className={`${styles.tableRow} ${selectedOrder?._id === order._id ? styles.activeRow : ''}`}
-                      onClick={() => handleView(order._id)}
-                    >
-                      <td>{(currentPage - 1) * ORDERS_PER_PAGE + idx + 1}</td>
-                      {/* <td>{order._id}</td> */}
-                      <td>{order.fullName}</td>
-                      <td>{order.grandTotal?.toLocaleString() || order.totalAmount?.toLocaleString()} VNĐ</td>
-                      <td>{order.status}</td>
-                      <td>{new Date(order.createdAt).toLocaleDateString('vi-VN')}</td>
-                      <td>
-                        <select
-                          className={styles.statusSelect}
-                          value={order.status}
-                          onChange={(e) => {
-                            e.stopPropagation();
-                            handleUpdateStatus(order._id, e.target.value);
-                          }}
-                        >
-                          <option value="Chờ xử lý">Chờ xử lý</option>
-                          <option value="Đang giao">Đang giao</option>
-                          <option value="Đã giao">Đã giao</option>
-                          <option value="Đã hủy">Đã hủy</option>
-                        </select>
-                      </td>
-                    </tr>
-                    {selectedOrder?._id === order._id && (
-                      <tr className={styles.detailRow}>
-                        <td colSpan="7">
-                          {detailLoading ? (
-                            <div className={styles.loading}>Đang tải chi tiết...</div>
-                          ) : (
-                            <div className={styles.detailContainer}>
-                              {/* <p><strong>Mã đơn:</strong> {selectedOrder._id}</p> */}
-                              <p><strong>Khách hàng:</strong> {selectedOrder.fullName}</p>
-                              <p><strong>Ngày sinh:</strong> {new Date(selectedOrder.dateOfBirth).toLocaleDateString('vi-VN')}</p>
-                              <p><strong>SĐT:</strong> {selectedOrder.phoneNumber}</p>
-                              <p><strong>Email:</strong> {selectedOrder.email}</p>
-                              <p><strong>Địa chỉ:</strong> {`${selectedOrder.address}, ${selectedOrder.ward}, ${selectedOrder.district}, ${selectedOrder.city}, ${selectedOrder.country}`}</p>
-                              <p><strong>Ghi chú:</strong> {selectedOrder.orderNote || 'Không có'}</p>
-                              <p><strong>Trạng thái:</strong> {selectedOrder.status}</p>
-                              <p><strong>Ngày đặt:</strong> {new Date(selectedOrder.createdAt).toLocaleDateString('vi-VN')}</p>
-                              <h3>Sản phẩm:</h3>
-                              <table className={styles.detailTable}>
-                                <thead>
-                                  <tr>
-                                    <th>Tên sản phẩm</th>
-                                    <th>Số lượng</th>
-                                    <th>Đơn giá</th>
-                                    <th>Thành tiền</th>
-                                  </tr>
-                                </thead>
-                                <tbody>
-                                  {selectedOrder.products.map((item, idx) => (
-                                    <tr key={idx}>
-                                      <td>{item.productName}</td>
-                                      <td>{item.quantity}</td>
-                                      <td>{item.price.toLocaleString()} VNĐ</td>
-                                      <td>{(item.price * item.quantity).toLocaleString()} VNĐ</td>
-                                    </tr>
-                                  ))}
-                                </tbody>
-                              </table>
-                              <p><strong>Tổng tiền:</strong> {selectedOrder.totalAmount.toLocaleString()} VNĐ</p>
-                              <p><strong>Thành tiền cuối:</strong> {selectedOrder.grandTotal.toLocaleString()} VNĐ</p>
-                              <button
-                                className={styles.printButton}
-                                onClick={() => handlePrint(selectedOrder)}
-                              >
-                                In đơn hàng
-                              </button>
-                            </div>
-                          )}
-                        </td>
-                      </tr>
-                    )}
-                  </React.Fragment>
+                  <tr
+                    key={order._id}
+                    className={styles.tableRow}
+                    onClick={() => handleView(order._id)}
+                  >
+                    <td>{(currentPage - 1) * ORDERS_PER_PAGE + idx + 1}</td>
+                    <td>{order.fullName}</td>
+                    <td>{order.grandTotal?.toLocaleString() || order.totalAmount?.toLocaleString()} VNĐ</td>
+                    <td>{order.status}</td>
+                    <td>{new Date(order.createdAt).toLocaleDateString('vi-VN')}</td>
+                    <td>
+                      <select
+                        className={styles.statusSelect}
+                        value={order.status}
+                        onChange={(e) => {
+                          e.stopPropagation();
+                          handleUpdateStatus(order._id, e.target.value);
+                        }}
+                      >
+                        <option value={order.status}>{order.status}</option>
+                        {getNextStatuses(order.status).map((status) => (
+                          <option key={status} value={status}>
+                            {status}
+                          </option>
+                        ))}
+                      </select>
+                    </td>
+                  </tr>
                 ))}
               </tbody>
             </table>
           )}
         </div>
+
+        {/* Popup chi tiết đơn hàng */}
+        {selectedOrder && (
+          <div className={styles.popupOverlay}>
+            <div className={styles.popup}>
+              <button className={styles.closeButton} onClick={closePopup}>
+                &times;
+              </button>
+              {detailLoading ? (
+                <div className={styles.loading}>Đang tải chi tiết...</div>
+              ) : (
+                <div className={styles.detailContainer}>
+                  <h2>Chi tiết đơn hàng</h2>
+                  <p><strong>Khách hàng:</strong> {selectedOrder.fullName}</p>
+                  <p><strong>Ngày sinh:</strong> {new Date(selectedOrder.dateOfBirth).toLocaleDateString('vi-VN')}</p>
+                  <p><strong>SĐT:</strong> {selectedOrder.phoneNumber}</p>
+                  <p><strong>Email:</strong> {selectedOrder.email}</p>
+                  <p><strong>Địa chỉ:</strong> {`${selectedOrder.address}, ${selectedOrder.ward}, ${selectedOrder.district}, ${selectedOrder.city}, ${selectedOrder.country}`}</p>
+                  <p><strong>Ghi chú:</strong> {selectedOrder.orderNote || 'Không có'}</p>
+                  <p><strong>Trạng thái:</strong> {selectedOrder.status}</p>
+                  <p><strong>Ngày đặt:</strong> {new Date(selectedOrder.createdAt).toLocaleDateString('vi-VN')}</p>
+                  <h3>Sản phẩm:</h3>
+                  <table className={styles.detailTable}>
+                    <thead>
+                      <tr>
+                        <th>Tên sản phẩm</th>
+                        <th>Kích thước</th>
+                        <th>Số lượng</th>
+                        <th>Đơn giá</th>
+                        <th>Thành tiền</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {selectedOrder.products.map((item, idx) => (
+                        <tr key={idx}>
+                          <td>{item.productName}</td>
+                          <td>{item.size_name}</td>
+                          <td>{item.quantity}</td>
+                          <td>{item.price.toLocaleString()} VNĐ</td>
+                          <td>{(item.price * item.quantity).toLocaleString()} VNĐ</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                  <p><strong>Tổng tiền:</strong> {selectedOrder.totalAmount.toLocaleString()} VNĐ</p>
+                  <p><strong>Thành tiền cuối:</strong> {selectedOrder.grandTotal.toLocaleString()} VNĐ</p>
+                  <button
+                    className={styles.printButton}
+                    onClick={() => handlePrint(selectedOrder)}
+                  >
+                    In đơn hàng
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* Pagination */}
         {totalPages > 1 && (
