@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import styles from './Checkout.module.css';
 import ToastNotification from '../ToastNotification/ToastNotification';
@@ -7,7 +7,6 @@ import ToastNotification from '../ToastNotification/ToastNotification';
 const API_BASE_URL = process.env.REACT_APP_API_URL;
 
 const Checkout = () => {
-  // State declarations
   const [formData, setFormData] = useState({
     fullName: '',
     selectedDate: null,
@@ -35,13 +34,26 @@ const Checkout = () => {
   const [billInfo, setBillInfo] = useState(null);
   const [billCart, setBillCart] = useState([]);
   const [billDiscount, setBillDiscount] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const monthNames = ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6', 'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'];
   const calendarRef = useRef(null);
   const navigate = useNavigate();
+  const location = useLocation();
 
-  // Fetch provinces, districts, and wards
+  // Load cart and discount from location state, save discount to localStorage
   useEffect(() => {
+    const cart = JSON.parse(localStorage.getItem('cart_da')) || [];
+    setCartItems(cart);
+    const discount = location.state?.appliedDiscount || null;
+    if (discount && discount.code && discount.discountPercentage && discount.grandTotal) {
+      setAppliedDiscount(discount);
+      localStorage.setItem('applied_discount', JSON.stringify(discount));
+    } else {
+      setAppliedDiscount(null);
+      localStorage.removeItem('applied_discount');
+    }
+
     const fetchProvinces = async () => {
       try {
         const response = await fetch('https://provinces.open-api.vn/api/p/');
@@ -54,13 +66,9 @@ const Checkout = () => {
       }
     };
     fetchProvinces();
+  }, [location.state]);
 
-    const cart = JSON.parse(localStorage.getItem('cart_da')) || [];
-    const discount = JSON.parse(localStorage.getItem('applied_discount')) || null;
-    setCartItems(cart);
-    setAppliedDiscount(discount);
-  }, []);
-
+  // Fetch districts when province changes
   useEffect(() => {
     if (formData.province) {
       const fetchDistricts = async () => {
@@ -80,6 +88,7 @@ const Checkout = () => {
     }
   }, [formData.province]);
 
+  // Fetch wards when district changes
   useEffect(() => {
     if (formData.district) {
       const fetchWards = async () => {
@@ -98,6 +107,7 @@ const Checkout = () => {
     }
   }, [formData.district]);
 
+  // Handle calendar click outside
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (calendarRef.current && !calendarRef.current.contains(e.target)) {
@@ -112,7 +122,7 @@ const Checkout = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [showCalendar]);
 
-  // Render calendar
+  // Render calendar dates
   const renderCalendar = () => {
     const firstDay = new Date(currentYear, currentMonth, 1);
     const lastDay = new Date(currentYear, currentMonth + 1, 0);
@@ -139,6 +149,7 @@ const Checkout = () => {
     return dates;
   };
 
+  // Set calendar to today
   const setToday = () => {
     const today = new Date();
     setCurrentMonth(today.getMonth());
@@ -147,19 +158,26 @@ const Checkout = () => {
     setShowCalendar(false);
   };
 
+  // Format price in VND
   const formatPrice = (price) => new Intl.NumberFormat('vi-VN').format(price) + ' VND';
 
   // Handle order submission
   const handleOrder = async () => {
-    // Validate required fields
-    if (!formData.fullName || !formData.phone || !formData.email || !formData.country || !formData.province || !formData.district || !formData.ward || !formData.addressDetail) {
-      setToastMessage('Vui lòng nhập đầy đủ thông tin bắt buộc.');
+    const errors = [];
+    if (!formData.fullName) errors.push('Họ và tên');
+    if (!formData.phone) errors.push('Số điện thoại');
+    if (!formData.email) errors.push('Email');
+    if (!formData.province) errors.push('Tỉnh/Thành phố');
+    if (!formData.district) errors.push('Quận/Huyện');
+    if (!formData.ward) errors.push('Xã/Phường');
+    if (!formData.addressDetail) errors.push('Địa chỉ chi tiết');
+    if (errors.length > 0) {
+      setToastMessage(`Vui lòng nhập: ${errors.join(', ')}.`);
       setToastType('error');
       setShowToast(true);
       return;
     }
 
-    // Validate phone and email
     const phoneRegex = /^\d{10,11}$/;
     if (!phoneRegex.test(formData.phone)) {
       setToastMessage('Số điện thoại không hợp lệ (10-11 chữ số).');
@@ -174,7 +192,12 @@ const Checkout = () => {
       setShowToast(true);
       return;
     }
-
+    if (formData.selectedDate && formData.selectedDate > new Date()) {
+      setToastMessage('Ngày sinh không được là ngày trong tương lai.');
+      setToastType('error');
+      setShowToast(true);
+      return;
+    }
     if (cartItems.length === 0) {
       setToastMessage('Giỏ hàng trống! Vui lòng thêm sản phẩm trước khi đặt hàng.');
       setToastType('error');
@@ -182,8 +205,17 @@ const Checkout = () => {
       return;
     }
 
-    // Construct order data
     const subtotal = cartItems.reduce((sum, item) => sum + (parseFloat(item.price) || 0) * (parseInt(item.quantity) || 1), 0);
+    if (appliedDiscount && Math.abs(subtotal * (1 - appliedDiscount.discountPercentage / 100) - appliedDiscount.grandTotal) > 0.01) {
+      setToastMessage('Tổng tiền giảm giá không khớp, vui lòng kiểm tra lại mã giảm giá.');
+      setToastType('error');
+      setShowToast(true);
+      setAppliedDiscount(null);
+      localStorage.removeItem('applied_discount');
+      return;
+    }
+
+    setIsLoading(true);
     const orderData = {
       fullName: formData.fullName.trim(),
       dateOfBirth: formData.selectedDate ? formData.selectedDate.toISOString() : null,
@@ -192,7 +224,7 @@ const Checkout = () => {
       country: 'Việt Nam',
       city: provinces.find(p => p.code === parseInt(formData.province))?.name || '',
       district: districts.find(d => d.code === parseInt(formData.district))?.name || '',
-      ward: wards.find(w => w.code === parseInt(formData.ward))?.name || '',
+      ward: wards.find(w => w.code === parseInt(formData.ward))?.code || '',
       address: formData.addressDetail.trim(),
       orderNote: formData.note ? formData.note.trim() : '',
       products: cartItems.map(item => ({
@@ -208,8 +240,7 @@ const Checkout = () => {
     };
 
     try {
-      const response = await axios.post(`${API_BASE_URL}/orders`, orderData);
-      // Lưu thông tin bill
+      const response = await axios.post(`${API_BASE_URL}/order`, orderData);
       setBillInfo({
         ...formData,
         provinceName: provinces.find(p => p.code === parseInt(formData.province))?.name || '',
@@ -219,7 +250,6 @@ const Checkout = () => {
       setBillCart([...cartItems]);
       setBillDiscount(appliedDiscount);
 
-      // Xóa dữ liệu sau khi đặt hàng thành công
       localStorage.removeItem('cart_da');
       localStorage.removeItem('applied_discount');
       setCartItems([]);
@@ -239,7 +269,7 @@ const Checkout = () => {
       setDistricts([]);
       setWards([]);
       setOrderSuccess(true);
-      setToastMessage('Đặt hàng thành công!');
+      setToastMessage('Đặt hàng thành công! Đơn hàng đã được ghi nhận.');
       setToastType('success');
       setShowToast(true);
     } catch (error) {
@@ -247,19 +277,22 @@ const Checkout = () => {
       setToastMessage(error.response?.data?.message || 'Có lỗi xảy ra khi đặt hàng.');
       setToastType('error');
       setShowToast(true);
+    } finally {
+      setIsLoading(false);
     }
   };
 
+  // Close toast notification
   const handleToastClose = () => {
     setShowToast(false);
   };
 
-  // Tính toán cho hiển thị
+  // Calculate totals
   const subtotal = cartItems.reduce((sum, item) => sum + (parseFloat(item.price) || 0) * (parseInt(item.quantity) || 1), 0);
   const discountAmount = appliedDiscount ? (subtotal * (appliedDiscount.discountPercentage || 0)) / 100 : 0;
   const grandTotal = appliedDiscount ? appliedDiscount.grandTotal : subtotal;
 
-  // Success page
+  // Success page rendering
   if (orderSuccess) {
     const billSubtotal = billCart.reduce((sum, item) => sum + (parseFloat(item.price) || 0) * (parseInt(item.quantity) || 1), 0);
     const billDiscountAmount = billDiscount ? (billSubtotal * (billDiscount.discountPercentage || 0)) / 100 : 0;
@@ -282,6 +315,7 @@ const Checkout = () => {
               {billInfo?.districtName && `, ${billInfo.districtName}`}
               {billInfo?.provinceName && `, ${billInfo.provinceName}`}
             </p>
+            {billInfo?.note && <p><b>Ghi chú:</b> {billInfo.note}</p>}
           </div>
           <table className={styles.billTable}>
             <thead>
@@ -314,7 +348,7 @@ const Checkout = () => {
             <p>Tổng cộng: <b>{formatPrice(billGrandTotal)}</b></p>
             <p>Giao hàng: <b>Miễn phí vận chuyển</b></p>
           </div>
-          <p style={{ marginTop: 16 }}>Đơn hàng của bạn đã được ghi nhận. Vui lòng để ý điện thoại, nhân viên sẽ liên hệ xác nhận trong 2-3 ngày tới.</p>
+          <p style={{ marginTop: 16 }}>Đơn hàng của bạn đã được ghi nhận. Vui lòng để ý điện thoại, nhân viên sẽ liên hệ xác nhận trong 1-2 ngày tới.</p>
           <div style={{ marginTop: 24 }}>
             <button className={styles.successBtn} onClick={() => navigate('/')}>Về trang chủ</button>
           </div>
@@ -323,51 +357,34 @@ const Checkout = () => {
     );
   }
 
+  // Checkout form rendering
   return (
     <div className={styles.container}>
-      <h1 className={styles.container}>Đặt Hàng</h1>
+      <h1>Đặt Hàng</h1>
       <div className={styles.formContainer}>
         <div className={styles.customerInfo}>
-          <h2 className={styles.customerInfo}>THÔNG TIN KHÁCH HÀNG</h2>
-          <p className={styles.error} style={{ display: !formData.fullName || !formData.phone || !formData.email || !formData.country || !formData.province || !formData.district || !formData.ward || !formData.addressDetail ? 'block' : 'none' }}>
-            Vui lòng nhập đầy đủ thông tin bắt buộc.
-          </p>
+          <h2>THÔNG TIN KHÁCH HÀNG</h2>
+          
           <div className={styles.formGroup}>
-            <label htmlFor="full-name" className={styles.formGroup}>Họ và tên *</label>
+            <label htmlFor="full-name">Họ và tên *</label>
             <input
               type="text"
               id="full-name"
               value={formData.fullName}
               onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
               placeholder="Họ tên của bạn"
-              className={styles.formGroup}
             />
           </div>
           <div className={styles.formGroup}>
-            <label htmlFor="birth-date" className={styles.formGroup}>Ngày sinh (không bắt buộc)</label>
             <div className={styles.datePicker} ref={calendarRef}>
-              <input
-                type="text"
-                id="selected-date"
-                value={formData.selectedDate ? `${formData.selectedDate.getDate()} ${monthNames[formData.selectedDate.getMonth()]} ${formData.selectedDate.getFullYear()}` : ''}
-                placeholder="Chọn ngày sinh (không bắt buộc)"
-                readOnly
-                className={styles.datePicker}
-              />
-              <button
-                className={styles.calendarBtn}
-                onClick={() => setShowCalendar(!showCalendar)}
-              >
-                📅
-              </button>
+                
               {showCalendar && (
-                <div className={styles.calendarPopup} style={{ display: showCalendar ? 'block' : 'none' }}>
+                <div className={styles.calendarPopup}>
                   <div className={styles.calendarHeader}>
                     <select
                       id="month-select"
                       value={currentMonth}
                       onChange={(e) => setCurrentMonth(parseInt(e.target.value))}
-                      className={styles.calendarHeader}
                     >
                       {monthNames.map((month, index) => (
                         <option key={index} value={index}>{month}</option>
@@ -377,14 +394,13 @@ const Checkout = () => {
                       id="year-select"
                       value={currentYear}
                       onChange={(e) => setCurrentYear(parseInt(e.target.value))}
-                      className={styles.calendarHeader}
                     >
                       {Array.from({ length: new Date().getFullYear() - 1899 }, (_, i) => new Date().getFullYear() - i).map(year => (
                         <option key={year} value={year}>{year}</option>
                       ))}
                     </select>
-                    <button onClick={setToday} className={styles.calendarHeader}>Hôm nay</button>
-                    <button onClick={() => setShowCalendar(false)} className={styles.calendarHeader}>Đóng</button>
+                    <button onClick={setToday}>Hôm nay</button>
+                    <button onClick={() => setShowCalendar(false)}>Đóng</button>
                   </div>
                   <div className={styles.calendarDays}>
                     <div>H</div><div>B</div><div>T</div><div>N</div><div>S</div><div>B</div><div>C</div>
@@ -398,47 +414,43 @@ const Checkout = () => {
           </div>
           <div className={`${styles.formGroup} ${styles.mergeForms}`}>
             <div className={styles.sdt}>
-              <label htmlFor="phone" className={styles.formGroup}>Số điện thoại *</label>
+              <label htmlFor="phone">Số điện thoại *</label>
               <input
                 type="tel"
                 id="phone"
                 value={formData.phone}
                 onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                 placeholder="Số điện thoại của bạn"
-                className={styles.formGroup}
               />
             </div>
             <div className={styles.email}>
-              <label htmlFor="email" className={styles.formGroup}>Email *</label>
+              <label htmlFor="email">Email *</label>
               <input
                 type="email"
                 id="email"
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 placeholder="Email của bạn"
-                className={styles.formGroup}
               />
             </div>
           </div>
           <div className={`${styles.formGroup} ${styles.mergeForms}`}>
             <div className={styles.country}>
-              <label htmlFor="country" className={styles.formGroup}>Quốc gia *</label>
+              <label htmlFor="country">Quốc gia *</label>
               <select
                 id="country"
                 value={formData.country}
                 onChange={(e) => setFormData({ ...formData, country: e.target.value })}
-                className={styles.formGroup}
               >
                 <option value="vietnam">Việt Nam</option>
               </select>
             </div>
             <div className={styles.province}>
-              <label htmlFor="province" className={styles.formGroup}>Tỉnh/Thành phố *</label>
+              <label htmlFor="province">Tỉnh/Thành phố *</label>
               <select
                 id="province"
                 value={formData.province}
                 onChange={(e) => setFormData({ ...formData, province: e.target.value })}
-                className={styles.formGroup}
               >
                 <option value="">Chọn tỉnh/thành phố</option>
                 {provinces.map(province => (
@@ -449,12 +461,11 @@ const Checkout = () => {
           </div>
           <div className={`${styles.formGroup} ${styles.mergeForms}`}>
             <div className={styles.districtWard}>
-              <label htmlFor="district" className={styles.formGroup}>Quận/Huyện *</label>
+              <label htmlFor="district">Quận/Huyện *</label>
               <select
                 id="district"
                 value={formData.district}
                 onChange={(e) => setFormData({ ...formData, district: e.target.value })}
-                className={styles.formGroup}
                 disabled={!formData.province}
               >
                 <option value="">Chọn quận/huyện</option>
@@ -464,46 +475,43 @@ const Checkout = () => {
               </select>
             </div>
             <div className={styles.ward}>
-              <label htmlFor="ward" className={styles.formGroup}>Xã/Phường *</label>
+              <label htmlFor="ward">Xã/Phường *</label>
               <select
                 id="ward"
                 value={formData.ward}
                 onChange={(e) => setFormData({ ...formData, ward: e.target.value })}
-                className={styles.formGroup}
                 disabled={!formData.district}
               >
                 <option value="">Chọn xã/phường</option>
                 {wards.map(ward => (
-                  <option key={ward.code} value={ward.name}>{ward.name}</option>
+                  <option key={ward.code} value={ward.code}>{ward.name}</option>
                 ))}
               </select>
             </div>
           </div>
           <div className={styles.formGroup}>
-            <label htmlFor="address-detail" className={styles.formGroup}>Địa chỉ *</label>
+            <label htmlFor="address-detail">Địa chỉ chi tiết *</label>
             <input
               type="text"
               id="address-detail"
               value={formData.addressDetail}
               onChange={(e) => setFormData({ ...formData, addressDetail: e.target.value })}
               placeholder="Ví dụ: Số 20, ngõ 90"
-              className={styles.formGroup}
             />
           </div>
           <div className={styles.formGroup}>
-            <label htmlFor="note" className={styles.formGroup}>Ghi chú đặt hàng</label>
+            <label htmlFor="note">Ghi chú đặt hàng (không bắt buộc)</label>
             <textarea
               id="note"
               value={formData.note}
               onChange={(e) => setFormData({ ...formData, note: e.target.value })}
-              placeholder="Ghi chú cho đơn hàng của bạn"
-              className={styles.formGroup}
+              placeholder="Ghi chú cho đơn hàng của bạn (không bắt buộc)"
             />
           </div>
         </div>
         <div className={styles.orderInfo}>
-          <h2 className={styles.orderInfo}>THÔNG TIN ĐƠN HÀNG</h2>
-          {cartItems.length > 0 && (
+          <h2>THÔNG TIN ĐƠN HÀNG</h2>
+          {cartItems.length > 0 ? (
             <div className={styles.productList}>
               {cartItems.map((item, index) => (
                 <div key={index} className={styles.productGroup}>
@@ -516,6 +524,8 @@ const Checkout = () => {
                 </div>
               ))}
             </div>
+          ) : (
+            <p>Giỏ hàng trống</p>
           )}
           <div className={styles.order}>
             <div className={`${styles.orderItem} ${styles.total}`}>
@@ -544,9 +554,10 @@ const Checkout = () => {
           <div className={styles.orderBtn}>
             <button
               onClick={handleOrder}
+              disabled={isLoading}
               className={styles.orderBtn}
             >
-              ĐẶT HÀNG
+              {isLoading ? 'Đang xử lý...' : 'ĐẶT HÀNG'}
             </button>
           </div>
         </div>

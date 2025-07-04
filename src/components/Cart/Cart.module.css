@@ -152,14 +152,16 @@ body {
   border: 1px solid #3457a0;
   background: #fff;
   border-color: #3457a0;
+  color:#3457a0;
 }
 
 .quantityBtn:disabled {
   opacity: 0.5;
   border: 1px solid #3457a0;
   background: #fff;
-  border-color: #3457a0;
+  border-color: #4e4f52;
   cursor: not-allowed;
+  color:#6d6d6d;
 }
 
 .quantityInput {
@@ -353,6 +355,8 @@ body {
 
 .applyBtn:hover {
   background: #ebebeb;
+  color:#3457a0;
+  border-color: #3457a0;
 }
 
 .errorMessage {

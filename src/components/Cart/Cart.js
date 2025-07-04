@@ -8,12 +8,10 @@ import ToastNotification from '../ToastNotification/ToastNotification';
 
 const API_BASE_URL = process.env.REACT_APP_API_URL;
 
-
 const Cart = () => {
   const [cartItems, setCartItems] = useState([]);
   const [couponCode, setCouponCode] = useState('');
   const [appliedDiscount, setAppliedDiscount] = useState(null);
-  const [errorMessage, setErrorMessage] = useState('');
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   const [toastType, setToastType] = useState('success');
@@ -21,70 +19,67 @@ const Cart = () => {
   const [itemToRemove, setItemToRemove] = useState(null);
   const navigate = useNavigate();
 
+  // Load cart from localStorage on mount
   useEffect(() => {
     const cart = JSON.parse(localStorage.getItem('cart_da')) || [];
     setCartItems(cart);
-
-    const savedDiscount = JSON.parse(localStorage.getItem('applied_discount'));
-    if (savedDiscount) {
-      setAppliedDiscount(savedDiscount);
-    } else {
-      setAppliedDiscount(null);
-    }
-    setErrorMessage('');
   }, []);
 
-  const formatPrice = price => new Intl.NumberFormat('vi-VN').format(price) + ' VND';
+  // Format price in VND
+  const formatPrice = (price) => new Intl.NumberFormat('vi-VN').format(price) + ' VND';
 
-  const updateQuantity = (quantity, index) => {
+  // Update item quantity
+  const updateQuantity = (index, newQuantity) => {
+    const quantity = Math.max(1, parseInt(newQuantity) || 1);
     const newCart = [...cartItems];
     const item = newCart[index];
-    const newQuantity = Math.max(1, parseInt(quantity));
-    if (newQuantity > item.stock) {
-      setToastMessage(`Chỉ còn tối đa ${item.stock} sản phẩm trong kho!`);
+    if (quantity > item.stock) {
+      setToastMessage(`Chỉ còn ${item.stock} sản phẩm trong kho!`);
       setToastType('error');
       setShowToast(true);
-      item.quantity = item.stock;
+      newCart[index].quantity = item.stock;
     } else {
-      item.quantity = newQuantity;
+      newCart[index].quantity = quantity;
     }
     setCartItems(newCart);
     localStorage.setItem('cart_da', JSON.stringify(newCart));
-    setAppliedDiscount(null);
-    localStorage.removeItem('applied_discount');
-    setErrorMessage('');
+    setAppliedDiscount(null); // Clear discount on cart update
+    setToastMessage('Giỏ hàng đã được cập nhật!');
+    setToastType('success');
+    setShowToast(true);
   };
 
+  // Increase item quantity
   const increaseQuantity = (index) => {
-    const item = cartItems[index];
-    updateQuantity(item.quantity + 1, index);
+    updateQuantity(index, cartItems[index].quantity + 1);
   };
 
+  // Decrease item quantity
   const decreaseQuantity = (index) => {
-    const item = cartItems[index];
-    if (item.quantity > 1) {
-      updateQuantity(item.quantity - 1, index);
+    if (cartItems[index].quantity > 1) {
+      updateQuantity(index, cartItems[index].quantity - 1);
     }
   };
 
+  // Open confirmation popup for item removal
   const openPopup = (index) => {
     setItemToRemove(index);
     setShowPopup(true);
   };
 
+  // Close confirmation popup
   const closePopup = () => {
     setShowPopup(false);
     setItemToRemove(null);
   };
 
+  // Confirm item removal
   const confirmRemove = () => {
     if (itemToRemove !== null) {
       const newCart = cartItems.filter((_, i) => i !== itemToRemove);
       setCartItems(newCart);
       localStorage.setItem('cart_da', JSON.stringify(newCart));
-      setAppliedDiscount(null);
-      localStorage.removeItem('applied_discount');
-      setErrorMessage('');
+      setAppliedDiscount(null); // Clear discount on item removal
       setToastMessage('Sản phẩm đã được xóa khỏi giỏ hàng!');
       setToastType('success');
       setShowToast(true);
@@ -92,47 +87,58 @@ const Cart = () => {
     closePopup();
   };
 
+  // Apply coupon code
   const applyCoupon = async () => {
-    if (!couponCode.trim()) {
-      setErrorMessage('Vui lòng nhập mã giảm giá!');
-      setAppliedDiscount(null);
-      localStorage.removeItem('applied_discount');
+    if (!cartItems.length) {
+      setToastMessage('Giỏ hàng trống, không thể áp dụng mã giảm giá!');
+      setToastType('error');
+      setShowToast(true);
+      return;
+    }
+
+    const trimmedCouponCode = couponCode.trim();
+    if (!trimmedCouponCode) {
       setToastMessage('Vui lòng nhập mã giảm giá!');
       setToastType('error');
       setShowToast(true);
       return;
     }
 
+    const couponCodeRegex = /^[A-Za-z0-9-]+$/;
+    if (!couponCodeRegex.test(trimmedCouponCode)) {
+      setToastMessage('Mã giảm giá chỉ được chứa chữ cái, số và dấu gạch ngang!');
+      setToastType('error');
+      setShowToast(true);
+      return;
+    }
+
     try {
-      const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
-      const response = await axios.post(`${API_BASE_URL}/discounts/preview`, {
-        code: couponCode,
+      const subtotal = cartItems.reduce((sum, item) => sum + (parseFloat(item.price) || 0) * (parseInt(item.quantity) || 1), 0);
+      const response = await axios.post(`${API_BASE_URL}/discount/preview`, {
+        code: trimmedCouponCode,
         totalAmount: subtotal
       });
 
       const { discountCode, discountPercentage, grandTotal } = response.data;
       const discount = { code: discountCode, discountPercentage, grandTotal };
       setAppliedDiscount(discount);
-      localStorage.setItem('applied_discount', JSON.stringify(discount));
-      setErrorMessage('');
       setCouponCode('');
-      setToastMessage(`Mã giảm giá ${discountCode} đã áp dụng thành công!`);
+      setToastMessage(`Mã giảm giá ${discountCode} đã được áp dụng!`);
       setToastType('success');
       setShowToast(true);
     } catch (error) {
       setAppliedDiscount(null);
-      localStorage.removeItem('applied_discount');
-      setErrorMessage(error.response?.data?.message || 'Có lỗi xảy ra khi áp dụng mã giảm giá!');
-      setToastMessage(error.response?.data?.message || 'Có lỗi xảy ra khi áp dụng mã giảm giá!');
+      const errorMsg = error.response?.data?.message || 'Có lỗi xảy ra khi áp dụng mã giảm giá!';
+      setToastMessage(errorMsg);
       setToastType('error');
       setShowToast(true);
     }
   };
 
+  // Navigate to checkout with discount data
   const checkout = () => {
     if (cartItems.length > 0) {
-      // appliedDiscount đã được lưu vào localStorage trong applyCoupon
-      navigate('/checkout');
+      navigate('/checkout', { state: { appliedDiscount } });
     } else {
       setToastMessage('Giỏ hàng trống!');
       setToastType('error');
@@ -140,23 +146,14 @@ const Cart = () => {
     }
   };
 
-  const updateCart = () => {
-    setToastMessage('Giỏ hàng đã được cập nhật!');
-    setToastType('success');
-    setShowToast(true);
-    setAppliedDiscount(null);
-    localStorage.removeItem('applied_discount');
-    setErrorMessage('');
-  };
-
+  // Close toast notification
   const handleToastClose = () => {
     setShowToast(false);
   };
 
-  const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
-  const discountAmount = appliedDiscount
-    ? (subtotal * appliedDiscount.discountPercentage) / 100
-    : 0;
+  // Calculate totals
+  const subtotal = cartItems.reduce((sum, item) => sum + (parseFloat(item.price) || 0) * (parseInt(item.quantity) || 1), 0);
+  const discountAmount = appliedDiscount ? (subtotal * appliedDiscount.discountPercentage) / 100 : 0;
   const grandTotal = appliedDiscount ? appliedDiscount.grandTotal : subtotal;
 
   return (
@@ -172,7 +169,7 @@ const Cart = () => {
           </div>
         ) : (
           <>
-            {/* Desktop Table View */}
+            <h2>Giỏ Hàng</h2>
             <div className={styles.desktopView}>
               <table className={styles.productTable}>
                 <thead>
@@ -194,8 +191,8 @@ const Cart = () => {
                           </div>
                           <div className={styles.productDetails}>
                             <h3>{item.name}</h3>
-                            <div className={styles.charmInfo}>Charm: {item.charm}</div>
-                            <div className={styles.sizeInfo}>Size: {item.size_name}</div>
+                            <div className={styles.charmInfo}>Charm: {item.charm || 'N/A'}</div>
+                            <div className={styles.sizeInfo}>Size: {item.size_name || 'N/A'}</div>
                           </div>
                         </div>
                       </td>
@@ -215,7 +212,7 @@ const Cart = () => {
                             value={item.quantity}
                             min="1"
                             max={item.stock}
-                            onChange={e => updateQuantity(e.target.value, index)}
+                            onChange={(e) => updateQuantity(index, e.target.value)}
                           />
                           <button
                             className={styles.quantityBtn}
@@ -226,7 +223,7 @@ const Cart = () => {
                           </button>
                         </div>
                       </td>
-                      <td className={styles.totalCell}>{formatPrice(item.price * item.quantity)}</td>
+                      <td className={styles.totalCell}>{formatPrice((parseFloat(item.price) || 0) * (parseInt(item.quantity) || 1))}</td>
                       <td>
                         <button
                           className={styles.removeBtn}
@@ -241,8 +238,6 @@ const Cart = () => {
                 </tbody>
               </table>
             </div>
-
-            {/* Mobile Card View */}
             <div className={styles.mobileView}>
               {cartItems.map((item, index) => (
                 <div key={index} className={styles.mobileCard}>
@@ -253,8 +248,8 @@ const Cart = () => {
                       </div>
                       <div className={styles.mobileProductDetails}>
                         <h3>{item.name}</h3>
-                        <div className={styles.charmInfo}>Charm: {item.charm}</div>
-                        <div className={styles.sizeInfo}>Size: {item.size_name}</div>
+                        <div className={styles.charmInfo}>Charm: {item.charm || 'N/A'}</div>
+                        <div className={styles.sizeInfo}>Size: {item.size_name || 'N/A'}</div>
                       </div>
                     </div>
                     <button
@@ -286,7 +281,7 @@ const Cart = () => {
                           value={item.quantity}
                           min="1"
                           max={item.stock}
-                          onChange={e => updateQuantity(e.target.value, index)}
+                          onChange={(e) => updateQuantity(index, e.target.value)}
                         />
                         <button
                           className={styles.quantityBtn}
@@ -299,27 +294,24 @@ const Cart = () => {
                     </div>
                     <div className={styles.mobileTotalRow}>
                       <span>Thành tiền:</span>
-                      <span className={styles.total}>{formatPrice(item.price * item.quantity)}</span>
+                      <span className={styles.total}>{formatPrice((parseFloat(item.price) || 0) * (parseInt(item.quantity) || 1))}</span>
                     </div>
                   </div>
                 </div>
               ))}
             </div>
-
             <div className={styles.couponSection}>
               <input
                 type="text"
                 className={styles.couponInput}
                 placeholder="Mã giảm giá"
                 value={couponCode}
-                onChange={e => setCouponCode(e.target.value)}
+                onChange={(e) => setCouponCode(e.target.value)}
               />
               <button className={styles.applyBtn} onClick={applyCoupon}>
                 Áp dụng
               </button>
-              {errorMessage && <p className={styles.errorMessage}>{errorMessage}</p>}
             </div>
-
             <div className={styles.bottomActions}>
               <Link to="/product" className={styles.continueShopping}>
                 TIẾP TỤC MUA SẮM
@@ -328,7 +320,6 @@ const Cart = () => {
           </>
         )}
       </div>
-
       <div className={styles.summarySection}>
         <h2 className={styles.summaryTitle}>TỔNG CỘNG</h2>
         <div className={styles.summaryContent}>
@@ -355,7 +346,6 @@ const Cart = () => {
           MUA HÀNG
         </button>
       </div>
-
       {showToast && (
         <ToastNotification
           message={toastMessage}
@@ -363,10 +353,9 @@ const Cart = () => {
           onClose={handleToastClose}
         />
       )}
-
       {showPopup && (
         <div className={styles.popupOverlay} onClick={closePopup}>
-          <div className={styles.popupContent} onClick={e => e.stopPropagation()}>
+          <div className={styles.popupContent} onClick={(e) => e.stopPropagation()}>
             <h3>Bạn có chắc chắn muốn xóa sản phẩm này khỏi giỏ hàng?</h3>
             <div className={styles.popupButtons}>
               <button className={styles.okBtn} onClick={confirmRemove}>OK</button>

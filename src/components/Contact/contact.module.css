@@ -176,7 +176,7 @@
 }
 
 .sendButton {
-  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+  background: #3457a0;
   color: var(--white);
   padding: 0.875rem 1.75rem;
   border: none;

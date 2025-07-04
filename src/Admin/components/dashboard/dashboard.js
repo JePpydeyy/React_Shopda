@@ -7,7 +7,6 @@ import styles from './dashboard.module.css';
 
 ChartJS.register(CategoryScale, LinearScale, LineElement, PointElement, Title, Tooltip, Legend);
 
-
 // Utility function to format currency in VND
 const formatCurrency = (amount) => {
   return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
@@ -30,7 +29,7 @@ const Dashboard = () => {
   });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [timePeriod, setTimePeriod] = useState('month'); // Default to month
+  const [timePeriod, setTimePeriod] = useState('week'); // Default to week
 
   // Base API URL
   const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://api-tuyendung-cty.onrender.com/api';
@@ -67,7 +66,7 @@ const Dashboard = () => {
         setOrders(sortedOrders);
 
         // Calculate total revenue from delivered orders only
-        const totalRevenue = deliveredOrders.reduce((sum, order) => sum + (order.grandTotal || 0), 0) / 1000000; // Convert to millions
+        const totalRevenue = deliveredOrders.reduce((sum, order) => sum + (order.grandTotal || 0), 0);
 
         // Aggregate revenue based on selected time period
         const today = new Date();
@@ -75,44 +74,66 @@ const Dashboard = () => {
         const revenueData = [];
 
         if (timePeriod === 'week') {
-          // Last 6 weeks
-          for (let i = 0; i < 6; i++) {
-            const weekStart = new Date(today.getFullYear(), today.getMonth(), today.getDate() - i * 7);
-            const weekEnd = new Date(today.getFullYear(), today.getMonth(), today.getDate() - (i - 1) * 7);
-            labels.unshift(`Tuần ${weekStart.getDate()}/${weekStart.getMonth() + 1}`);
-            const weekRevenue = deliveredOrders
+          // Week starts from Monday
+          const daysOfWeek = ['Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7', 'Chủ nhật'];
+          const currentDayOfWeek = today.getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+          const daysSinceMonday = currentDayOfWeek === 0 ? 6 : currentDayOfWeek - 1; // Days since last Monday
+          const monday = new Date(today.getFullYear(), today.getMonth(), today.getDate() - daysSinceMonday);
+
+          // Loop through all 7 days from Monday to Sunday
+          for (let i = 0; i < 7; i++) {
+            const day = new Date(monday.getFullYear(), monday.getMonth(), monday.getDate() + i);
+            const dayIndex = day.getDay(); // Get day of the week (0 = Sunday, 1 = Monday, ...)
+            labels.push(daysOfWeek[dayIndex === 0 ? 6 : dayIndex - 1]); // Adjust for Monday-first order
+            const dayRevenue = deliveredOrders
               .filter(order => {
                 const orderDate = new Date(order.createdAt);
-                return orderDate >= weekStart && orderDate < weekEnd;
+                return (
+                  orderDate.getFullYear() === day.getFullYear() &&
+                  orderDate.getMonth() === day.getMonth() &&
+                  orderDate.getDate() === day.getDate()
+                );
               })
-              .reduce((sum, order) => sum + (order.grandTotal || 0), 0) / 1000000; // Convert to millions
-            revenueData.unshift(weekRevenue.toFixed(2));
+              .reduce((sum, order) => sum + (order.grandTotal || 0), 0);
+            revenueData.push(dayRevenue.toFixed(0));
           }
         } else if (timePeriod === 'month') {
-          // Last 6 months
-          for (let i = 0; i < 6; i++) {
-            const monthDate = new Date(today.getFullYear(), today.getMonth() - i, 1);
-            labels.unshift(`Tháng ${monthDate.getMonth() + 1}`);
+          // Daily revenue for the current month
+          const daysInMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate(); // Get number of days in current month
+          for (let i = 1; i <= daysInMonth; i++) {
+            const day = new Date(today.getFullYear(), today.getMonth(), i);
+            labels.push(`${i}/${day.getMonth() + 1}`);
+            const dayRevenue = deliveredOrders
+              .filter(order => {
+                const orderDate = new Date(order.createdAt);
+                return (
+                  orderDate.getFullYear() === day.getFullYear() &&
+                  orderDate.getMonth() === day.getMonth() &&
+                  orderDate.getDate() === i
+                );
+              })
+              .reduce((sum, order) => sum + (order.grandTotal || 0), 0);
+            revenueData.push(dayRevenue.toFixed(0));
+          }
+        } else if (timePeriod === 'year') {
+          // Monthly revenue for the current year
+          const monthsOfYear = [
+            'Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6',
+            'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'
+          ];
+          for (let i = 0; i < 12; i++) {
+            const monthStart = new Date(today.getFullYear(), i, 1);
+            labels.push(monthsOfYear[i]);
             const monthRevenue = deliveredOrders
               .filter(order => {
                 const orderDate = new Date(order.createdAt);
-                return orderDate.getFullYear() === monthDate.getFullYear() && orderDate.getMonth() === monthDate.getMonth();
+                return (
+                  orderDate.getFullYear() === today.getFullYear() &&
+                  orderDate.getMonth() === i
+                );
               })
-              .reduce((sum, order) => sum + (order.grandTotal || 0), 0) / 1000000; // Convert to millions
-            revenueData.unshift(monthRevenue.toFixed(2));
-          }
-        } else if (timePeriod === 'year') {
-          // Last 6 years
-          for (let i = 0; i < 6; i++) {
-            const year = today.getFullYear() - i;
-            labels.unshift(`Năm ${year}`);
-            const yearRevenue = deliveredOrders
-              .filter(order => {
-                const orderDate = new Date(order.createdAt);
-                return orderDate.getFullYear() === year;
-              })
-              .reduce((sum, order) => sum + (order.grandTotal || 0), 0) / 1000000; // Convert to millions
-            revenueData.unshift(yearRevenue.toFixed(2));
+              .reduce((sum, order) => sum + (order.grandTotal || 0), 0);
+            revenueData.push(monthRevenue.toFixed(0));
           }
         }
 
@@ -134,7 +155,7 @@ const Dashboard = () => {
         const newStats = [
           { value: productsResponse.data.length || 0, change: 12, trend: 'up', label: 'Tổng sản phẩm', suffix: '' },
           { value: deliveredOrders.length || 0, change: 5, trend: 'up', label: 'Đơn hàng đã giao', suffix: '' },
-          { value: totalRevenue.toFixed(2), change: 18, trend: 'up', label: 'Doanh thu', suffix: ' triệu' },
+          { value: formatCurrency(totalRevenue), change: 18, trend: 'up', label: 'Doanh thu', suffix: '' },
           { value: categoriesResponse.data.length || 0, change: 8, trend: 'up', label: 'Danh mục sản phẩm', suffix: '' },
           { value: discountsResponse.data.length || 0, change: 3, trend: 'down', label: 'Mã giảm giá', suffix: '' },
           { value: newsCategoriesResponse.data.length || 0, change: 6, trend: 'up', label: 'Danh mục tin tức', suffix: '' },
@@ -155,22 +176,30 @@ const Dashboard = () => {
   const chartOptions = {
     responsive: true,
     maintainAspectRatio: true,
-    aspectRatio: 2, // Adjust aspect ratio for better responsiveness
+    aspectRatio: 2,
     plugins: {
       legend: { position: 'bottom' },
       title: {
         display: true,
-        text: `Báo cáo doanh thu theo ${timePeriod === 'week' ? 'tuần' : timePeriod === 'month' ? 'tháng' : 'năm'}`,
+        text: `Báo cáo doanh thu theo ${timePeriod === 'week' ? 'ngày trong tuần' : timePeriod === 'month' ? 'ngày trong tháng' : 'tháng trong năm'}`,
         font: { size: 16 }
       }
     },
     scales: {
       y: {
         beginAtZero: true,
-        title: { display: true, text: 'Triệu đồng' }
+        title: { display: true, text: 'VND' },
+        ticks: {
+          callback: function (value) {
+            return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value);
+          }
+        }
       },
       x: {
-        title: { display: true, text: timePeriod === 'week' ? 'Tuần' : timePeriod === 'month' ? 'Tháng' : 'Năm' }
+        title: { display: true, text: timePeriod === 'week' ? 'Ngày trong tuần' : timePeriod === 'month' ? 'Ngày' : 'Tháng' },
+        ticks: {
+          maxTicksLimit: timePeriod === 'month' ? 15 : 12
+        }
       }
     }
   };

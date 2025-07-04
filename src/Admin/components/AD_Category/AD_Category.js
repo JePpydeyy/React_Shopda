@@ -338,7 +338,7 @@ const CategoryManagement = () => {
               <h3 style={{ color: '#e74c3c', marginBottom: 12, fontWeight: 600 }}>Xác nhận xóa danh mục</h3>
               <p style={{ marginBottom: 24, color: '#333' }}>
                 <strong>Tất cả sản phẩm trong danh mục này sẽ bị ẩn đi.</strong><br />
-                Bạn có chắc muốn xóa danh mục này?
+                
               </p>
               <div className={styles.formActions}>
                 <button
@@ -349,7 +349,7 @@ const CategoryManagement = () => {
                     setDeleteConfirm({ open: false, id: null });
                   }}
                 >
-                  Đồng ý
+                  Xóa
                 </button>
                 <button
                   className={styles.cancelButton}

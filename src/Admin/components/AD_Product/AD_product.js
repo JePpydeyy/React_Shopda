@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import axios from 'axios';
+import Quill from 'quill';
+import 'quill/dist/quill.snow.css';
 import Sidebar from '../Sidebar/Sidebar';
 import styles from './Product.module.css';
 
@@ -88,10 +90,10 @@ const ProductManagement = () => {
   });
   const [formErrors, setFormErrors] = useState({});
   const [showErrorPopup, setShowErrorPopup] = useState(false);
-  const [activeButtons, setActiveButtons] = useState(new Set());
   const [activeTooltip, setActiveTooltip] = useState(null);
   const editorRef = useRef(null);
   const modalRef = useRef(null);
+  const quillRef = useRef(null);
   const token = localStorage.getItem('adminToken');
   const productsPerPage = 9;
   const API_URL = process.env.REACT_APP_API_URL || 'https://api-tuyendung-cty.onrender.com/api';
@@ -117,6 +119,58 @@ const ProductManagement = () => {
     );
   }, [filteredProducts, currentPage]);
 
+  // Initialize Quill editor
+  useEffect(() => {
+    if (editorRef.current && !quillRef.current && (editProduct || addProduct)) {
+      console.log('Initializing Quill editor');
+      try {
+        const quill = new Quill(editorRef.current, {
+          theme: 'snow',
+          modules: {
+            toolbar: [
+              [{ font: [] }],
+              [{ size: ['small', false, 'large', 'huge'] }],
+              ['bold', 'italic', 'underline', 'strike'],
+              [{ list: 'ordered' }, { list: 'bullet' }],
+              [{ header: [1, 2, 3, 4, 5, 6, false] }],
+            ],
+          },
+          placeholder: 'Nhập mô tả chi tiết...',
+        });
+
+        // Set initial content
+        if (formData.description) {
+          console.log('Setting initial description:', formData.description);
+          quill.root.innerHTML = formData.description;
+        }
+
+        // Sync Quill content with formData
+        quill.on('text-change', () => {
+          const content = quill.root.innerHTML;
+          console.log('Quill text changed:', content);
+          setFormData((prev) => {
+            if (prev.description !== content) {
+              return { ...prev, description: content };
+            }
+            return prev;
+          });
+        });
+
+        quillRef.current = quill;
+      } catch (err) {
+        console.error('Failed to initialize Quill:', err);
+      }
+    }
+
+    // Cleanup Quill instance
+    return () => {
+      console.log('Cleaning up Quill instance');
+      if (quillRef.current) {
+        quillRef.current = null;
+      }
+    };
+  }, [editProduct, addProduct]);
+
   // Fetch products
   useEffect(() => {
     const fetchData = async () => {
@@ -126,7 +180,6 @@ const ProductManagement = () => {
         const response = await axios.get(`${endpoint}?limit=1000`, {
           headers: token ? { Authorization: `Bearer ${token}` } : {},
         });
-        console.log('Fetched products:', response.data);
         setProducts(response.data);
       } catch (err) {
         setError(err.response?.data?.message || 'Không thể tải dữ liệu sản phẩm');
@@ -151,74 +204,6 @@ const ProductManagement = () => {
     };
     fetchCategories();
   }, [token]);
-
-  // Update toolbar state
-  const updateToolbarState = useCallback(() => {
-    const newActiveButtons = new Set();
-    try {
-      const selection = window.getSelection();
-      if (selection.rangeCount > 0 && editorRef.current?.contains(selection.anchorNode)) {
-        if (document.queryCommandState('bold')) newActiveButtons.add('bold');
-        if (document.queryCommandState('italic')) newActiveButtons.add('italic');
-        if (document.queryCommandState('underline')) newActiveButtons.add('underline');
-        if (document.queryCommandState('strikeThrough')) newActiveButtons.add('strikeThrough');
-        if (document.queryCommandState('insertUnorderedList')) newActiveButtons.add('list_ul');
-        if (document.queryCommandState('insertOrderedList')) newActiveButtons.add('list_ol');
-      }
-    } catch (error) {
-      console.warn('Error checking command state:', error);
-    }
-    setActiveButtons(newActiveButtons);
-  }, []);
-
-  // Selection change listener
-  useEffect(() => {
-    const handleSelectionChange = () => {
-      if (document.activeElement === editorRef.current) {
-        updateToolbarState();
-      }
-    };
-    document.addEventListener('selectionchange', handleSelectionChange);
-    return () => document.removeEventListener('selectionchange', handleSelectionChange);
-  }, [updateToolbarState]);
-
-  // Utility to save and restore cursor position
-  const saveCursorPosition = useCallback((element) => {
-    const selection = window.getSelection();
-    if (!selection.rangeCount || !element.contains(selection.anchorNode)) return null;
-
-    const range = selection.getRangeAt(0);
-    const preCaretRange = range.cloneRange();
-    preCaretRange.selectNodeContents(element);
-    preCaretRange.setEnd(range.endContainer, range.endOffset);
-    return {
-      range: preCaretRange,
-      offset: range.endOffset,
-      container: range.endContainer
-    };
-  }, []);
-
-  const restoreCursorPosition = useCallback((element, savedPosition) => {
-    if (!savedPosition || !element.contains(savedPosition.container)) return;
-
-    const selection = window.getSelection();
-    const range = document.createRange();
-    try {
-      range.setStart(savedPosition.container, savedPosition.offset);
-      range.setEnd(savedPosition.container, savedPosition.offset);
-      selection.removeAllRanges();
-      selection.addRange(range);
-    } catch (error) {
-      console.warn('Error restoring cursor position:', error);
-    }
-  }, []);
-
-  // Sync editor content
-  useEffect(() => {
-    if ((editProduct || addProduct) && editorRef.current) {
-      editorRef.current.innerHTML = formData.description || '';
-    }
-  }, [editProduct, addProduct]);
 
   // Form handling
   const handleFormChange = useCallback((e) => {
@@ -271,56 +256,6 @@ const ProductManagement = () => {
     setOldImages((prev) => prev.filter((_, i) => i !== index));
   }, []);
 
-  const execCommand = useCallback((command, value = null) => {
-    if (!editorRef.current) return;
-
-    const savedPosition = saveCursorPosition(editorRef.current);
-    try {
-      editorRef.current.focus();
-      document.execCommand(command, false, value);
-      if (savedPosition) {
-        restoreCursorPosition(editorRef.current, savedPosition);
-      }
-      updateToolbarState();
-      setFormData((prev) => ({
-        ...prev,
-        description: editorRef.current.innerHTML
-      }));
-    } catch (error) {
-      console.error('Error executing command:', error);
-    }
-  }, [updateToolbarState, saveCursorPosition, restoreCursorPosition]);
-
-  const handleDescriptionChange = useCallback(() => {
-    if (editorRef.current) {
-      setFormData((prev) => ({
-        ...prev,
-        description: editorRef.current.innerHTML
-      }));
-    }
-  }, []);
-
-  const insertList = useCallback((type) => {
-    const command = type === 'ul' ? 'insertUnorderedList' : 'insertOrderedList';
-    execCommand(command);
-  }, [execCommand]);
-
-  const changeFontSize = useCallback((size) => {
-    if (size) execCommand('fontSize', size);
-  }, [execCommand]);
-
-  const changeFontFamily = useCallback((font) => {
-    if (font) execCommand('fontName', font);
-  }, [execCommand]);
-
-  const insertHeading = useCallback((level) => {
-    if (level) execCommand('formatBlock', `<h${level}>`);
-  }, [execCommand]);
-
-  const handleEditorFocus = useCallback(() => {
-    updateToolbarState();
-  }, [updateToolbarState]);
-
   const validateForm = useCallback(() => {
     const errors = {};
     if (!formData.name) errors.name = 'Tên sản phẩm là bắt buộc';
@@ -366,7 +301,7 @@ const ProductManagement = () => {
       formDataToSend.append('tag', formData.tag || 'new');
       formDataToSend.append('short_description', formData.short_description || '');
       formDataToSend.append('status', formData.status || 'show');
-      formDataToSend.append('description', editorRef.current?.innerHTML || '');
+      formDataToSend.append('description', formData.description || '');
       formDataToSend.append('purchases', parseInt(formData.purchases) || 0);
       const options = formData.option.map(opt => ({
         size_name: opt.size_name,
@@ -415,7 +350,6 @@ const ProductManagement = () => {
   }, [formData, editProduct, oldImages, categories, token, validateForm]);
 
   const handleEdit = useCallback((product) => {
-    console.log('Editing product:', product);
     const categoryId = product.category?._id || product.category?.id || '';
     setEditProduct(product);
     setAddProduct(false);
@@ -480,10 +414,9 @@ const ProductManagement = () => {
     });
     setFormErrors({});
     setShowErrorPopup(false);
-    setActiveButtons(new Set());
     setActiveTooltip(null);
-    if (editorRef.current) {
-      editorRef.current.innerHTML = '';
+    if (quillRef.current) {
+      quillRef.current.root.innerHTML = '';
     }
   }, []);
 
@@ -554,7 +487,6 @@ const ProductManagement = () => {
 
   const handleShowDetails = useCallback((product, e) => {
     if (e.target.tagName === 'BUTTON') return;
-    console.log('Showing details for product:', product);
     setShowDetailProduct(product);
   }, []);
 
@@ -993,110 +925,7 @@ const ProductManagement = () => {
                   >
                     Mô tả chi tiết
                   </TooltipButton>
-                  <div className={styles.toolbar}>
-                    <div className={styles.toolbarGroup}>
-                      <select
-                        className={styles.toolbarSelect}
-                        onChange={(e) => changeFontFamily(e.target.value)}
-                        defaultValue=""
-                      >
-                        <option value="">Font chữ</option>
-                        <option value="Arial">Arial</option>
-                        <option value="Times New Roman">Times New Roman</option>
-                        <option value="Helvetica">Helvetica</option>
-                        <option value="Georgia">Georgia</option>
-                        <option value="Verdana">Verdana</option>
-                      </select>
-                      <select
-                        className={styles.toolbarSelect}
-                        onChange={(e) => changeFontSize(e.target.value)}
-                        defaultValue=""
-                      >
-                        <option value="">Kích cỡ</option>
-                        <option value="1">8pt</option>
-                        <option value="2">10pt</option>
-                        <option value="3">12pt</option>
-                        <option value="4">14pt</option>
-                        <option value="5">18pt</option>
-                        <option value="6">24pt</option>
-                        <option value="7">36pt</option>
-                      </select>
-                      <select
-                        className={styles.toolbarSelect}
-                        onChange={(e) => insertHeading(e.target.value)}
-                        defaultValue=""
-                      >
-                        <option value="">Tiêu đề</option>
-                        <option value="1">H1</option>
-                        <option value="2">H2</option>
-                        <option value="3">H3</option>
-                        <option value="4">H4</option>
-                        <option value="5">H5</option>
-                        <option value="6">H6</option>
-                      </select>
-                    </div>
-                    <div className={styles.toolbarGroup}>
-                      <button
-                        type="button"
-                        className={`${styles.toolbarBtn} ${activeButtons.has('bold') ? styles.selected : ''}`}
-                        onClick={() => execCommand('bold')}
-                        title="Đậm"
-                      >
-                        <strong>B</strong>
-                      </button>
-                      <button
-                        type="button"
-                        className={`${styles.toolbarBtn} ${activeButtons.has('italic') ? styles.selected : ''}`}
-                        onClick={() => execCommand('italic')}
-                        title="Nghiêng"
-                      >
-                        <em>I</em>
-                      </button>
-                      <button
-                        type="button"
-                        className={`${styles.toolbarBtn} ${activeButtons.has('underline') ? styles.selected : ''}`}
-                        onClick={() => execCommand('underline')}
-                        title="Gạch chân"
-                      >
-                        <u>U</u>
-                      </button>
-                      <button
-                        type="button"
-                        className={`${styles.toolbarBtn} ${activeButtons.has('strikeThrough') ? styles.selected : ''}`}
-                        onClick={() => execCommand('strikeThrough')}
-                        title="Gạch ngang"
-                      >
-                        <s>S</s>
-                      </button>
-                    </div>
-                    <div className={styles.toolbarGroup}>
-                      <button
-                        type="button"
-                        className={`${styles.toolbarBtn} ${activeButtons.has('list_ul') ? styles.selected : ''}`}
-                        onClick={() => insertList('ul')}
-                        title="Danh sách không đánh số"
-                      >
-                        • List
-                      </button>
-                      <button
-                        type="button"
-                        className={`${styles.toolbarBtn} ${activeButtons.has('list_ol') ? styles.selected : ''}`}
-                        onClick={() => insertList('ol')}
-                        title="Danh sách đánh số"
-                      >
-                        1. List
-                      </button>
-                    </div>
-                  </div>
-                  <div
-                    ref={editorRef}
-                    className={styles.editor}
-                    contentEditable
-                    onInput={handleDescriptionChange}
-                    onFocus={handleEditorFocus}
-                    data-placeholder="Nhập mô tả chi tiết..."
-                    suppressContentEditableWarning={true}
-                  />
+                  <div ref={editorRef} className={styles.editor} />
                 </div>
                 <div className={styles.formGroup}>
                   <TooltipButton

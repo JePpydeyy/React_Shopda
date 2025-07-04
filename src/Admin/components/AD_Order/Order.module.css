@@ -145,18 +145,17 @@
 
 /* Popup Overlay */
 .popupOverlay {
-  position: fixed;
+ position: fixed;
   top: 0;
   left: 0;
-  right: 0;
-  bottom: 0;
+  width: 100%;
+  height: 100%;
   background: rgba(0, 0, 0, 0.5);
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 1000;
 }
-
 /* Popup */
 .popup {
   background: white;
@@ -313,6 +312,7 @@
   .container, .content, .searchFilter, .tableContainer, .pagination, .sidebar, .popupOverlay {
     display: none !important;
   }
+
   .detailContainer {
     display: block !important;
     border: none;
@@ -407,6 +407,10 @@
   .statusSelect {
     font-size: 0.85rem;
   }
+  .statusSelect option:disabled {
+  color: #999;
+  background-color: #f0f0f0;
+}
 
   .popup {
     width: 100%;

@@ -3,7 +3,6 @@ import axios from 'axios';
 import Sidebar from '../Sidebar/Sidebar';
 import styles from './Discount.module.css';
 
-// const API_URL = 'https://api-tuyendung-cty.onrender.com/api/discount';
 const API_URL = `${process.env.REACT_APP_API_URL}/discount`;
 
 const defaultForm = {
@@ -14,7 +13,7 @@ const defaultForm = {
   isActive: true,
 };
 
-const AD_Discout = () => {
+const AD_Discount = () => {
   const [discounts, setDiscounts] = useState([]);
   const [filteredDiscounts, setFilteredDiscounts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -27,14 +26,23 @@ const AD_Discout = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
+  const [detailsModalOpen, setDetailsModalOpen] = useState(false); // State for details modal
+  const [orderDetails, setOrderDetails] = useState([]); // Store order details
   const discountsPerPage = 10;
 
-  // Fetch all discounts
+  // Generate short order code from MongoDB _id (first 8 characters)
+  const generateShortOrderCode = (_id) => {
+    return _id ? _id.substring(0, 8) : 'N/A';
+  };
+
+  // Fetch all discounts with orders
   useEffect(() => {
     const fetchDiscounts = async () => {
       setLoading(true);
       try {
-        const res = await axios.get(API_URL);
+        const token = localStorage.getItem('adminToken');
+        const config = { headers: { Authorization: `Bearer ${token}` } };
+        const res = await axios.get(`${API_URL}/with-orders`, config);
         setDiscounts(res.data);
         setFilteredDiscounts(res.data);
       } catch (err) {
@@ -163,6 +171,24 @@ const AD_Discout = () => {
     }
   };
 
+  // Fetch order details
+  const fetchOrderDetails = async (discountId) => {
+    try {
+      const discount = discounts.find((d) => d._id === discountId);
+      if (discount && discount.orderIds) {
+        setOrderDetails(discount.orderIds); // Use orderIds from API response
+        setDetailsModalOpen(true); // Open details modal
+      } else {
+        setOrderDetails([]);
+        setError('Không có đơn hàng nào sử dụng mã này.');
+        setDetailsModalOpen(true);
+      }
+    } catch (err) {
+      setError('Không thể tải thông tin đơn hàng');
+      setDetailsModalOpen(false);
+    }
+  };
+
   // Handle pagination
   const handlePageChange = (page) => {
     setCurrentPage(page);
@@ -209,50 +235,58 @@ const AD_Discout = () => {
                     <th>Phần trăm (%)</th>
                     <th>Ngày hết hạn</th>
                     <th>Đã dùng</th>
-                    <th>số lượt có thể dùng</th>
+                    <th>Số lượt có thể dùng</th>
                     <th>Trạng thái</th>
                     <th>Hành động</th>
                   </tr>
                 </thead>
                 <tbody>
                   {currentDiscounts.map((d, idx) => (
-                    <tr key={d._id} className={styles.tableRow}>
-                      <td>{indexOfFirstDiscount + idx + 1}</td>
-                      <td>{d.code}</td>
-                      <td>{d.discountPercentage}</td>
-                      <td>{new Date(d.expirationDate).toLocaleDateString()}</td>
-                      <td>{d.usedCount}</td>
-                      <td>{d.usageLimit}</td>
-                      <td>
-                        <span
-                          className={
-                            d.isActive ? styles.statusActive : styles.statusInactive
-                          }
-                        >
-                          {d.isActive ? 'Kích hoạt' : 'Vô hiệu'}
-                        </span>
-                      </td>
-                      <td>
-                        <button
-                          className={styles.actionButton}
-                          onClick={() => openModal('edit', d)}
-                        >
-                          Sửa
-                        </button>
-                        <button
-                          className={`${styles.actionButton} ${styles.deleteButton}`}
-                          onClick={() => handleDelete(d._id)}
-                        >
-                          Xóa
-                        </button>
-                        <button
-                          className={`${styles.actionButton} ${styles.toggleButton}`}
-                          onClick={() => handleToggleActive(d)}
-                        >
-                          {d.isActive ? 'Vô hiệu' : 'Kích hoạt'}
-                        </button>
-                      </td>
-                    </tr>
+                    <React.Fragment key={d._id}>
+                      <tr className={styles.tableRow}>
+                        <td>{indexOfFirstDiscount + idx + 1}</td>
+                        <td>{d.code}</td>
+                        <td>{d.discountPercentage}</td>
+                        <td>{new Date(d.expirationDate).toLocaleDateString('vi-VN')}</td>
+                        <td>{d.usedCount}</td>
+                        <td>{d.usageLimit}</td>
+                        <td>
+                          <span
+                            className={
+                              d.isActive ? styles.statusActive : styles.statusInactive
+                            }
+                          >
+                            {d.isActive ? 'Kích hoạt' : 'Vô hiệu'}
+                          </span>
+                        </td>
+                        <td>
+                          <button
+                            className={styles.actionButton}
+                            onClick={() => openModal('edit', d)}
+                          >
+                            Sửa
+                          </button>
+                          <button
+                            className={`${styles.actionButton} ${styles.deleteButton}`}
+                            onClick={() => handleDelete(d._id)}
+                          >
+                            Xóa
+                          </button>
+                          <button
+                            className={`${styles.actionButton} ${styles.toggleButton}`}
+                            onClick={() => handleToggleActive(d)}
+                          >
+                            {d.isActive ? 'Vô hiệu' : 'Kích hoạt'}
+                          </button>
+                          <button
+                            className={styles.actionButton}
+                            onClick={() => fetchOrderDetails(d._id)}
+                          >
+                            Xem chi tiết
+                          </button>
+                        </td>
+                      </tr>
+                    </React.Fragment>
                   ))}
                 </tbody>
               </table>
@@ -273,7 +307,7 @@ const AD_Discout = () => {
           </>
         )}
 
-        {/* Modal */}
+        {/* Modal for add/edit discount */}
         {modalOpen && (
           <div className={styles.modalOverlay}>
             <div className={styles.modal}>
@@ -319,7 +353,7 @@ const AD_Discout = () => {
                   />
                 </div>
                 <div className={styles.formGroup}>
-                  <label>số lượt dùng:</label>
+                  <label>Số lượt dùng:</label>
                   <input
                     type="number"
                     name="usageLimit"
@@ -361,9 +395,58 @@ const AD_Discout = () => {
             </div>
           </div>
         )}
+
+        {/* Modal for order details */}
+        {detailsModalOpen && (
+          <div className={styles.modalOverlay}>
+            <div className={`${styles.modal} ${styles.detailsModal}`}>
+              <h2>Thông tin đơn hàng sử dụng mã</h2>
+              {error && <div className={styles.error}>{error}</div>}
+              <div className={styles.orderDetailsContainer}>
+                {orderDetails.length > 0 ? (
+                  orderDetails.map((order, i) => (
+                    <div key={i} className={styles.orderDetail}>
+                      <h3>Đơn hàng #{i + 1}</h3>
+                      <p><strong>Mã đơn hàng:</strong> {generateShortOrderCode(order._id)}</p>
+                      <p><strong>Tên người dùng:</strong> {order.fullName}</p>
+                      <p><strong>Số điện thoại:</strong> {order.phoneNumber}</p>
+                      <p><strong>Email:</strong> {order.email}</p>
+                      <p><strong>Tổng tiền:</strong> {order.totalAmount.toLocaleString('vi-VN')} VNĐ</p>
+                      <p><strong>Tiền sau giảm giá:</strong> {order.grandTotal.toLocaleString('vi-VN')} VNĐ</p>
+                      <p><strong>Trạng thái:</strong> {order.status}</p>
+                      <p><strong>Ngày tạo:</strong> {new Date(order.createdAt).toLocaleString('vi-VN')}</p>
+                      <p><strong>Sản phẩm:</strong></p>
+                      <ul className={styles.productList}>
+                        {order.products && order.products.length > 0 ? (
+                          order.products.map((product, j) => (
+                            <li key={j}>
+                              {product.productName} (Kích thước: {product.size_name}, Số lượng: {product.quantity}, Giá: {product.price.toLocaleString('vi-VN')} VNĐ)
+                            </li>
+                          ))
+                        ) : (
+                          <li>Không có thông tin sản phẩm.</li>
+                        )}
+                      </ul>
+                    </div>
+                  ))
+                ) : (
+                  <p>Không có đơn hàng nào sử dụng mã này.</p>
+                )}
+              </div>
+              <div className={styles.formActions}>
+                <button
+                  className={styles.closeButton}
+                  onClick={() => setDetailsModalOpen(false)}
+                >
+                  Đóng
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
 };
 
-export default AD_Discout;
+export default AD_Discount;

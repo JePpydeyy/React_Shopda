@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import styles from './New.module.css';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCalendarAlt } from '@fortawesome/free-solid-svg-icons';
 
 const New = () => {
   const [newsItems, setNewsItems] = useState([]);
@@ -11,6 +13,14 @@ const New = () => {
   const [selectedCategoryId, setSelectedCategoryId] = useState(null);
 
   const API_BASE_URL = process.env.REACT_APP_API_BASE;
+
+  const truncateTitle = (title) => {
+    const words = title.split(' ');
+    if (words.length > 10) {
+      return words.slice(0, 10).join(' ') + '...';
+    }
+    return title;
+  };
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -124,10 +134,10 @@ const New = () => {
                   </div>
                   <div className={styles.postContent}>
                     <p>
-                      <i className="fas fa-calendar-alt" style={{ marginRight: 5 }}></i>
+                      <FontAwesomeIcon icon={faCalendarAlt} style={{ marginRight: 5 }} />
                       {item.date}
                     </p>
-                    <h3>{item.title}</h3>
+                    <h3>{truncateTitle(item.title)}</h3>
                     <div className={styles.postLink}>
                       <Link to={`/newdetail/${item.slug}`}>XEM THÊM</Link>
                     </div>

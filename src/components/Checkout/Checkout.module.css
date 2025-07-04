@@ -1,7 +1,7 @@
 .container {
   max-width: 1200px;
   margin: 0 auto;
-  background-color: white;
+  background: #fff;
   padding: 20px;
   border-radius: 8px;
 }
@@ -20,7 +20,7 @@
 .customerInfo, .orderInfo {
   flex: 1;
   padding: 20px;
-  background-color: #f9f9f9;
+  background: #f9f9f9;
   border-radius: 8px;
 }
 
@@ -33,7 +33,7 @@
   border: 1px solid #e0e0e0;
   border-radius: 8px;
   padding: 15px;
-  background-color: #fff;
+  background: #fff;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
@@ -91,22 +91,22 @@
   padding: 13px;
   border: 1px solid #ccc;
   border-radius: 4px;
-  background-color: white;
+  background: #fff;
   cursor: pointer;
 }
 
 .calendarBtn {
   padding: 12px 15px;
   margin-left: 10px;
-  background-color: #dfdfdf;
-  color: white;
+  background: #dfdfdf;
+  color: #fff;
   border: none;
   border-radius: 4px;
   cursor: pointer;
 }
 
 .calendarBtn:hover {
-  background-color: #bbbbbb;
+  background: #bbbbbb;
 }
 
 .calendarPopup {
@@ -114,7 +114,7 @@
   position: absolute;
   top: 100%;
   left: 0;
-  background-color: white;
+  background: #fff;
   border: 1px solid #ccc;
   border-radius: 4px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
@@ -138,8 +138,8 @@
 
 .calendarHeader button {
   padding: 5px 10px;
-  background-color: #3457a0;
-  color: white;
+  background: #3457a0;
+  color: #fff;
   border: none;
   width: 120px;
   height: 40px;
@@ -149,7 +149,7 @@
 }
 
 .calendarHeader button:hover {
-  background-color: #7a3a0f;
+  background: #7a3a0f;
 }
 
 .calendarDays {
@@ -176,12 +176,12 @@
 }
 
 .calendarDates div:hover {
-  background-color: #f0f0f0;
+  background: #f0f0f0;
 }
 
 .selectedDate {
-  background-color: #3457a0;
-  color: white;
+  background: #3457a0;
+  color: #fff;
   border-radius: 50%;
 }
 
@@ -230,7 +230,7 @@
 }
 
 .orderItem.total {
-  background-color: #f5f5f5;
+  background: #f5f5f5;
   padding: 15px 20px;
   font-size: 16px;
   font-weight: 700;
@@ -259,8 +259,8 @@
 
 .orderBtn button {
   padding: 12px;
-  background-color: #3457a0;
-  color: white;
+  background: #3457a0;
+  color: #fff;
   border: none;
   border-radius: 6px;
   width: 100%;
@@ -269,289 +269,226 @@
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: background 0.3s ease;
 }
 
 .orderBtn button:hover {
-  background-color: #7a3a0f;
+  background: #7a3a0f;
 }
 
+/* Updated Success Page Styles */
 .successContainer {
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 60vh;
-  background: #f8f8f8;
+  min-height: 80vh;
+  background: linear-gradient(135deg, #f7fafc, #edf2f7);
+  padding: 20px 10px;
 }
 
 .successBox {
   background: #fff;
-  padding: 32px 24px;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px #0001;
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
   text-align: center;
-  max-width: 600px;
+  max-width: 700px;
   width: 100%;
+  border: 1px solid #e2e8f0;
+  animation: fadeIn 0.4s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(15px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .successBox h2 {
-  color: #222;
-  margin-bottom: 8px;
-  font-size: 2rem;
-  font-weight: 600;
+  color: #1a202c;
+  font-size: 2.25rem;
+  font-weight: 700;
+  margin-bottom: 12px;
+  background: linear-gradient(90deg, #1abc9c, #2ecc71);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.successBox p {
+  color: #4a5568;
+  font-size: 1rem;
+  margin-bottom: 20px;
 }
 
 .successBox h3 {
-  margin: 18px 0 10px 0;
-  font-size: 1.3rem;
-  font-weight: 500;
   color: #1abc9c;
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 20px 0 16px;
+  border-bottom: 2px solid #1abc9c;
+  padding-bottom: 4px;
+  display: inline-block;
 }
 
 .billInfo {
   text-align: left;
-  margin: 0 auto 16px auto;
-  max-width: 420px;
-  font-size: 1.05rem;
+  max-width: 500px;
+  margin: 0 auto 20px;
+  font-size: 1rem;
+  color: #2d3748;
+  background: #f9fafb;
+  padding: 12px;
+  border-left: 4px solid #1abc9c;
+  border-radius: 6px;
+}
+
+.billInfo p {
+  margin: 8px 0;
+}
+
+.billInfo b {
+  color: #1a202c;
+  font-weight: 600;
 }
 
 .billTable {
   width: 100%;
-  border-collapse: collapse;
-  margin: 16px 0;
-  font-size: 1rem;
+  border-collapse: separate;
+  border-spacing: 0;
+  margin: 20px 0;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
 }
 
 .billTable th, .billTable td {
-  border: 1px solid #ddd;
-  padding: 8px 12px;
+  padding: 12px 16px;
   text-align: left;
+  border-bottom: 1px solid #edf2f7;
 }
 
 .billTable th {
-  background: #f5f5f5;
+  background: linear-gradient(90deg, #edf2f7, #e2e8f0);
+  color: #1a202c;
   font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.billTable tr:last-child td {
+  border-bottom: none;
+}
+
+.billTable tr:hover td {
+  background: #f9fafb;
 }
 
 .billTotal {
-  text-align: right;
-  margin-top: 10px;
-  margin-bottom: 10px;
+  text-align: left;
+  max-width: 500px;
+  margin: 0 auto 20px;
+  margin-left: auto;
+  background: #f9fafb;
+  padding: 12px;
+  border-left: 4px solid #1abc9c;
+  border-radius: 6px;
 }
 
 .billTotal p {
-  margin: 4px 0;
-  font-size: 1.1em;
+  margin: 6px 0;
+  font-size: 1.1rem;
+  color: #2d3748;
+  display: flex;
+  justify-content: space-between;
+  /* Removed max-width: 400px to fix indentation */
+}
+
+.billTotal b {
+  color: #1a202c;
+  font-weight: 600;
+}
+
+.billTotal p:last-child {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #1abc9c;
+  border-top: 1px solid #e2e8f0;
+  padding-top: 10px;
+  margin-top: 10px;
 }
 
 .successBtn {
-  margin-top: 24px;
-  padding: 10px 32px;
-  background: #1abc9c;
+  margin-top: 30px;
+  padding: 12px 40px;
+  background: linear-gradient(90deg, #1abc9c, #2ecc71);
   color: #fff;
   border: none;
   border-radius: 6px;
   font-size: 1.1rem;
+  font-weight: 600;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: background 0.3s, transform 0.2s;
 }
 
 .successBtn:hover {
-  background: #159c85;
+  background: linear-gradient(90deg, #159c85, #27ae60);
+  transform: translateY(-2px);
 }
 
-/* Responsive for Tablets/iPads (481px - 1024px) */
+.successBtn:active {
+  transform: translateY(0);
+}
+
+/* Responsive Styles */
 @media (max-width: 1024px) {
-  .container {
-    max-width: 100%;
-    padding: 15px;
-  }
-
-  .formContainer {
-    flex-direction: column;
-    gap: 15px;
-  }
-
-  .customerInfo, .orderInfo {
-    max-width: 100%;
-    padding: 15px;
-  }
-
-  .orderInfo {
-    max-width: 100%;
-  }
-
-  .container h1 {
-    font-size: 20px;
-  }
-
-  .customerInfo h2, .orderInfo h2 {
-    font-size: 16px;
-  }
-
-  .mergeForms {
-    flex-direction: column;
-  }
-
-  .mergeForms .sdt,
-  .mergeForms .email,
-  .mergeForms .districtWard,
-  .mergeForms .ward,
-  .mergeForms .country,
-  .mergeForms .province {
-    width: 100%;
-  }
-
-  .calendarPopup {
-    width: 100%;
-    max-width: 300px;
-  }
-
-  .calendarHeader {
-    flex-wrap: wrap;
-    gap: 5px;
-  }
-
-  .calendarHeader select, .calendarHeader button {
-    width: 100%;
-    margin-left: 0;
-    margin-bottom: 5px;
-  }
-
-  .orderBtn button {
-    max-width: 100%;
-  }
-
-  .successBox {
-    padding: 20px 15px;
-    max-width: 90%;
-  }
-
-  .successBox h2 {
-    font-size: 1.8rem;
-  }
-
-  .billInfo {
-    max-width: 100%;
-    font-size: 1rem;
-  }
-
-  .billTable th, .billTable td {
-    padding: 6px 8px;
-    font-size: 0.95rem;
-  }
+  .container { padding: 15px; }
+  .formContainer { flex-direction: column; gap: 15px; }
+  .customerInfo, .orderInfo { max-width: 100%; padding: 15px; }
+  .orderInfo { max-width: 100%; }
+  .container h1 { font-size: 20px; }
+  .customerInfo h2, .orderInfo h2 { font-size: 16px; }
+  .mergeForms { flex-direction: column; }
+  .mergeForms .sdt, .mergeForms .email, .mergeForms .districtWard, .mergeForms .ward, .mergeForms .country, .mergeForms .province { width: 100%; }
+  .calendarPopup { max-width: 300px; }
+  .calendarHeader { flex-wrap: wrap; gap: 5px; }
+  .calendarHeader select, .calendarHeader button { width: 100%; margin: 0 0 5px; }
+  .orderBtn button { max-width: 100%; }
+  .successContainer { padding: 15px; }
+  .successBox { padding: 25px; max-width: 90%; }
+  .successBox h2 { font-size: 1.8rem; }
+  .successBox p { font-size: 0.95rem; }
+  .successBox h3 { font-size: 1.3rem; margin: 18px 0 14px; }
+  .billInfo, .billTotal { max-width: 100%; padding: 10px; margin: 0 auto 18px; }
+  .billTable th, .billTable td { padding: 10px 12px; font-size: 0.9rem; }
+  .billTotal p { font-size: 1rem; }
+  .billTotal p:last-child { font-size: 1.1rem; }
+  .successBtn { padding: 10px 30px; font-size: 1rem; }
 }
 
-/* Responsive for Mobile Phones (up to 480px) */
 @media (max-width: 480px) {
-  .container {
-    padding: 10px;
-  }
-
-  .container h1 {
-    font-size: 18px;
-    margin-bottom: 15px;
-  }
-
-  .customerInfo, .orderInfo {
-    padding: 10px;
-  }
-
-  .customerInfo h2, .orderInfo h2 {
-    font-size: 14px;
-    margin-bottom: 10px;
-  }
-
-  .formGroup {
-    margin-bottom: 8px;
-  }
-
-  .formGroup label {
-    font-size: 14px;
-  }
-
-  .formGroup input,
-  .formGroup select,
-  .formGroup textarea {
-    padding: 10px;
-    font-size: 14px;
-  }
-
-  .datePicker input#selectedDate {
-    padding: 10px;
-  }
-
-  .calendarBtn {
-    padding: 10px 12px;
-    margin-left: 5px;
-  }
-
-  .calendarPopup {
-    width: 100%;
-    max-width: 260px;
-    padding: 8px;
-  }
-
-  .calendarDays div, .calendarDates div {
-    padding: 4px;
-    font-size: 12px;
-  }
-
-  .error {
-    font-size: 12px;
-  }
-
-  .orderItem {
-    padding: 10px;
-    font-size: 12px;
-  }
-
-  .orderItem.total {
-    font-size: 14px;
-    padding: 12px;
-  }
-
-  .orderBtn button {
-    height: 40px;
-    font-size: 14px;
-  }
-
-  .successContainer {
-    min-height: 100vh;
-    padding: 10px;
-  }
-
-  .successBox {
-    padding: 15px 10px;
-    font-size: 0.9rem;
-  }
-
-  .successBox h2 {
-    font-size: 1.5rem;
-  }
-
-  .successBox h3 {
-    font-size: 1.1rem;
-  }
-
-  .billInfo {
-    font-size: 0.9rem;
-  }
-
-  .billTable {
-    font-size: 0.85rem;
-  }
-
-  .billTable th, .billTable td {
-    padding: 5px 6px;
-  }
-
-  .billTotal p {
-    font-size: 1rem;
-  }
-
-  .successBtn {
-    padding: 8px 20px;
-    font-size: 1rem;
-  }
+  .container { padding: 10px; }
+  .container h1 { font-size: 18px; margin-bottom: 15px; }
+  .customerInfo, .orderInfo { padding: 10px; }
+  .customerInfo h2, .orderInfo h2 { font-size: 14px; margin-bottom: 10px; }
+  .formGroup { margin-bottom: 8px; }
+  .formGroup label { font-size: 14px; }
+  .formGroup input, .formGroup select, .formGroup textarea { padding: 10px; font-size: 14px; }
+  .datePicker input#selectedDate { padding: 10px; }
+  .calendarBtn { padding: 10px 12px; margin-left: 5px; }
+  .calendarPopup { max-width: 260px; padding: 8px; }
+  .calendarDays div, .calendarDates div { padding: 4px; font-size: 12px; }
+  .error { font-size: 12px; }
+  .orderItem { padding: 10px; font-size: 12px; }
+  .orderItem.total { font-size: 14px; padding: 12px; }
+  .orderBtn button { height: 40px; font-size: 14px; }
+  .successContainer { min-height: 100vh; padding: 10px; }
+  .successBox { padding: 15px; max-width: 95%; }
+  .successBox h2 { font-size: 1.4rem; }
+  .successBox p { font-size: 0.9rem; }
+  .successBox h3 { font-size: 1.1rem; margin: 14px 0 10px; }
+  .billInfo, .billTotal { padding: 8px; margin: 0 auto 14px; font-size: 0.85rem; }
+  .billTable th, .billTable td { padding: 8px 10px; font-size: 0.8rem; }
+  .billTotal p { font-size: 0.9rem; }
+  .billTotal p:last-child { font-size: 1rem; }
+  .successBtn { padding: 8px 24px; font-size: 0.95rem; }
 }
