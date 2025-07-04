@@ -17,7 +17,7 @@ const NewsManagement = () => {
   const navigate = useNavigate();
 
   const API_BASE_URL = process.env.REACT_APP_API_BASE || 'https://api-tuyendung-cty.onrender.com';
-  const PLACEHOLDER_IMAGE = 'https://via.placeholder.com/150'; // Placeholder công khai
+  const PLACEHOLDER_IMAGE = 'https://via.placeholder.com/150';
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -25,11 +25,12 @@ const NewsManagement = () => {
         const res = await fetch(`${API_BASE_URL}/api/new-category`, {
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('adminToken') || ''}`,
+            Authorization: `Bearer ${localStorage.getItem('adminToken') || ''}`,
           },
         });
+        if (!res.ok) throw new Error('Lỗi tải danh mục');
         const result = await res.json();
-        setCategories(Array.isArray(result) ? result : []);
+        setCategories(Array.isArray(result) ? result : result.data || []);
       } catch (err) {
         console.error('Lỗi tải danh mục:', err);
         setCategories([]);
@@ -41,44 +42,46 @@ const NewsManagement = () => {
   const fetchNews = async () => {
     try {
       setLoading(true);
-      console.log('API_BASE_URL:', API_BASE_URL); // Kiểm tra API_BASE_URL
       const res = await fetch(`${API_BASE_URL}/api/new`, {
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('adminToken') || ''}`,
+          Authorization: `Bearer ${localStorage.getItem('adminToken') || ''}`,
         },
       });
 
       if (!res.ok) throw new Error(`Lỗi HTTP: ${res.status} ${res.statusText}`);
       const result = await res.json();
-      console.log('API Response:', result); // Kiểm tra dữ liệu API
       const data = result.data || result.news || result || [];
 
       const transformed = data.map(item => {
-        console.log('Raw thumbnailUrl:', item.thumbnailUrl); // Kiểm tra thumbnailUrl
         const imageUrl = item.thumbnailUrl && typeof item.thumbnailUrl === 'string' && item.thumbnailUrl !== '+image'
           ? item.thumbnailUrl.startsWith('http') || item.thumbnailUrl.startsWith('data:')
             ? item.thumbnailUrl
-            : `${API_BASE_URL}/${item.thumbnailUrl.replace(/^\/+/, '')}`
+            : `${API_BASE_URL}/${item.thumbnailUrl.replace(/^\/+/g, '')}`
           : PLACEHOLDER_IMAGE;
 
-        const category = categories.find(c => c._id === item.category_new)?._id || 'Chưa phân loại';
+        const categoryOid = item['category-new']?.oid || '';
+        const category = categories.find(c => c._id === categoryOid)?.category || 'Chưa phân loại';
 
         return {
           id: item._id,
           slug: item.slug,
           title: item.title || 'Không có tiêu đề',
-          content: item.content,
+          content: item.contentBlocks ? item.contentBlocks.map(block => {
+            if (block.type === 'text') return `<p>${block.content}</p>`;
+            if (block.type === 'image') return `<img src="${block.url.startsWith('http') || block.url.startsWith('data:') ? block.url : `${API_BASE_URL}/${block.url.replace(/^\/+/g, '')}`}" alt="${block.caption || ''}" />`;
+            return '';
+          }).join('') : '',
           publishedAt: item.publishedAt || item.createdAt,
           views: item.views || 0,
           reviews: item.reviews || 0,
           status: item.status === 'show' ? 'Hiển thị' : 'Ẩn',
-          category,
+          category: categoryOid,
+          categoryName: category,
           image: imageUrl,
         };
       });
 
-      console.log('Transformed News:', transformed); // Kiểm tra dữ liệu đã biến đổi
       setNews(transformed);
     } catch (err) {
       console.error('Lỗi fetchNews:', err);
@@ -89,9 +92,7 @@ const NewsManagement = () => {
   };
 
   useEffect(() => {
-    if (categories.length > 0) {
-      fetchNews();
-    }
+    if (categories.length > 0) fetchNews();
   }, [categories]);
 
   const filteredNews = news.filter(article =>
@@ -105,32 +106,64 @@ const NewsManagement = () => {
   };
 
   const handleToggleStatus = async (slug, currentStatus) => {
-    const newStatus = currentStatus === 'Hiển thị' ? 'Ẩn' : 'Hiển thị';
-    if (!window.confirm(`Bạn có chắc muốn ${newStatus.toLowerCase()} bài viết này?`)) return;
+    const newStatus = currentStatus === 'Hiển thị' ? 'hidden' : 'show';
+    const statusLabel = newStatus === 'show' ? 'Hiển thị' : 'Ẩn';
+
+    if (!window.confirm(`Bạn có chắc muốn ${statusLabel.toLowerCase()} bài viết này?`)) return;
 
     try {
-      const res = await fetch(`${API_BASE_URL}/api/new/${slug}/toggle-visibility`, {
+      setLoading(true);
+      const token = localStorage.getItem('adminToken');
+      if (!token) {
+        throw new Error('Vui lòng đăng nhập lại.');
+      }
+
+      const formDataToSend = new FormData();
+      const article = news.find(item => item.slug === slug);
+      if (!article) {
+        throw new Error('Không tìm thấy bài viết.');
+      }
+
+      formDataToSend.append('title', article.title);
+      formDataToSend.append('slug', article.slug);
+      formDataToSend.append('thumbnailUrl', article.image !== PLACEHOLDER_IMAGE ? article.image : '');
+      formDataToSend.append('thumbnailCaption', ''); // Assuming no change to caption
+      formDataToSend.append('status', newStatus);
+      formDataToSend.append('publishedAt', article.publishedAt || new Date().toISOString());
+      formDataToSend.append('views', article.views.toString());
+      formDataToSend.append('contentBlocks', JSON.stringify(article.content ? article.content.split('<p>').filter(p => p).map(p => ({
+        type: 'text',
+        content: p.replace('</p>', ''),
+        caption: '',
+        url: '',
+      })) : []));
+      formDataToSend.append('category-new', JSON.stringify({ oid: article.category }));
+
+      const res = await fetch(`${API_BASE_URL}/api/new/${slug}`, {
         method: 'PUT',
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('adminToken') || ''}`,
+          Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ status: newStatus === 'Hiển thị' ? 'show' : 'hide' }),
+        body: formDataToSend,
       });
 
-     
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || `Cập nhật thất bại: ${data.message || 'Lỗi không xác định'}`);
+      }
 
-      if (!res.ok) throw new Error('Lỗi cập nhật trạng thái');
-      await res.json();
       await fetchNews();
 
       if (selectedArticle?.slug === slug) {
-        setSelectedArticle(prev => ({ ...prev, status: newStatus }));
+        setSelectedArticle(prev => ({ ...prev, status: statusLabel }));
       }
 
-      alert(`Đã cập nhật trạng thái: ${newStatus}`);
+      alert(`Đã cập nhật trạng thái: ${statusLabel}`);
     } catch (err) {
+      console.error('Lỗi cập nhật trạng thái:', err);
       alert(`Lỗi cập nhật trạng thái: ${err.message}`);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -141,7 +174,7 @@ const NewsManagement = () => {
       const res = await fetch(`${API_BASE_URL}/api/new/${slug}`, {
         method: 'DELETE',
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('adminToken') || ''}`,
+          Authorization: `Bearer ${localStorage.getItem('adminToken') || ''}`,
         },
       });
 
@@ -149,9 +182,7 @@ const NewsManagement = () => {
       if (res.ok) {
         alert('Đã xóa bài viết thành công.');
         fetchNews();
-        if (selectedArticle?.slug === slug) {
-          setSelectedArticle(null);
-        }
+        if (selectedArticle?.slug === slug) setSelectedArticle(null);
       } else {
         alert(`Xóa thất bại: ${result.message || 'Lỗi không xác định'}`);
       }
@@ -167,14 +198,9 @@ const NewsManagement = () => {
         if (!src || src === '+image') {
           return `<img src="${PLACEHOLDER_IMAGE}"`;
         }
-        return `<img src="${
-          src.startsWith('http') || src.startsWith('data:') 
-            ? src 
-            : `${API_BASE_URL}/${src.replace(/^\/+/, '')}`
-        }"`;
+        return `<img src="${src.startsWith('http') || src.startsWith('data:') ? src : `${API_BASE_URL}/${src.replace(/^\/+/g, '')}`}"`;
       }
     );
-    console.log('Processed HTML:', safeHTML); // Kiểm tra HTML đã xử lý
     return { __html: safeHTML || '' };
   };
 
@@ -210,12 +236,12 @@ const NewsManagement = () => {
             onChange={(e) => setCategoryFilter(e.target.value)}
           >
             <option value="all">Tất cả danh mục</option>
-            <option value="Chưa phân loại">Chưa phân loại</option>
+            <option value="">Chưa phân loại</option>
             {categories.map(c => (
               <option key={c._id} value={c._id}>{c.category}</option>
             ))}
           </select>
-          <button className={styles.addbutton} onClick={() => navigate('/admin/add_news')}>+ Thêm Tin Tức</button>
+          <button className={styles.addButton} onClick={() => navigate('/admin/add_news')}>+ Thêm Tin Tức</button>
         </div>
 
         <div className={styles.tableContainer}>
@@ -235,7 +261,7 @@ const NewsManagement = () => {
               {filteredNews.length > 0 ? filteredNews.map(article => (
                 <tr key={article.slug} className={styles.tableRow} onClick={() => setSelectedArticle(article)}>
                   <td>{article.title}</td>
-                  <td>{categories.find(c => c._id === article.category)?.category || 'Chưa phân loại'}</td>
+                  <td>{article.categoryName}</td>
                   <td>{new Date(article.publishedAt).toLocaleDateString('vi-VN')}</td>
                   <td>{article.views}</td>
                   <td>{article.reviews}</td>
@@ -285,7 +311,7 @@ const NewsManagement = () => {
                 <div className={styles.articleHeader}>
                   <h3>{selectedArticle.title}</h3>
                   <p className={styles.meta}>
-                    Danh mục: {categories.find(c => c._id === selectedArticle.category)?.category || 'Chưa phân loại'} | 
+                    Danh mục: {selectedArticle.categoryName} |
                     Ngày: {new Date(selectedArticle.publishedAt).toLocaleDateString('vi-VN')} |
                     Lượt xem: {selectedArticle.views} | Lượt đánh giá: {selectedArticle.reviews} |
                     Trạng thái: <span className={selectedArticle.status === 'Hiển thị' ? styles.statusShow : styles.statusHidden}>
