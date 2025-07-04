@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import Sidebar from '../Sidebar/Sidebar';
+import ToastNotification from '../../../components/ToastNotification/ToastNotification';
 import styles from './Order.module.css';
 import axios from 'axios';
 
@@ -13,6 +14,8 @@ const OrderManagement = () => {
   const [statusFilter, setStatusFilter] = useState('all');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [successMessage, setSuccessMessage] = useState(null);
+  const [errorMessage, setErrorMessage] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [detailLoading, setDetailLoading] = useState(false);
@@ -32,6 +35,7 @@ const OrderManagement = () => {
         );
         setOrders(sortedOrders);
       } catch (err) {
+        setErrorMessage('Không thể tải danh sách đơn hàng');
         setError('Không thể tải danh sách đơn hàng');
       } finally {
         setLoading(false);
@@ -102,8 +106,9 @@ const OrderManagement = () => {
       if (selectedOrder && selectedOrder._id === id) {
         setSelectedOrder({ ...selectedOrder, status: newStatus });
       }
+      setSuccessMessage(`Cập nhật trạng thái đơn hàng thành "${newStatus}"`);
     } catch {
-      alert('Không thể cập nhật trạng thái đơn hàng');
+      setErrorMessage('Không thể cập nhật trạng thái đơn hàng');
     }
   };
 
@@ -116,8 +121,9 @@ const OrderManagement = () => {
         headers: { Authorization: `Bearer ${token}` },
       });
       setSelectedOrder(res.data);
+      setSuccessMessage('Tải chi tiết đơn hàng thành công');
     } catch {
-      alert('Không thể tải chi tiết đơn hàng');
+      setErrorMessage('Không thể tải chi tiết đơn hàng');
     } finally {
       setDetailLoading(false);
     }
@@ -133,6 +139,12 @@ const OrderManagement = () => {
     if (e.target.className.includes(styles.popupOverlay)) {
       closePopup();
     }
+  };
+
+  // Close toast notification
+  const handleCloseToast = () => {
+    setSuccessMessage(null);
+    setErrorMessage(null);
   };
 
   // Print order
@@ -362,6 +374,22 @@ const OrderManagement = () => {
               </button>
             ))}
           </div>
+        )}
+
+        {/* Toast Notifications */}
+        {successMessage && (
+          <ToastNotification
+            message={successMessage}
+            type="success"
+            onClose={handleCloseToast}
+          />
+        )}
+        {errorMessage && (
+          <ToastNotification
+            message={errorMessage}
+            type="error"
+            onClose={handleCloseToast}
+          />
         )}
       </div>
     </div>

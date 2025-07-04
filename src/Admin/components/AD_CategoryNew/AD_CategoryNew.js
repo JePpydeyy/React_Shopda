@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Sidebar from '../Sidebar/Sidebar';
+import ToastNotification from '../../../components/ToastNotification/ToastNotification';
 import styles from './categorynew.module.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPenToSquare, faEye, faEyeSlash, faPlus, faTrash } from '@fortawesome/free-solid-svg-icons';
@@ -20,6 +21,8 @@ const CategoryNewsManagement = () => {
   const [statusFilter, setStatusFilter] = useState('all');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [successMessage, setSuccessMessage] = useState(null);
+  const [errorMessage, setErrorMessage] = useState(null);
   const [editCategory, setEditCategory] = useState(null);
   const navigate = useNavigate();
 
@@ -29,6 +32,7 @@ const CategoryNewsManagement = () => {
     try {
       setLoading(true);
       setError(null);
+      setErrorMessage(null);
       const token = localStorage.getItem('adminToken');
       if (!token) throw new Error('Không tìm thấy token xác thực. Vui lòng đăng nhập lại.');
 
@@ -54,6 +58,7 @@ const CategoryNewsManagement = () => {
       setCategories(transformed);
     } catch (err) {
       setError(err.message);
+      setErrorMessage(err.message);
     } finally {
       setLoading(false);
     }
@@ -68,6 +73,8 @@ const CategoryNewsManagement = () => {
     if (!window.confirm(`Bạn có chắc muốn ${newStatus.toLowerCase()} danh mục tin tức này?`)) return;
 
     try {
+      setSuccessMessage(null);
+      setErrorMessage(null);
       const token = localStorage.getItem('adminToken');
       if (!token) {
         navigate('/admin/login');
@@ -89,9 +96,9 @@ const CategoryNewsManagement = () => {
       }
 
       await fetchCategories();
-      alert(`Đã cập nhật trạng thái: ${newStatus}`);
+      setSuccessMessage(`Đã cập nhật trạng thái: ${newStatus}`);
     } catch (err) {
-      alert(`Lỗi cập nhật trạng thái: ${err.message}`);
+      setErrorMessage(`Lỗi cập nhật trạng thái: ${err.message}`);
     }
   };
 
@@ -99,6 +106,8 @@ const CategoryNewsManagement = () => {
     if (!window.confirm('Bạn có chắc muốn xoá danh mục tin tức này?')) return;
 
     try {
+      setSuccessMessage(null);
+      setErrorMessage(null);
       const token = localStorage.getItem('adminToken');
       if (!token) {
         navigate('/admin/login');
@@ -118,22 +127,32 @@ const CategoryNewsManagement = () => {
       }
 
       await fetchCategories();
-      alert('Đã xoá danh mục thành công!');
+      setSuccessMessage('Đã xoá danh mục thành công!');
     } catch (err) {
-      alert(`Lỗi xoá danh mục: ${err.message}`);
+      setErrorMessage(`Lỗi xoá danh mục: ${err.message}`);
     }
   };
 
   const handleEdit = (category) => {
+    setSuccessMessage(null);
+    setErrorMessage(null);
     setEditCategory({ ...category, status: category.status === 'Hiển thị' ? 'show' : 'hide' });
   };
 
   const handleSaveEdit = async () => {
-    if (!editCategory || !editCategory.name) return;
+    if (!editCategory || !editCategory.name) {
+      setErrorMessage('Tên danh mục không được để trống');
+      return;
+    }
 
     try {
+      setSuccessMessage(null);
+      setErrorMessage(null);
       const token = localStorage.getItem('adminToken');
-      if (!token) throw new Error('Không tìm thấy token xác thực.');
+      if (!token) {
+        navigate('/admin/login');
+        throw new Error('Không tìm thấy token xác thực.');
+      }
 
       const slug = generateSlug(editCategory.name);
       const payload = {
@@ -163,10 +182,15 @@ const CategoryNewsManagement = () => {
 
       await fetchCategories();
       setEditCategory(null);
-      alert(`${editCategory.id ? 'Cập nhật' : 'Tạo'} danh mục thành công!`);
+      setSuccessMessage(`${editCategory.id ? 'Cập nhật' : 'Tạo'} danh mục thành công!`);
     } catch (err) {
-      alert(`Lỗi: ${err.message}`);
+      setErrorMessage(`Lỗi: ${err.message}`);
     }
+  };
+
+  const handleCloseToast = () => {
+    setSuccessMessage(null);
+    setErrorMessage(null);
   };
 
   const filteredCategories = categories.filter(category =>
@@ -192,7 +216,7 @@ const CategoryNewsManagement = () => {
             <option value="Hiển thị">Hiển thị</option>
             <option value="Ẩn">Ẩn</option>
           </select>
-          <button className={styles.createButton} onClick={() => setEditCategory({ id: '', name: '', slug: '', status: 'show' })}>
+          <button className={styles.createButton} onClick={() => handleEdit({ id: '', name: '', slug: '', status: 'show' })}>
             <FontAwesomeIcon icon={faPlus} /> Tạo Thêm Danh Mục
           </button>
         </div>
@@ -269,6 +293,21 @@ const CategoryNewsManagement = () => {
               </div>
             </div>
           </div>
+        )}
+
+        {successMessage && (
+          <ToastNotification
+            message={successMessage}
+            type="success"
+            onClose={handleCloseToast}
+          />
+        )}
+        {errorMessage && (
+          <ToastNotification
+            message={errorMessage}
+            type="error"
+            onClose={handleCloseToast}
+          />
         )}
       </div>
     </div>
