@@ -17,7 +17,7 @@ const OrderManagement = () => {
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [detailLoading, setDetailLoading] = useState(false);
 
-  // Lấy danh sách đơn hàng từ API
+  // Fetch orders from API
   useEffect(() => {
     const fetchOrders = async () => {
       setLoading(true);
@@ -40,7 +40,7 @@ const OrderManagement = () => {
     fetchOrders();
   }, []);
 
-  // Lọc đơn hàng theo tìm kiếm và trạng thái
+  // Filter orders by search term and status
   const filteredOrders = orders.filter(
     (order) =>
       (order.fullName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -48,14 +48,14 @@ const OrderManagement = () => {
       (statusFilter === 'all' || order.status === statusFilter)
   );
 
-  // Phân trang
+  // Pagination
   const totalPages = Math.ceil(filteredOrders.length / ORDERS_PER_PAGE);
   const paginatedOrders = filteredOrders.slice(
     (currentPage - 1) * ORDERS_PER_PAGE,
     currentPage * ORDERS_PER_PAGE
   );
 
-  // Danh sách trạng thái
+  // List of all statuses
   const statuses = [
     'Chờ xử lý',
     'Đang giao',
@@ -65,21 +65,29 @@ const OrderManagement = () => {
     'Đã hoàn',
   ];
 
-  // Logic xác định trạng thái tiếp theo hợp lệ
-  const getNextStatuses = (currentStatus) => {
-    switch (currentStatus) {
-      case 'Chờ xử lý':
-        return ['Đang giao', 'Đã hủy'];
-      case 'Đang giao':
-        return ['Đã giao'];
-      case 'Đã giao':
-        return ['Đang hoàn', 'Đã hoàn'];
-      default:
-        return [];
-    }
+  // Determine valid next statuses
+  const getStatusOptions = (currentStatus) => {
+    const validNextStatuses = (() => {
+      switch (currentStatus) {
+        case 'Chờ xử lý':
+          return ['Đang giao', 'Đã hủy'];
+        case 'Đang giao':
+          return ['Đã giao'];
+        case 'Đã giao':
+          return ['Đang hoàn'];
+        case 'Đang hoàn':
+          return ['Đã hoàn'];
+        default:
+          return [];
+      }
+    })();
+    return statuses.map((status) => ({
+      value: status,
+      disabled: status !== currentStatus && !validNextStatuses.includes(status),
+    }));
   };
 
-  // Đổi trạng thái đơn hàng
+  // Update order status
   const handleUpdateStatus = async (id, newStatus) => {
     try {
       const token = localStorage.getItem('adminToken');
@@ -99,7 +107,7 @@ const OrderManagement = () => {
     }
   };
 
-  // Xem chi tiết đơn hàng
+  // View order details
   const handleView = async (id) => {
     setDetailLoading(true);
     try {
@@ -115,23 +123,28 @@ const OrderManagement = () => {
     }
   };
 
-  // Đóng popup
+  // Close popup
   const closePopup = () => {
     setSelectedOrder(null);
   };
 
-  // In đơn hàng
+  // Handle click outside popup
+  const handleOverlayClick = (e) => {
+    if (e.target.className.includes(styles.popupOverlay)) {
+      closePopup();
+    }
+  };
+
+  // Print order
   const handlePrint = (order) => {
     const printContent = `
       <div>
         <h2>Chi tiết đơn hàng</h2>
         <p><strong>Khách hàng:</strong> ${order.fullName}</p>
-        <p><strong>Ngày sinh:</strong> ${new Date(order.dateOfBirth).toLocaleDateString('vi-VN')}</p>
         <p><strong>SĐT:</strong> ${order.phoneNumber}</p>
         <p><strong>Email:</strong> ${order.email}</p>
         <p><strong>Địa chỉ:</strong> ${order.address}, ${order.ward}, ${order.district}, ${order.city}, ${order.country}</p>
         <p><strong>Ghi chú:</strong> ${order.orderNote || 'Không có'}</p>
-        <p><strong>Trạng thái:</strong> ${order.status}</p>
         <p><strong>Ngày đặt:</strong> ${new Date(order.createdAt).toLocaleDateString('vi-VN')}</p>
         <h3>Sản phẩm:</h3>
         <table style="width: 100%; border-collapse: collapse;">
@@ -186,7 +199,7 @@ const OrderManagement = () => {
     printWindow.document.close();
   };
 
-  // Xử lý chuyển trang
+  // Handle page change
   const handlePageChange = (page) => {
     setCurrentPage(page);
     setSelectedOrder(null);
@@ -251,19 +264,22 @@ const OrderManagement = () => {
                     <td>{order.grandTotal?.toLocaleString() || order.totalAmount?.toLocaleString()} VNĐ</td>
                     <td>{order.status}</td>
                     <td>{new Date(order.createdAt).toLocaleDateString('vi-VN')}</td>
-                    <td>
+                    <td onClick={(e) => e.stopPropagation()}>
                       <select
                         className={styles.statusSelect}
                         value={order.status}
                         onChange={(e) => {
-                          e.stopPropagation();
                           handleUpdateStatus(order._id, e.target.value);
                         }}
                       >
-                        <option value={order.status}>{order.status}</option>
-                        {getNextStatuses(order.status).map((status) => (
-                          <option key={status} value={status}>
-                            {status}
+                        {getStatusOptions(order.status).map((option) => (
+                          <option
+                            key={option.value}
+                            value={option.value}
+                            disabled={option.disabled}
+                            style={option.disabled ? { color: '#999', backgroundColor: '#f0f0f0' } : {}}
+                          >
+                            {option.value}
                           </option>
                         ))}
                       </select>
@@ -275,12 +291,12 @@ const OrderManagement = () => {
           )}
         </div>
 
-        {/* Popup chi tiết đơn hàng */}
+        {/* Order Detail Popup */}
         {selectedOrder && (
-          <div className={styles.popupOverlay}>
+          <div className={styles.popupOverlay} onClick={handleOverlayClick}>
             <div className={styles.popup}>
               <button className={styles.closeButton} onClick={closePopup}>
-                &times;
+                ×
               </button>
               {detailLoading ? (
                 <div className={styles.loading}>Đang tải chi tiết...</div>
