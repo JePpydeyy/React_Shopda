@@ -76,7 +76,7 @@ const fieldGuides = {
   tag: "Sale: Giảm giá | New: Sản phẩm mới",
   short_description: "Mô tả ngắn gọn (100-150 ký tự)",
   description: "Mô tả chi tiết: nguồn gốc, khối lượng, lợi ích, bảo quản...",
-  images: "Chọn tối đa 10 ảnh chất lượng cao (JPEG, PNG, GIF)",
+  images: "Chọn tối đa 5 ảnh chất lượng cao (JPEG, PNG, GIF)",
   status: "Hiển thị: Hiện trên website | Ẩn: Không hiện",
   purchases: "Số lượng đã bán (mặc định 0, không âm)",
 };
