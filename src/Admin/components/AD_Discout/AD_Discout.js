@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import Sidebar from '../Sidebar/Sidebar';
+import ToastNotification from '../../../components/ToastNotification/ToastNotification';
 import styles from './Discount.module.css';
 
 const API_URL = `${process.env.REACT_APP_API_URL}/discount`;
@@ -22,12 +23,14 @@ const AD_Discount = () => {
   const [form, setForm] = useState(defaultForm);
   const [editId, setEditId] = useState(null);
   const [error, setError] = useState('');
+  const [successMessage, setSuccessMessage] = useState(null);
+  const [errorMessage, setErrorMessage] = useState(null);
   const [submitLoading, setSubmitLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
-  const [detailsModalOpen, setDetailsModalOpen] = useState(false); // State for details modal
-  const [orderDetails, setOrderDetails] = useState([]); // Store order details
+  const [detailsModalOpen, setDetailsModalOpen] = useState(false);
+  const [orderDetails, setOrderDetails] = useState([]);
   const discountsPerPage = 10;
 
   // Generate short order code from MongoDB _id (first 8 characters)
@@ -39,6 +42,7 @@ const AD_Discount = () => {
   useEffect(() => {
     const fetchDiscounts = async () => {
       setLoading(true);
+      setError('');
       try {
         const token = localStorage.getItem('adminToken');
         const config = { headers: { Authorization: `Bearer ${token}` } };
@@ -47,6 +51,7 @@ const AD_Discount = () => {
         setFilteredDiscounts(res.data);
       } catch (err) {
         setError('Không thể tải danh sách mã giảm giá');
+        setErrorMessage('Không thể tải danh sách mã giảm giá');
       } finally {
         setLoading(false);
       }
@@ -79,6 +84,8 @@ const AD_Discount = () => {
   const openModal = (mode, discount = null) => {
     setModalMode(mode);
     setError('');
+    setSuccessMessage(null);
+    setErrorMessage(null);
     if (mode === 'edit' && discount) {
       setForm({
         code: discount.code,
@@ -109,6 +116,8 @@ const AD_Discount = () => {
     e.preventDefault();
     setSubmitLoading(true);
     setError('');
+    setSuccessMessage(null);
+    setErrorMessage(null);
     try {
       const token = localStorage.getItem('adminToken');
       const config = {
@@ -120,11 +129,13 @@ const AD_Discount = () => {
       if (modalMode === 'add') {
         const res = await axios.post(API_URL, form, config);
         setDiscounts((prev) => [...prev, res.data]);
+        setSuccessMessage('Thêm mã giảm giá thành công');
       } else {
         const res = await axios.put(`${API_URL}/${editId}`, form, config);
         setDiscounts((prev) =>
           prev.map((d) => (d._id === editId ? res.data : d))
         );
+        setSuccessMessage('Cập nhật mã giảm giá thành công');
       }
       setModalOpen(false);
     } catch (err) {
@@ -132,6 +143,11 @@ const AD_Discount = () => {
         err.response?.data?.message ||
           err.response?.data?.error ||
           'Có lỗi xảy ra'
+      );
+      setErrorMessage(
+        err.response?.data?.message ||
+          err.response?.data?.error ||
+          'Có lỗi xảy ra khi lưu mã giảm giá'
       );
     } finally {
       setSubmitLoading(false);
@@ -141,19 +157,24 @@ const AD_Discount = () => {
   // Delete discount
   const handleDelete = async (id) => {
     if (!window.confirm('Bạn có chắc muốn xóa mã này?')) return;
+    setSuccessMessage(null);
+    setErrorMessage(null);
     try {
       const token = localStorage.getItem('adminToken');
       await axios.delete(`${API_URL}/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setDiscounts((prev) => prev.filter((d) => d._id !== id));
+      setSuccessMessage('Xóa mã giảm giá thành công');
     } catch {
-      alert('Không thể xóa mã giảm giá');
+      setErrorMessage('Không thể xóa mã giảm giá');
     }
   };
 
   // Toggle active
   const handleToggleActive = async (discount) => {
+    setSuccessMessage(null);
+    setErrorMessage(null);
     try {
       const token = localStorage.getItem('adminToken');
       const res = await axios.put(
@@ -166,27 +187,41 @@ const AD_Discount = () => {
           d._id === discount._id ? { ...d, isActive: res.data.isActive } : d
         )
       );
+      setSuccessMessage(
+        `Mã giảm giá đã được ${res.data.isActive ? 'kích hoạt' : 'vô hiệu'}`
+      );
     } catch {
-      alert('Không thể thay đổi trạng thái');
+      setErrorMessage('Không thể thay đổi trạng thái mã giảm giá');
     }
   };
 
   // Fetch order details
   const fetchOrderDetails = async (discountId) => {
+    setSuccessMessage(null);
+    setErrorMessage(null);
     try {
       const discount = discounts.find((d) => d._id === discountId);
       if (discount && discount.orderIds) {
-        setOrderDetails(discount.orderIds); // Use orderIds from API response
-        setDetailsModalOpen(true); // Open details modal
+        setOrderDetails(discount.orderIds);
+        setDetailsModalOpen(true);
+        setSuccessMessage('Tải thông tin đơn hàng thành công');
       } else {
         setOrderDetails([]);
         setError('Không có đơn hàng nào sử dụng mã này.');
+        setErrorMessage('Không có đơn hàng nào sử dụng mã này.');
         setDetailsModalOpen(true);
       }
     } catch (err) {
       setError('Không thể tải thông tin đơn hàng');
+      setErrorMessage('Không thể tải thông tin đơn hàng');
       setDetailsModalOpen(false);
     }
+  };
+
+  // Close toast notification
+  const handleCloseToast = () => {
+    setSuccessMessage(null);
+    setErrorMessage(null);
   };
 
   // Handle pagination
@@ -443,6 +478,22 @@ const AD_Discount = () => {
               </div>
             </div>
           </div>
+        )}
+
+        {/* Toast Notifications */}
+        {successMessage && (
+          <ToastNotification
+            message={successMessage}
+            type="success"
+            onClose={handleCloseToast}
+          />
+        )}
+        {errorMessage && (
+          <ToastNotification
+            message={errorMessage}
+            type="error"
+            onClose={handleCloseToast}
+          />
         )}
       </div>
     </div>

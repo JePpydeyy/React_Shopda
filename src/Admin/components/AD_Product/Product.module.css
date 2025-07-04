@@ -1,5 +1,3 @@
-/* Product.module.css */
-
 /* Reuse root variables */
 :global(:root) {
   --secondary-color: #1a1a3d;
@@ -558,7 +556,6 @@
 
 .toolbarBtn:hover {
   background-color: gray;
-
 }
 
 .toolbarBtn.selected {
@@ -595,6 +592,8 @@
 .error {
   color: #dc2626;
 }
+
+/* Error Popup */
 .errorPopupOverlay {
   position: fixed;
   top: 0;
@@ -611,10 +610,10 @@
 .errorPopup {
   background: white;
   padding: 20px;
-  border-radius: 8px;
+  border-radius: var(--border-radius);
   max-width: 400px;
   width: 100%;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  box-shadow: var(--shadow-md);
 }
 
 .errorPopup h3 {
@@ -645,6 +644,69 @@
 .errorPopupCloseButton:hover {
   background: #b71c1c;
 }
+
+/* Confirm Popup */
+.confirmPopup {
+  background: white;
+  padding: var(--spacing-md);
+  border-radius: var(--border-radius);
+  max-width: 400px;
+  width: 100%;
+  box-shadow: var(--shadow-md);
+  text-align: center;
+}
+
+.confirmPopup h3 {
+  margin-top: 0;
+  margin-bottom: var(--spacing-sm);
+  color: var(--secondary-color);
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.confirmPopup p {
+  margin: var(--spacing-sm) 0;
+  color: var(--text-color);
+  font-size: 0.95rem;
+}
+
+.confirmPopupActions {
+  display: flex;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-md);
+}
+
+.confirmButton {
+  padding: var(--spacing-sm) var(--spacing-md);
+  background-color: #dc2626;
+  color: var(--text-hover-color);
+  border: none;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  font-size: 0.95rem;
+  transition: background-color 0.2s ease;
+}
+
+.confirmButton:hover {
+  background-color: #b91c1c;
+}
+
+.cancelButton {
+  padding: var(--spacing-sm) var(--spacing-md);
+  background-color: #6c757d;
+  color: var(--text-hover-color);
+  border: none;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  font-size: 0.95rem;
+  transition: background-color 0.2s ease;
+}
+
+.cancelButton:hover {
+  background-color: #5a6268;
+}
+
 /* Responsive Styles */
 @media (max-width: 768px) {
   .content {

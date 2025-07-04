@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Sidebar from '../Sidebar/Sidebar';
+import ToastNotification from '../../../components/ToastNotification/ToastNotification';
 import styles from './Category.module.css';
 
 const CategoryManagement = () => {
@@ -8,6 +9,8 @@ const CategoryManagement = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [successMessage, setSuccessMessage] = useState(null);
+  const [errorMessage, setErrorMessage] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState('add');
   const [currentCategory, setCurrentCategory] = useState({ id: '', name_categories: '', status: 'show' });
@@ -25,6 +28,8 @@ const CategoryManagement = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       setIsLoading(true);
+      setError(null);
+      setErrorMessage(null);
       try {
         const response = await axios.get(`${API_URL}/category`);
         const transformedCategories = response.data.map(cat => ({
@@ -35,6 +40,7 @@ const CategoryManagement = () => {
         setCategories(transformedCategories);
       } catch (err) {
         setError('Không thể tải danh mục. Vui lòng thử lại.');
+        setErrorMessage('Không thể tải danh mục. Vui lòng thử lại.');
         console.error('Error fetching categories:', err);
       } finally {
         setIsLoading(false);
@@ -45,8 +51,10 @@ const CategoryManagement = () => {
 
   // Open modal for adding
   const openAddModal = () => {
+    setSuccessMessage(null);
+    setErrorMessage(null);
     if (!isAuthenticated()) {
-      setError('Vui lòng đăng nhập với quyền admin để thêm danh mục.');
+      setErrorMessage('Vui lòng đăng nhập với quyền admin để thêm danh mục.');
       setTimeout(() => window.location.href = '/admin/login', 2000);
       return;
     }
@@ -58,8 +66,10 @@ const CategoryManagement = () => {
 
   // Open modal for editing
   const openEditModal = async (id) => {
+    setSuccessMessage(null);
+    setErrorMessage(null);
     if (!isAuthenticated()) {
-      setError('Vui lòng đăng nhập với quyền admin để sửa danh mục.');
+      setErrorMessage('Vui lòng đăng nhập với quyền admin để sửa danh mục.');
       setTimeout(() => window.location.href = '/admin/login', 2000);
       return;
     }
@@ -74,8 +84,10 @@ const CategoryManagement = () => {
         status: response.data.status,
       });
       setIsModalOpen(true);
+      setSuccessMessage('Tải thông tin danh mục thành công');
     } catch (err) {
       setModalError('Không thể tải danh mục. Vui lòng thử lại.');
+      setErrorMessage('Không thể tải danh mục. Vui lòng thử lại.');
       console.error('Error fetching category:', err);
     } finally {
       setModalLoading(false);
@@ -85,8 +97,10 @@ const CategoryManagement = () => {
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setSuccessMessage(null);
+    setErrorMessage(null);
     if (!isAuthenticated()) {
-      setModalError('Vui lòng đăng nhập với quyền admin.');
+      setErrorMessage('Vui lòng đăng nhập với quyền admin.');
       setTimeout(() => window.location.href = '/admin/login', 2000);
       return;
     }
@@ -111,6 +125,7 @@ const CategoryManagement = () => {
           status: response.data.status,
         };
         setCategories(categories.map(cat => (cat.id === currentCategory.id ? updatedCategory : cat)));
+        setSuccessMessage('Cập nhật danh mục thành công');
       } else {
         response = await axios.post(`${API_URL}/category`, data, config);
         const newCategory = {
@@ -119,14 +134,17 @@ const CategoryManagement = () => {
           status: response.data.status,
         };
         setCategories([...categories, newCategory]);
+        setSuccessMessage('Thêm danh mục thành công');
       }
       setIsModalOpen(false);
     } catch (err) {
       if (err.response?.status === 401) {
         setModalError('Phiên đăng nhập hết hạn hoặc không có quyền admin. Đang chuyển hướng đến trang đăng nhập...');
+        setErrorMessage('Phiên đăng nhập hết hạn hoặc không có quyền admin.');
         setTimeout(() => window.location.href = '/admin/login', 2000);
       } else {
         setModalError(err.response?.data?.message || 'Có lỗi xảy ra. Vui lòng thử lại.');
+        setErrorMessage(err.response?.data?.message || 'Có lỗi xảy ra khi lưu danh mục.');
       }
       console.error('Error saving category:', err);
     } finally {
@@ -136,8 +154,10 @@ const CategoryManagement = () => {
 
   // Handle delete
   const handleDelete = async (id) => {
+    setSuccessMessage(null);
+    setErrorMessage(null);
     if (!isAuthenticated()) {
-      setError('Vui lòng đăng nhập với quyền admin để xóa danh mục.');
+      setErrorMessage('Vui lòng đăng nhập với quyền admin để xóa danh mục.');
       setTimeout(() => window.location.href = '/admin/login', 2000);
       return;
     }
@@ -148,12 +168,13 @@ const CategoryManagement = () => {
         },
       });
       setCategories(categories.filter(category => category.id !== id));
+      setSuccessMessage('Xóa danh mục thành công');
     } catch (err) {
       if (err.response?.status === 401) {
-        setError('Phiên đăng nhập hết hạn hoặc không có quyền admin. Đang chuyển hướng đến trang đăng nhập...');
+        setErrorMessage('Phiên đăng nhập hết hạn hoặc không có quyền admin.');
         setTimeout(() => window.location.href = '/admin/login', 2000);
       } else {
-        setError('Không thể xóa danh mục. Vui lòng thử lại.');
+        setErrorMessage('Không thể xóa danh mục. Vui lòng thử lại.');
       }
       console.error('Error deleting category:', err);
     }
@@ -161,11 +182,11 @@ const CategoryManagement = () => {
 
   // Handle toggle status
   const handleToggleStatus = async (id) => {
+    setSuccessMessage(null);
+    setErrorMessage(null);
     if (!isAuthenticated()) {
-      setError('Vui lòng đăng nhập với quyền admin để thay đổi trạng thái.');
-      setTimeout(() => window.location.href = '/admin/login', 2000
-
-      );
+      setErrorMessage('Vui lòng đăng nhập với quyền admin để thay đổi trạng thái.');
+      setTimeout(() => window.location.href = '/admin/login', 2000);
       return;
     }
     try {
@@ -186,15 +207,22 @@ const CategoryManagement = () => {
       setCategories(categories.map(category =>
         category.id === id ? updatedCategory : category
       ));
+      setSuccessMessage(`Đã thay đổi trạng thái danh mục thành ${response.data.status === 'show' ? 'Hiển thị' : 'Ẩn'}`);
     } catch (err) {
       if (err.response?.status === 401) {
-        setError('Phiên đăng nhập hết hạn hoặc không có quyền admin. Đang chuyển hướng đến trang đăng nhập...');
+        setErrorMessage('Phiên đăng nhập hết hạn hoặc không có quyền admin.');
         setTimeout(() => window.location.href = '/admin/login', 2000);
       } else {
-        setError('Không thể thay đổi trạng thái danh mục. Vui lòng thử lại.');
+        setErrorMessage('Không thể thay đổi trạng thái danh mục. Vui lòng thử lại.');
       }
       console.error('Error toggling status:', err);
     }
+  };
+
+  // Handle close toast
+  const handleCloseToast = () => {
+    setSuccessMessage(null);
+    setErrorMessage(null);
   };
 
   // Filter categories based on search term
@@ -338,7 +366,6 @@ const CategoryManagement = () => {
               <h3 style={{ color: '#e74c3c', marginBottom: 12, fontWeight: 600 }}>Xác nhận xóa danh mục</h3>
               <p style={{ marginBottom: 24, color: '#333' }}>
                 <strong>Tất cả sản phẩm trong danh mục này sẽ bị ẩn đi.</strong><br />
-                
               </p>
               <div className={styles.formActions}>
                 <button
@@ -360,6 +387,22 @@ const CategoryManagement = () => {
               </div>
             </div>
           </div>
+        )}
+
+        {/* Toast Notifications */}
+        {successMessage && (
+          <ToastNotification
+            message={successMessage}
+            type="success"
+            onClose={handleCloseToast}
+          />
+        )}
+        {errorMessage && (
+          <ToastNotification
+            message={errorMessage}
+            type="error"
+            onClose={handleCloseToast}
+          />
         )}
       </div>
     </div>

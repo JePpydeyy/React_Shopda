@@ -191,7 +191,7 @@ const Cart = () => {
                           </div>
                           <div className={styles.productDetails}>
                             <h3>{item.name}</h3>
-                            <div className={styles.charmInfo}>Charm: {item.charm || 'N/A'}</div>
+                            {/* <div className={styles.charmInfo}>Charm: {item.charm || 'N/A'}</div> */}
                             <div className={styles.sizeInfo}>Size: {item.size_name || 'N/A'}</div>
                           </div>
                         </div>

@@ -3,6 +3,7 @@ import axios from 'axios';
 import Quill from 'quill';
 import 'quill/dist/quill.snow.css';
 import Sidebar from '../Sidebar/Sidebar';
+import ToastNotification from '../../../components/ToastNotification/ToastNotification';
 import styles from './Product.module.css';
 
 // Reusable TooltipButton component
@@ -47,6 +48,24 @@ const ErrorPopup = ({ errors, onClose }) => (
   </div>
 );
 
+// Reusable ConfirmPopup component
+const ConfirmPopup = ({ message, onConfirm, onCancel }) => (
+  <div className={styles.errorPopupOverlay}>
+    <div className={styles.confirmPopup}>
+      <h3>Xác nhận xóa</h3>
+      <p>{message}</p>
+      <div className={styles.confirmPopupActions}>
+        <button onClick={onConfirm} className={styles.confirmButton}>
+          Xác nhận
+        </button>
+        <button onClick={onCancel} className={styles.cancelButton}>
+          Hủy
+        </button>
+      </div>
+    </div>
+  </div>
+);
+
 // Tooltip guides
 const fieldGuides = {
   name: "Nhập tên sản phẩm rõ ràng, cụ thể. VD: 'Vòng tay Thạch Anh Hồng'",
@@ -58,7 +77,7 @@ const fieldGuides = {
   short_description: "Mô tả ngắn gọn (100-150 ký tự)",
   description: "Mô tả chi tiết: nguồn gốc, khối lượng, lợi ích, bảo quản...",
   images: "Chọn tối đa 10 ảnh chất lượng cao (JPEG, PNG, GIF)",
-  status: "Hiển thị: Hiện trên website | Ẩn: Không hiện | Sale: Đang giảm giá",
+  status: "Hiển thị: Hiện trên website | Ẩn: Không hiện",
   purchases: "Số lượng đã bán (mặc định 0, không âm)",
 };
 
@@ -70,10 +89,14 @@ const ProductManagement = () => {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [successMessage, setSuccessMessage] = useState(null);
+  const [errorMessage, setErrorMessage] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [editProduct, setEditProduct] = useState(null);
   const [addProduct, setAddProduct] = useState(false);
   const [showDetailProduct, setShowDetailProduct] = useState(null);
+  const [showConfirmPopup, setShowConfirmPopup] = useState(false);
+  const [pendingDeleteSlug, setPendingDeleteSlug] = useState(null);
   const [oldImages, setOldImages] = useState([]);
   const [formData, setFormData] = useState({
     name: '',
@@ -176,6 +199,8 @@ const ProductManagement = () => {
     const fetchData = async () => {
       try {
         setLoading(true);
+        setError(null);
+        setErrorMessage(null);
         const endpoint = statusFilter === 'show' ? `${API_URL}/product/show` : `${API_URL}/product`;
         const response = await axios.get(`${endpoint}?limit=1000`, {
           headers: token ? { Authorization: `Bearer ${token}` } : {},
@@ -183,6 +208,7 @@ const ProductManagement = () => {
         setProducts(response.data);
       } catch (err) {
         setError(err.response?.data?.message || 'Không thể tải dữ liệu sản phẩm');
+        setErrorMessage(err.response?.data?.message || 'Không thể tải dữ liệu sản phẩm');
       } finally {
         setLoading(false);
       }
@@ -194,16 +220,25 @@ const ProductManagement = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
+        setError(null);
+        setErrorMessage(null);
         const res = await axios.get(`${API_URL}/category`, {
           headers: token ? { Authorization: `Bearer ${token}` } : {},
         });
         setCategories(res.data);
       } catch (err) {
         setError(err.response?.data?.message || 'Không thể tải dữ liệu danh mục');
+        setErrorMessage(err.response?.data?.message || 'Không thể tải dữ liệu danh mục');
       }
     };
     fetchCategories();
   }, [token]);
+
+  // Handle close toast
+  const handleCloseToast = () => {
+    setSuccessMessage(null);
+    setErrorMessage(null);
+  };
 
   // Form handling
   const handleFormChange = useCallback((e) => {
@@ -279,6 +314,13 @@ const ProductManagement = () => {
 
   const handleFormSubmit = useCallback(async (e) => {
     e.preventDefault();
+    setSuccessMessage(null);
+    setErrorMessage(null);
+    if (!token) {
+      setErrorMessage('Vui lòng đăng nhập với quyền admin để lưu sản phẩm.');
+      setTimeout(() => window.location.href = '/admin/login', 2000);
+      return;
+    }
     if (!validateForm()) return;
 
     try {
@@ -331,6 +373,7 @@ const ProductManagement = () => {
         setProducts((prev) =>
           prev.map((p) => (p._id === editProduct._id ? response.data.product : p))
         );
+        setSuccessMessage('Cập nhật sản phẩm thành công');
       } else {
         response = await axios.post(
           `${API_URL}/product`,
@@ -338,18 +381,23 @@ const ProductManagement = () => {
           config
         );
         setProducts((prev) => [...prev, response.data.product]);
+        setSuccessMessage('Thêm sản phẩm thành công');
       }
 
       closeModal();
     } catch (err) {
-      setFormErrors({
-        api: err.response?.data?.error || err.response?.data?.message || 'Không thể lưu sản phẩm',
-      });
-      setShowErrorPopup(true);
+      if (err.response?.status === 401) {
+        setErrorMessage('Phiên đăng nhập hết hạn hoặc không có quyền admin.');
+        setTimeout(() => window.location.href = '/admin/login', 2000);
+      } else {
+        setErrorMessage(err.response?.data?.error || err.response?.data?.message || 'Không thể lưu sản phẩm');
+      }
     }
   }, [formData, editProduct, oldImages, categories, token, validateForm]);
 
   const handleEdit = useCallback((product) => {
+    setSuccessMessage(null);
+    setErrorMessage(null);
     const categoryId = product.category?._id || product.category?.id || '';
     setEditProduct(product);
     setAddProduct(false);
@@ -374,9 +422,12 @@ const ProductManagement = () => {
       images: [],
       purchases: (product.purchases || 0).toString(),
     });
+    setSuccessMessage('Tải thông tin sản phẩm để chỉnh sửa thành công');
   }, []);
 
   const handleAddProduct = useCallback(() => {
+    setSuccessMessage(null);
+    setErrorMessage(null);
     setAddProduct(true);
     setEditProduct(null);
     setOldImages([]);
@@ -396,6 +447,8 @@ const ProductManagement = () => {
   }, []);
 
   const closeModal = useCallback(() => {
+    setSuccessMessage(null);
+    setErrorMessage(null);
     setEditProduct(null);
     setAddProduct(false);
     setShowDetailProduct(null);
@@ -486,28 +539,66 @@ const ProductManagement = () => {
   }, [currentPage, totalPages, handlePageChange]);
 
   const handleShowDetails = useCallback((product, e) => {
+    setSuccessMessage(null);
+    setErrorMessage(null);
     if (e.target.tagName === 'BUTTON') return;
     setShowDetailProduct(product);
+    setSuccessMessage('Đã tải chi tiết sản phẩm thành công');
   }, []);
 
-  const handleDelete = useCallback(async (slug) => {
-    if (window.confirm('Bạn có chắc muốn xóa sản phẩm này?')) {
-      try {
-        await axios.delete(`${API_URL}/product/${slug}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setProducts((prev) => prev.filter((p) => p.slug !== slug));
-        setError(null);
-      } catch (err) {
+  const handleDelete = useCallback((slug) => {
+    setSuccessMessage(null);
+    setErrorMessage(null);
+    setPendingDeleteSlug(slug);
+    setShowConfirmPopup(true);
+  }, []);
+
+  const handleConfirmDelete = useCallback(async () => {
+    if (!token) {
+      setErrorMessage('Vui lòng đăng nhập với quyền admin để xóa sản phẩm.');
+      setShowConfirmPopup(false);
+      setPendingDeleteSlug(null);
+      setTimeout(() => window.location.href = '/admin/login', 2000);
+      return;
+    }
+    try {
+      await axios.delete(`${API_URL}/product/${pendingDeleteSlug}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setProducts((prev) => prev.filter((p) => p.slug !== pendingDeleteSlug));
+      setError(null);
+      setSuccessMessage('Xóa sản phẩm thành công');
+      setShowConfirmPopup(false);
+      setPendingDeleteSlug(null);
+    } catch (err) {
+      setShowConfirmPopup(false);
+      setPendingDeleteSlug(null);
+      if (err.response?.status === 401) {
+        setErrorMessage('Phiên đăng nhập hết hạn hoặc không có quyền admin.');
+        setTimeout(() => window.location.href = '/admin/login', 2000);
+      } else {
         setError(err.response?.data?.message || 'Không thể xóa sản phẩm');
+        setErrorMessage(err.response?.data?.message || 'Không thể xóa sản phẩm');
       }
     }
-  }, [token]);
+  }, [token, pendingDeleteSlug]);
+
+  const handleCancelDelete = useCallback(() => {
+    setShowConfirmPopup(false);
+    setPendingDeleteSlug(null);
+  }, []);
 
   const toggleStatus = useCallback(async (product) => {
-    const validStatuses = ['show', 'hidden', 'sale'];
+    setSuccessMessage(null);
+    setErrorMessage(null);
+    if (!token) {
+      setErrorMessage('Vui lòng đăng nhập với quyền admin để thay đổi trạng thái.');
+      setTimeout(() => window.location.href = '/admin/login', 2000);
+      return;
+    }
+    const validStatuses = ['show', 'hidden'];
     const currentStatus = product.status || 'show';
-    const newStatus = validStatuses[(validStatuses.indexOf(currentStatus) + 1) % validStatuses.length];
+    const newStatus = currentStatus === 'show' ? 'hidden' : 'show';
     try {
       const response = await axios.patch(
         `${API_URL}/product/${product.slug}/status`,
@@ -520,8 +611,15 @@ const ProductManagement = () => {
         prev.map((p) => (p._id === product._id ? response.data.product : p))
       );
       setError(null);
+      setSuccessMessage(`Đã đổi trạng thái sản phẩm thành ${newStatus === 'show' ? 'Hiển thị' : 'Ẩn'}`);
     } catch (err) {
-      setError(err.response?.data?.message || 'Không thể đổi trạng thái sản phẩm');
+      if (err.response?.status === 401) {
+        setErrorMessage('Phiên đăng nhập hết hạn hoặc không có quyền admin.');
+        setTimeout(() => window.location.href = '/admin/login', 2000);
+      } else {
+        setError(err.response?.data?.message || 'Không thể đổi trạng thái sản phẩm');
+        setErrorMessage(err.response?.data?.message || 'Không thể đổi trạng thái sản phẩm');
+      }
     }
   }, [token]);
 
@@ -565,7 +663,6 @@ const ProductManagement = () => {
             <option value="all">Tất cả trạng thái</option>
             <option value="show">Hiển thị</option>
             <option value="hidden">Ẩn</option>
-            <option value="sale">Sale</option>
           </select>
           <button onClick={handleAddProduct} className={styles.addButton}>
             Thêm Sản Phẩm
@@ -605,9 +702,7 @@ const ProductManagement = () => {
                   <td>{product.name}</td>
                   <td>{product.category?.name_categories || 'Chưa xác định'}</td>
                   <td>{calculateTotalStock(product)}</td>
-                  <td>
-                    {product.status === 'show' ? 'Hiển thị' : product.status === 'hidden' ? 'Ẩn' : 'Sale'}
-                  </td>
+                  <td>{product.status === 'show' ? 'Hiển thị' : 'Ẩn'}</td>
                   <td onClick={(e) => e.stopPropagation()}>
                     <button
                       onClick={() => handleEdit(product)}
@@ -619,7 +714,7 @@ const ProductManagement = () => {
                       onClick={() => toggleStatus(product)}
                       className={`${styles.actionButton} ${styles.toggleButton}`}
                     >
-                      {product.status === 'show' ? 'Ẩn' : product.status === 'hidden' ? 'Hiện' : 'Hủy Sale'}
+                      {product.status === 'show' ? 'Ẩn' : 'Hiện'}
                     </button>
                     <button
                       onClick={() => handleDelete(product.slug)}
@@ -944,7 +1039,6 @@ const ProductManagement = () => {
                   >
                     <option value="show">Hiển thị</option>
                     <option value="hidden">Ẩn</option>
-                    <option value="sale">Sale</option>
                   </select>
                 </div>
                 <div className={styles.formGroup}>
@@ -991,7 +1085,7 @@ const ProductManagement = () => {
                 <p><strong>Thẻ:</strong> {showDetailProduct.tag || 'Chưa xác định'}</p>
                 <p><strong>Mô tả ngắn:</strong> {showDetailProduct.short_description || 'Chưa có'}</p>
                 <p><strong>Mô tả chi tiết:</strong> <div dangerouslySetInnerHTML={{ __html: showDetailProduct.description || 'Chưa có' }} /></p>
-                <p><strong>các size còn trong kho:</strong></p>
+                <p><strong>Các size còn trong kho:</strong></p>
                 <ul>
                   {(showDetailProduct.option || []).map((opt, index) => (
                     <li key={opt._id || index}>
@@ -1028,6 +1122,27 @@ const ProductManagement = () => {
         )}
         {showErrorPopup && (
           <ErrorPopup errors={formErrors} onClose={closeErrorPopup} />
+        )}
+        {showConfirmPopup && (
+          <ConfirmPopup
+            message="Bạn có chắc muốn xóa sản phẩm này?"
+            onConfirm={handleConfirmDelete}
+            onCancel={handleCancelDelete}
+          />
+        )}
+        {successMessage && (
+          <ToastNotification
+            message={successMessage}
+            type="success"
+            onClose={handleCloseToast}
+          />
+        )}
+        {errorMessage && (
+          <ToastNotification
+            message={errorMessage}
+            type="error"
+            onClose={handleCloseToast}
+          />
         )}
       </div>
     </div>
