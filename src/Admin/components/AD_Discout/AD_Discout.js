@@ -278,7 +278,7 @@ const AD_Discount = () => {
                 <tbody>
                   {currentDiscounts.map((d, idx) => (
                     <React.Fragment key={d._id}>
-                      <tr className={styles.tableRow}>
+                      <tr className={styles.tableRow} onClick={() => fetchOrderDetails(d._id)}>
                         <td>{indexOfFirstDiscount + idx + 1}</td>
                         <td>{d.code}</td>
                         <td>{d.discountPercentage}</td>
@@ -312,12 +312,6 @@ const AD_Discount = () => {
                             onClick={() => handleToggleActive(d)}
                           >
                             {d.isActive ? 'Vô hiệu' : 'Kích hoạt'}
-                          </button>
-                          <button
-                            className={styles.actionButton}
-                            onClick={() => fetchOrderDetails(d._id)}
-                          >
-                            Xem chi tiết
                           </button>
                         </td>
                       </tr>
