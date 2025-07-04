@@ -51,7 +51,7 @@ const ErrorPopup = ({ errors, onClose }) => (
 const fieldGuides = {
   name: "Nhập tên sản phẩm rõ ràng, cụ thể. VD: 'Vòng tay Thạch Anh Hồng'",
   category: "Chọn danh mục phù hợp nhất với sản phẩm của bạn",
-  option: "Thêm các kích thước, tồn kho và giá. VD: 12cm, 10 đơn vị, 150000 VNĐ",
+  option: "Thêm các kích thước, tồn kho và giá. VD: 12cm, 10 tồn kho, 150000 VNĐ",
   level: "Phân loại: Cao Cấp, Trung Cấp, Phổ biến",
   element: "Nguyên tố phong thủy: Thổ, Kim, Mộc, Hỏa, Thủy",
   tag: "Sale: Giảm giá | New: Sản phẩm mới",
@@ -991,11 +991,11 @@ const ProductManagement = () => {
                 <p><strong>Thẻ:</strong> {showDetailProduct.tag || 'Chưa xác định'}</p>
                 <p><strong>Mô tả ngắn:</strong> {showDetailProduct.short_description || 'Chưa có'}</p>
                 <p><strong>Mô tả chi tiết:</strong> <div dangerouslySetInnerHTML={{ __html: showDetailProduct.description || 'Chưa có' }} /></p>
-                <p><strong>Tùy chọn kích thước:</strong></p>
+                <p><strong>các size còn trong kho:</strong></p>
                 <ul>
                   {(showDetailProduct.option || []).map((opt, index) => (
                     <li key={opt._id || index}>
-                      {opt.size_name || 'Chưa xác định'}: {opt.stock || 0} đơn vị, Giá: {(opt.price || 0).toLocaleString('vi-VN')} VNĐ
+                      {opt.size_name || 'Chưa xác định'}, {opt.stock || 0} tồn kho, Giá: {(opt.price || 0).toLocaleString('vi-VN')} VNĐ
                     </li>
                   ))}
                 </ul>

@@ -188,7 +188,7 @@ const OrderManagement = () => {
             p { margin: 10px 0; font-size: 16px; }
             strong { color: #1a1a3d; font-weight: bold; }
             table { width: 100%; border-collapse: collapse; margin: 10px 0; }
-            th, td { padding: 8px; text-align: left; border-bottom: 1px solid #ccc; }
+            th, personally { padding: 8px; text-align: left; border-bottom: 1px solid #ccc; }
           </style>
         </head>
         <body onload="window.print(); window.close();">
