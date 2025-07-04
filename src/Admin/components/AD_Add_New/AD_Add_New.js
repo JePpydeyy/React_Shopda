@@ -13,7 +13,7 @@ const AddNews = () => {
     contentBlocks: [],
     status: 'show',
     views: 0,
-    categoryNew: '', // ✅ đổi tên chuẩn camelCase
+    categoryNew: '',
   });
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -50,6 +50,7 @@ const AddNews = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    if (name === 'title' && value.length > 120) return;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
@@ -146,7 +147,7 @@ const AddNews = () => {
       formDataToSend.append('status', formData.status);
       formDataToSend.append('publishedAt', new Date().toISOString());
       formDataToSend.append('views', formData.views.toString());
-      formDataToSend.append('categoryNew', formData.categoryNew); // ✅ đúng key
+      formDataToSend.append('category-new', JSON.stringify({ oid: formData.categoryNew }));
       formDataToSend.append('contentBlocks', JSON.stringify(processedBlocks));
 
       formData.contentBlocks.forEach((block) => {
@@ -184,8 +185,8 @@ const AddNews = () => {
           <div className={styles.formGroup}>
             <label>Tiêu đề</label>
             <input
-              className={styles.inputField}
               name="title"
+              className={styles.inputField}
               value={formData.title}
               onChange={handleChange}
               placeholder="Nhập tiêu đề"
@@ -219,7 +220,7 @@ const AddNews = () => {
               name="thumbnailCaption"
               value={formData.thumbnailCaption}
               onChange={handleChange}
-              placeholder="Nhập chú thích hình ảnh"
+              placeholder="Nhập chú thích"
             />
           </div>
 
@@ -272,10 +273,7 @@ const AddNews = () => {
                       <input
                         type="file"
                         accept="image/jpeg,image/png"
-                        onChange={(e) => {
-                          const file = e.target.files?.[0] || null;
-                          handleBlockChange(index, 'url', file);
-                        }}
+                        onChange={(e) => handleBlockChange(index, 'url', e.target.files?.[0])}
                         className={styles.blockInput}
                       />
                       <input

@@ -14,25 +14,24 @@ const NewsManagement = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedArticle, setSelectedArticle] = useState(null);
-  const navigate = useNavigate();
+  const [currentPage, setCurrentPage] = useState(1);
 
+  const navigate = useNavigate();
   const API_BASE_URL = process.env.REACT_APP_API_BASE || 'https://api-tuyendung-cty.onrender.com';
   const PLACEHOLDER_IMAGE = 'https://via.placeholder.com/150';
+  const PAGE_SIZE = 12;
 
   useEffect(() => {
     const fetchCategories = async () => {
       try {
         const res = await fetch(`${API_BASE_URL}/api/new-category`, {
           headers: {
-            'Content-Type': 'application/json',
             Authorization: `Bearer ${localStorage.getItem('adminToken') || ''}`,
           },
         });
-        if (!res.ok) throw new Error('Lỗi tải danh mục');
         const result = await res.json();
         setCategories(Array.isArray(result) ? result : result.data || []);
-      } catch (err) {
-        console.error('Lỗi tải danh mục:', err);
+      } catch {
         setCategories([]);
       }
     };
@@ -44,21 +43,17 @@ const NewsManagement = () => {
       setLoading(true);
       const res = await fetch(`${API_BASE_URL}/api/new`, {
         headers: {
-          'Content-Type': 'application/json',
           Authorization: `Bearer ${localStorage.getItem('adminToken') || ''}`,
         },
       });
 
-      if (!res.ok) throw new Error(`Lỗi HTTP: ${res.status} ${res.statusText}`);
       const result = await res.json();
       const data = result.data || result.news || result || [];
 
       const transformed = data.map(item => {
-        const imageUrl = item.thumbnailUrl && typeof item.thumbnailUrl === 'string' && item.thumbnailUrl !== '+image'
-          ? item.thumbnailUrl.startsWith('http') || item.thumbnailUrl.startsWith('data:')
-            ? item.thumbnailUrl
-            : `${API_BASE_URL}/${item.thumbnailUrl.replace(/^\/+/g, '')}`
-          : PLACEHOLDER_IMAGE;
+        const imageUrl = item.thumbnailUrl?.startsWith('http')
+          ? item.thumbnailUrl
+          : `${API_BASE_URL}/${item.thumbnailUrl?.replace(/^\/+/, '')}`;
 
         const categoryOid = item['category-new']?.oid || '';
         const category = categories.find(c => c._id === categoryOid)?.category || 'Chưa phân loại';
@@ -67,24 +62,17 @@ const NewsManagement = () => {
           id: item._id,
           slug: item.slug,
           title: item.title || 'Không có tiêu đề',
-          content: item.contentBlocks ? item.contentBlocks.map(block => {
-            if (block.type === 'text') return `<p>${block.content}</p>`;
-            if (block.type === 'image') return `<img src="${block.url.startsWith('http') || block.url.startsWith('data:') ? block.url : `${API_BASE_URL}/${block.url.replace(/^\/+/g, '')}`}" alt="${block.caption || ''}" />`;
-            return '';
-          }).join('') : '',
           publishedAt: item.publishedAt || item.createdAt,
           views: item.views || 0,
-          reviews: item.reviews || 0,
           status: item.status === 'show' ? 'Hiển thị' : 'Ẩn',
           category: categoryOid,
           categoryName: category,
-          image: imageUrl,
+          image: imageUrl || PLACEHOLDER_IMAGE,
         };
       });
 
       setNews(transformed);
     } catch (err) {
-      console.error('Lỗi fetchNews:', err);
       setError(err.message);
     } finally {
       setLoading(false);
@@ -101,6 +89,9 @@ const NewsManagement = () => {
     (categoryFilter === 'all' || article.category === categoryFilter)
   );
 
+  const paginatedNews = filteredNews.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
+  const totalPages = Math.ceil(filteredNews.length / PAGE_SIZE);
+
   const handleEdit = (slug) => {
     navigate(`/admin/editnew/${slug}`);
   };
@@ -114,29 +105,18 @@ const NewsManagement = () => {
     try {
       setLoading(true);
       const token = localStorage.getItem('adminToken');
-      if (!token) {
-        throw new Error('Vui lòng đăng nhập lại.');
-      }
+      const article = news.find(item => item.slug === slug);
+      if (!article) throw new Error('Không tìm thấy bài viết.');
 
       const formDataToSend = new FormData();
-      const article = news.find(item => item.slug === slug);
-      if (!article) {
-        throw new Error('Không tìm thấy bài viết.');
-      }
-
       formDataToSend.append('title', article.title);
       formDataToSend.append('slug', article.slug);
       formDataToSend.append('thumbnailUrl', article.image !== PLACEHOLDER_IMAGE ? article.image : '');
-      formDataToSend.append('thumbnailCaption', ''); // Assuming no change to caption
+      formDataToSend.append('thumbnailCaption', '');
       formDataToSend.append('status', newStatus);
       formDataToSend.append('publishedAt', article.publishedAt || new Date().toISOString());
       formDataToSend.append('views', article.views.toString());
-      formDataToSend.append('contentBlocks', JSON.stringify(article.content ? article.content.split('<p>').filter(p => p).map(p => ({
-        type: 'text',
-        content: p.replace('</p>', ''),
-        caption: '',
-        url: '',
-      })) : []));
+      formDataToSend.append('contentBlocks', JSON.stringify([]));
       formDataToSend.append('category-new', JSON.stringify({ oid: article.category }));
 
       const res = await fetch(`${API_BASE_URL}/api/new/${slug}`, {
@@ -148,19 +128,15 @@ const NewsManagement = () => {
       });
 
       const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data.error || `Cập nhật thất bại: ${data.message || 'Lỗi không xác định'}`);
-      }
+      if (!res.ok) throw new Error(data.error || 'Lỗi không xác định');
 
       await fetchNews();
-
       if (selectedArticle?.slug === slug) {
         setSelectedArticle(prev => ({ ...prev, status: statusLabel }));
       }
 
       alert(`Đã cập nhật trạng thái: ${statusLabel}`);
     } catch (err) {
-      console.error('Lỗi cập nhật trạng thái:', err);
       alert(`Lỗi cập nhật trạng thái: ${err.message}`);
     } finally {
       setLoading(false);
@@ -191,17 +167,23 @@ const NewsManagement = () => {
     }
   };
 
-  const createMarkup = (html) => {
-    const safeHTML = html?.replace(
-      /<img\s+[^>]*src=["']([^"']+)["']/gi,
-      (_, src) => {
-        if (!src || src === '+image') {
-          return `<img src="${PLACEHOLDER_IMAGE}"`;
-        }
-        return `<img src="${src.startsWith('http') || src.startsWith('data:') ? src : `${API_BASE_URL}/${src.replace(/^\/+/g, '')}`}"`;
+  const handleShowDetail = async (article) => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/new/${article.slug}`);
+      const result = await res.json();
+      if (res.ok) {
+        const contentData = result.data || result;
+        const contentBlocks = contentData.contentBlocks || [];
+        setSelectedArticle({
+          ...article,
+          contentBlocks,
+        });
+      } else {
+        alert('Không lấy được nội dung bài viết');
       }
-    );
-    return { __html: safeHTML || '' };
+    } catch (err) {
+      alert('Lỗi khi lấy nội dung chi tiết: ' + err.message);
+    }
   };
 
   if (loading) return <div className={styles.container}>Đang tải...</div>;
@@ -221,20 +203,12 @@ const NewsManagement = () => {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
-          <select
-            className={styles.filterSelect}
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-          >
+          <select className={styles.filterSelect} value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
             <option value="all">Tất cả trạng thái</option>
             <option value="Hiển thị">Hiển thị</option>
             <option value="Ẩn">Ẩn</option>
           </select>
-          <select
-            className={styles.filterSelect}
-            value={categoryFilter}
-            onChange={(e) => setCategoryFilter(e.target.value)}
-          >
+          <select className={styles.filterSelect} value={categoryFilter} onChange={(e) => setCategoryFilter(e.target.value)}>
             <option value="all">Tất cả danh mục</option>
             <option value="">Chưa phân loại</option>
             {categories.map(c => (
@@ -252,83 +226,98 @@ const NewsManagement = () => {
                 <th>Danh mục</th>
                 <th>Ngày xuất bản</th>
                 <th>Lượt xem</th>
-                <th>Lượt đánh giá</th>
                 <th>Trạng thái</th>
                 <th>Hành động</th>
               </tr>
             </thead>
             <tbody>
-              {filteredNews.length > 0 ? filteredNews.map(article => (
-                <tr key={article.slug} className={styles.tableRow} onClick={() => setSelectedArticle(article)}>
-                  <td>{article.title}</td>
+              {paginatedNews.length > 0 ? paginatedNews.map(article => (
+                <tr key={article.slug} className={styles.tableRow} onClick={() => handleShowDetail(article)}>
+                  <td>{article.title.length > 60 ? article.title.slice(0, 57) + '...' : article.title}</td>
                   <td>{article.categoryName}</td>
                   <td>{new Date(article.publishedAt).toLocaleDateString('vi-VN')}</td>
                   <td>{article.views}</td>
-                  <td>{article.reviews}</td>
                   <td>
                     <span className={`${styles.status} ${article.status === 'Hiển thị' ? styles.statusShow : styles.statusHidden}`}>
                       {article.status}
                     </span>
                   </td>
                   <td>
-                    <button
-                      className={styles.iconButton}
-                      title="Chỉnh sửa"
-                      onClick={(e) => { e.stopPropagation(); handleEdit(article.slug); }}
-                    >
+                    <button className={styles.iconButton} title="Chỉnh sửa" onClick={(e) => { e.stopPropagation(); handleEdit(article.slug); }}>
                       <FontAwesomeIcon icon={faPenToSquare} />
                     </button>
-                    <button
-                      className={styles.iconButton}
-                      title={article.status === 'Hiển thị' ? 'Ẩn bài viết' : 'Hiển thị bài viết'}
-                      onClick={(e) => { e.stopPropagation(); handleToggleStatus(article.slug, article.status); }}
-                    >
+                    <button className={styles.iconButton} title={article.status === 'Hiển thị' ? 'Ẩn bài viết' : 'Hiển thị bài viết'} onClick={(e) => { e.stopPropagation(); handleToggleStatus(article.slug, article.status); }}>
                       <FontAwesomeIcon icon={article.status === 'Hiển thị' ? faEyeSlash : faEye} />
                     </button>
-                    <button
-                      className={styles.iconButton}
-                      title="Xóa bài viết"
-                      onClick={(e) => { e.stopPropagation(); handleDeleteArticle(article.slug); }}
-                    >
+                    <button className={styles.iconButton} title="Xóa bài viết" onClick={(e) => { e.stopPropagation(); handleDeleteArticle(article.slug); }}>
                       <FontAwesomeIcon icon={faTrash} />
                     </button>
                   </td>
                 </tr>
               )) : (
                 <tr>
-                  <td colSpan="7" className={styles.noData}>Không có bài viết để hiển thị.</td>
+                  <td colSpan="6" className={styles.noData}>Không có bài viết để hiển thị.</td>
                 </tr>
               )}
             </tbody>
           </table>
         </div>
 
-        {selectedArticle && (
-          <div className={styles.popupOverlay} onClick={(e) => e.target === e.currentTarget && setSelectedArticle(null)}>
-            <div className={styles.popup}>
-              <h2 className={styles.popupTitle}>Chi Tiết Bài Viết</h2>
-              <div className={styles.popupContent}>
-                <div className={styles.articleHeader}>
-                  <h3>{selectedArticle.title}</h3>
-                  <p className={styles.meta}>
-                    Danh mục: {selectedArticle.categoryName} |
-                    Ngày: {new Date(selectedArticle.publishedAt).toLocaleDateString('vi-VN')} |
-                    Lượt xem: {selectedArticle.views} | Lượt đánh giá: {selectedArticle.reviews} |
-                    Trạng thái: <span className={selectedArticle.status === 'Hiển thị' ? styles.statusShow : styles.statusHidden}>
-                      {selectedArticle.status}
-                    </span>
-                  </p>
-                </div>
-                <div className={styles.postImage}>
-                  <img src={selectedArticle.image} alt={selectedArticle.title} className={styles.articleImage} onError={(e) => e.target.src = PLACEHOLDER_IMAGE} />
-                </div>
-                <div className={styles.articleContent} dangerouslySetInnerHTML={createMarkup(selectedArticle.content)} />
-              </div>
-              <button className={styles.closeButton} onClick={() => setSelectedArticle(null)}>Đóng</button>
-            </div>
+        {totalPages > 1 && (
+          <div className={styles.pagination}>
+            {Array.from({ length: totalPages }, (_, i) => (
+              <button
+                key={i}
+                className={`${styles.pageButton} ${currentPage === i + 1 ? styles.activePage : ''}`}
+                onClick={() => setCurrentPage(i + 1)}
+              >
+                {i + 1}
+              </button>
+            ))}
           </div>
         )}
       </div>
+
+      {selectedArticle && (
+        <div className={styles.popupOverlay} onClick={() => setSelectedArticle(null)}>
+          <div className={styles.popup} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.articleHeader}>
+              <h3>{selectedArticle.title}</h3>
+              <div className={styles.meta}>
+                <div>Danh mục: {selectedArticle.categoryName}</div>
+                <div>Ngày xuất bản: {new Date(selectedArticle.publishedAt).toLocaleDateString('vi-VN')}</div>
+                <div>Lượt xem: {selectedArticle.views}</div>
+                <div>Trạng thái: {selectedArticle.status}</div>
+              </div>
+            </div>
+            <div className={styles.postImage}>
+              <img src={selectedArticle.image} alt="thumbnail" className={styles.articleImage} />
+            </div>
+            <div className={styles.articleContent}>
+              {selectedArticle.contentBlocks?.length > 0 ? selectedArticle.contentBlocks.map((block, index) => {
+                switch (block.type) {
+                  case 'heading': return <h2 key={index}>{block.content}</h2>;
+                  case 'sub_heading': return <h3 key={index}>{block.content}</h3>;
+                  case 'text': return <p key={index}>{block.content}</p>;
+                  case 'image': return (
+                    <div key={index} className={styles.articleImage}>
+                      <img src={block.url?.startsWith('http') ? block.url : `${API_BASE_URL}/${block.url}`} alt="block-img" />
+                      {block.caption && <p style={{ fontStyle: 'italic', textAlign: 'center' }}>{block.caption}</p>}
+                    </div>
+                  );
+                  case 'list': return (
+                    <ul key={index}>
+                      {block.items?.map((item, i) => <li key={i}>{item}</li>)}
+                    </ul>
+                  );
+                  default: return null;
+                }
+              }) : <p>Không có nội dung để hiển thị.</p>}
+            </div>
+            <button className={styles.closeButton} onClick={() => setSelectedArticle(null)}>Đóng</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
