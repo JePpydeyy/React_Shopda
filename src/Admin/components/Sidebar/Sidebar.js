@@ -55,12 +55,7 @@ const Sidebar = () => {
     { path: '/admin/categorynew', icon: 'fa-envelope', label: 'danh mục tin tức' },
     { path: '/admin/new', icon: 'fa-newspaper', label: 'Tin tức' },
     { path: '/admin/contact', icon: 'fa-envelope', label: 'Liên hệ' },
-<<<<<<< HEAD
     { path: '/admin/discout', icon: 'fa-envelope', label: 'Mã giảm giá' }
-=======
-    { path: '/admin/discout', icon: 'fa-envelope', label: 'mã giảm giá' }
-    
->>>>>>> 25f563bd58a01299a7db7ec17e27f9a10f1de508
 
   ];
 
