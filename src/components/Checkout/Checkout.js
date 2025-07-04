@@ -1,13 +1,13 @@
-// ...existing imports...
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import styles from './Checkout.module.css';
 import ToastNotification from '../ToastNotification/ToastNotification';
 
 const API_BASE_URL = process.env.REACT_APP_API_URL;
 
 const Checkout = () => {
-  // ...existing state...
+  // State declarations
   const [formData, setFormData] = useState({
     fullName: '',
     selectedDate: null,
@@ -18,7 +18,7 @@ const Checkout = () => {
     district: '',
     ward: '',
     addressDetail: '',
-    note: '',
+    note: ''
   });
   const [cartItems, setCartItems] = useState([]);
   const [appliedDiscount, setAppliedDiscount] = useState(null);
@@ -32,8 +32,6 @@ const Checkout = () => {
   const [districts, setDistricts] = useState([]);
   const [wards, setWards] = useState([]);
   const [orderSuccess, setOrderSuccess] = useState(false);
-
-  // State lưu bill
   const [billInfo, setBillInfo] = useState(null);
   const [billCart, setBillCart] = useState([]);
   const [billDiscount, setBillDiscount] = useState(null);
@@ -42,8 +40,7 @@ const Checkout = () => {
   const calendarRef = useRef(null);
   const navigate = useNavigate();
 
-  // ...existing useEffect for provinces, districts, wards...
-
+  // Fetch provinces, districts, and wards
   useEffect(() => {
     const fetchProvinces = async () => {
       try {
@@ -115,6 +112,7 @@ const Checkout = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [showCalendar]);
 
+  // Render calendar
   const renderCalendar = () => {
     const firstDay = new Date(currentYear, currentMonth, 1);
     const lastDay = new Date(currentYear, currentMonth + 1, 0);
@@ -151,25 +149,11 @@ const Checkout = () => {
 
   const formatPrice = (price) => new Intl.NumberFormat('vi-VN').format(price) + ' VND';
 
-  const updateProductStock = async (productId, sizeName, quantity) => {
-    if (!sizeName || !productId || !quantity) return;
-    try {
-      await fetch(`${API_BASE_URL}/products/${productId}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          size: [{ size_name: sizeName, stock: -quantity }],
-        }),
-      });
-    } catch (error) {
-      // Không cần thông báo lỗi stock ở đây
-    }
-  };
-
+  // Handle order submission
   const handleOrder = async () => {
     // Validate required fields
-    if (!formData.fullName || !formData.selectedDate || !formData.phone || !formData.email || !formData.country || !formData.province || !formData.district || !formData.ward || !formData.addressDetail) {
-      setToastMessage('Mời bạn nhập đầy đủ thông tin.');
+    if (!formData.fullName || !formData.phone || !formData.email || !formData.country || !formData.province || !formData.district || !formData.ward || !formData.addressDetail) {
+      setToastMessage('Vui lòng nhập đầy đủ thông tin bắt buộc.');
       setToastType('error');
       setShowToast(true);
       return;
@@ -198,81 +182,46 @@ const Checkout = () => {
       return;
     }
 
-    // Lưu lại thông tin bill trước khi reset, bao gồm tên tỉnh/thành/quận/xã
-    setBillInfo({
-      ...formData,
-      provinceName: provinces.find(p => p.code === parseInt(formData.province))?.name || '',
-      districtName: districts.find(d => d.code === parseInt(formData.district))?.name || '',
-      wardName: wards.find(w => w.code === parseInt(formData.ward))?.name || ''
-    });
-    setBillCart([...cartItems]);
-    setBillDiscount(appliedDiscount);
-
     // Construct order data
+    const subtotal = cartItems.reduce((sum, item) => sum + (parseFloat(item.price) || 0) * (parseInt(item.quantity) || 1), 0);
     const orderData = {
       fullName: formData.fullName.trim(),
       dateOfBirth: formData.selectedDate ? formData.selectedDate.toISOString() : null,
       phoneNumber: formData.phone.trim(),
       email: formData.email.trim(),
       country: 'Việt Nam',
-      city: provinces.find(p => p.code === parseInt(formData.province))?.name || formData.province,
-      district: districts.find(d => d.code === parseInt(formData.district))?.name || formData.district,
-      ward: wards.find(w => w.code === parseInt(formData.ward))?.name || formData.ward,
+      city: provinces.find(p => p.code === parseInt(formData.province))?.name || '',
+      district: districts.find(d => d.code === parseInt(formData.district))?.name || '',
+      ward: wards.find(w => w.code === parseInt(formData.ward))?.name || '',
       address: formData.addressDetail.trim(),
       orderNote: formData.note ? formData.note.trim() : '',
       products: cartItems.map(item => ({
         productId: item._id || item.productId || '',
         productName: item.name || 'Unknown Product',
+        size_name: item.size_name || 'N/A',
         quantity: parseInt(item.quantity) || 1,
-        price: parseFloat(item.price) || 0,
-        ...(item.size_name && item.size_name.trim() !== '' ? { size_name: item.size_name } : {})
+        price: parseFloat(item.price) || 0
       })),
-      totalAmount: cartItems.reduce((sum, item) => sum + (parseFloat(item.price) || 0) * (parseInt(item.quantity) || 1), 0),
-      grandTotal: appliedDiscount
-        ? cartItems.reduce((sum, item) => sum + (parseFloat(item.price) || 0) * (parseInt(item.quantity) || 1), 0) -
-          (cartItems.reduce((sum, item) => sum + (parseFloat(item.price) || 0) * (parseInt(item.quantity) || 1), 0) * (appliedDiscount.discountPercentage || 0)) / 100
-        : cartItems.reduce((sum, item) => sum + (parseFloat(item.price) || 0) * (parseInt(item.quantity) || 1), 0),
-      status: 'Chờ xử lý'
+      totalAmount: subtotal,
+      grandTotal: appliedDiscount ? appliedDiscount.grandTotal : subtotal,
+      discountCode: appliedDiscount ? appliedDiscount.code : null
     };
+
     try {
-      const orderResponse = await fetch(`${API_BASE_URL}/order`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(orderData),
+      const response = await axios.post(`${API_BASE_URL}/orders`, orderData);
+      // Lưu thông tin bill
+      setBillInfo({
+        ...formData,
+        provinceName: provinces.find(p => p.code === parseInt(formData.province))?.name || '',
+        districtName: districts.find(d => d.code === parseInt(formData.district))?.name || '',
+        wardName: wards.find(w => w.code === parseInt(formData.ward))?.name || ''
       });
+      setBillCart([...cartItems]);
+      setBillDiscount(appliedDiscount);
 
-      if (!orderResponse.ok) {
-        const errorData = await orderResponse.json().catch(() => ({ message: 'Không nhận được phản hồi từ server' }));
-        throw new Error(errorData.message || `Lỗi gửi đơn hàng: ${orderResponse.status} ${orderResponse.statusText}`);
-      }
-
-      // Update stock for each product
-      for (const item of cartItems) {
-        const productId = item._id || item.productId;
-        const sizeName = item.size_name;
-        const quantity = parseInt(item.quantity) || 1;
-        if (productId && sizeName && quantity > 0) {
-          await updateProductStock(productId, sizeName, quantity);
-        }
-      }
-
-      // Apply discount if present
-      if (appliedDiscount && appliedDiscount.code) {
-        try {
-          await fetch(`${API_BASE_URL}/discount/apply`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ code: appliedDiscount.code }),
-          });
-        } catch (discountError) {
-          // Không cần thông báo lỗi discount ở đây
-        }
-      }
-
-      // Xóa localStorage và reset state
+      // Xóa dữ liệu sau khi đặt hàng thành công
       localStorage.removeItem('cart_da');
       localStorage.removeItem('applied_discount');
-      localStorage.removeItem('checkoutFormData');
       setCartItems([]);
       setAppliedDiscount(null);
       setFormData({
@@ -285,15 +234,17 @@ const Checkout = () => {
         district: '',
         ward: '',
         addressDetail: '',
-        note: '',
+        note: ''
       });
       setDistricts([]);
       setWards([]);
-
       setOrderSuccess(true);
-
+      setToastMessage('Đặt hàng thành công!');
+      setToastType('success');
+      setShowToast(true);
     } catch (error) {
-      setToastMessage(`Không thể đặt hàng: ${error.message}`);
+      console.error('Order error:', error);
+      setToastMessage(error.response?.data?.message || 'Có lỗi xảy ra khi đặt hàng.');
       setToastType('error');
       setShowToast(true);
     }
@@ -303,13 +254,17 @@ const Checkout = () => {
     setShowToast(false);
   };
 
-  // Tính lại tổng cho bill (dùng billCart, billDiscount)
-  const billSubtotal = billCart.reduce((sum, item) => sum + (parseFloat(item.price) || 0) * (parseInt(item.quantity) || 1), 0);
-  const billDiscountAmount = billDiscount ? (billSubtotal * (billDiscount.discountPercentage || 0)) / 100 : 0;
-  const billGrandTotal = billSubtotal - billDiscountAmount;
+  // Tính toán cho hiển thị
+  const subtotal = cartItems.reduce((sum, item) => sum + (parseFloat(item.price) || 0) * (parseInt(item.quantity) || 1), 0);
+  const discountAmount = appliedDiscount ? (subtotal * (appliedDiscount.discountPercentage || 0)) / 100 : 0;
+  const grandTotal = appliedDiscount ? appliedDiscount.grandTotal : subtotal;
 
-  // Trang in bill khi đặt hàng thành công (KHÔNG có nút in hóa đơn)
+  // Success page
   if (orderSuccess) {
+    const billSubtotal = billCart.reduce((sum, item) => sum + (parseFloat(item.price) || 0) * (parseInt(item.quantity) || 1), 0);
+    const billDiscountAmount = billDiscount ? (billSubtotal * (billDiscount.discountPercentage || 0)) / 100 : 0;
+    const billGrandTotal = billSubtotal - billDiscountAmount;
+
     return (
       <div className={styles.successContainer}>
         <div className={styles.successBox} id="bill-print">
@@ -318,6 +273,7 @@ const Checkout = () => {
           <h3>HÓA ĐƠN ĐẶT HÀNG</h3>
           <div className={styles.billInfo}>
             <p><b>Khách hàng:</b> {billInfo?.fullName}</p>
+            <p><b>Ngày sinh:</b> {billInfo?.selectedDate ? billInfo.selectedDate.toLocaleDateString('vi-VN') : 'Không có'}</p>
             <p><b>SĐT:</b> {billInfo?.phone}</p>
             <p><b>Email:</b> {billInfo?.email}</p>
             <p>
@@ -358,8 +314,8 @@ const Checkout = () => {
             <p>Tổng cộng: <b>{formatPrice(billGrandTotal)}</b></p>
             <p>Giao hàng: <b>Miễn phí vận chuyển</b></p>
           </div>
-          <p style={{marginTop: 16}}>Đơn hàng của bạn đã được ghi nhận. Vui lòng để ý điện thoại, nhân viên sẽ liên hệ xác nhận trong 2-3 ngày tới.</p>
-          <div style={{marginTop: 24}}>
+          <p style={{ marginTop: 16 }}>Đơn hàng của bạn đã được ghi nhận. Vui lòng để ý điện thoại, nhân viên sẽ liên hệ xác nhận trong 2-3 ngày tới.</p>
+          <div style={{ marginTop: 24 }}>
             <button className={styles.successBtn} onClick={() => navigate('/')}>Về trang chủ</button>
           </div>
         </div>
@@ -367,37 +323,36 @@ const Checkout = () => {
     );
   }
 
-  
   return (
     <div className={styles.container}>
-      <h1 className={`${styles.container} h1`}>Đặt Hàng</h1>
+      <h1 className={styles.container}>Đặt Hàng</h1>
       <div className={styles.formContainer}>
         <div className={styles.customerInfo}>
-          <h2 className={`${styles.customerInfo} h2`}>THÔNG TIN KHÁCH HÀNG</h2>
-          <p className={styles.error} style={{ display: !formData.fullName || !formData.selectedDate || !formData.phone || !formData.email || !formData.country || !formData.province || !formData.district || !formData.ward || !formData.addressDetail ? 'block' : 'none' }}>
-            Mời bạn nhập đầy đủ thông tin.
+          <h2 className={styles.customerInfo}>THÔNG TIN KHÁCH HÀNG</h2>
+          <p className={styles.error} style={{ display: !formData.fullName || !formData.phone || !formData.email || !formData.country || !formData.province || !formData.district || !formData.ward || !formData.addressDetail ? 'block' : 'none' }}>
+            Vui lòng nhập đầy đủ thông tin bắt buộc.
           </p>
           <div className={styles.formGroup}>
-            <label htmlFor="full-name" className={`${styles.formGroup} label`}>Họ và tên *</label>
+            <label htmlFor="full-name" className={styles.formGroup}>Họ và tên *</label>
             <input
               type="text"
               id="full-name"
               value={formData.fullName}
               onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
               placeholder="Họ tên của bạn"
-              className={`${styles.formGroup} input`}
+              className={styles.formGroup}
             />
           </div>
           <div className={styles.formGroup}>
-            <label htmlFor="birth-date" className={`${styles.formGroup} label`}>Ngày sinh *</label>
+            <label htmlFor="birth-date" className={styles.formGroup}>Ngày sinh (không bắt buộc)</label>
             <div className={styles.datePicker} ref={calendarRef}>
               <input
                 type="text"
                 id="selected-date"
                 value={formData.selectedDate ? `${formData.selectedDate.getDate()} ${monthNames[formData.selectedDate.getMonth()]} ${formData.selectedDate.getFullYear()}` : ''}
-                placeholder="Chọn ngày sinh"
+                placeholder="Chọn ngày sinh (không bắt buộc)"
                 readOnly
-                className={`${styles.datePicker} #selectedDate`}
+                className={styles.datePicker}
               />
               <button
                 className={styles.calendarBtn}
@@ -412,7 +367,7 @@ const Checkout = () => {
                       id="month-select"
                       value={currentMonth}
                       onChange={(e) => setCurrentMonth(parseInt(e.target.value))}
-                      className={`${styles.calendarHeader} select`}
+                      className={styles.calendarHeader}
                     >
                       {monthNames.map((month, index) => (
                         <option key={index} value={index}>{month}</option>
@@ -422,14 +377,14 @@ const Checkout = () => {
                       id="year-select"
                       value={currentYear}
                       onChange={(e) => setCurrentYear(parseInt(e.target.value))}
-                      className={`${styles.calendarHeader} select`}
+                      className={styles.calendarHeader}
                     >
                       {Array.from({ length: new Date().getFullYear() - 1899 }, (_, i) => new Date().getFullYear() - i).map(year => (
                         <option key={year} value={year}>{year}</option>
                       ))}
                     </select>
-                    <button onClick={setToday} className={`${styles.calendarHeader} button`}>Hôm nay</button>
-                    <button onClick={() => setShowCalendar(false)} className={`${styles.calendarHeader} button`}>Đóng</button>
+                    <button onClick={setToday} className={styles.calendarHeader}>Hôm nay</button>
+                    <button onClick={() => setShowCalendar(false)} className={styles.calendarHeader}>Đóng</button>
                   </div>
                   <div className={styles.calendarDays}>
                     <div>H</div><div>B</div><div>T</div><div>N</div><div>S</div><div>B</div><div>C</div>
@@ -443,47 +398,47 @@ const Checkout = () => {
           </div>
           <div className={`${styles.formGroup} ${styles.mergeForms}`}>
             <div className={styles.sdt}>
-              <label htmlFor="phone" className={`${styles.formGroup} label`}>Số điện thoại *</label>
+              <label htmlFor="phone" className={styles.formGroup}>Số điện thoại *</label>
               <input
                 type="tel"
                 id="phone"
                 value={formData.phone}
                 onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                 placeholder="Số điện thoại của bạn"
-                className={`${styles.formGroup} input`}
+                className={styles.formGroup}
               />
             </div>
             <div className={styles.email}>
-              <label htmlFor="email" className={`${styles.formGroup} label`}>Email *</label>
+              <label htmlFor="email" className={styles.formGroup}>Email *</label>
               <input
                 type="email"
                 id="email"
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 placeholder="Email của bạn"
-                className={`${styles.formGroup} input`}
+                className={styles.formGroup}
               />
             </div>
           </div>
           <div className={`${styles.formGroup} ${styles.mergeForms}`}>
             <div className={styles.country}>
-              <label htmlFor="country" className={`${styles.formGroup} label`}>Quốc gia *</label>
+              <label htmlFor="country" className={styles.formGroup}>Quốc gia *</label>
               <select
                 id="country"
                 value={formData.country}
                 onChange={(e) => setFormData({ ...formData, country: e.target.value })}
-                className={`${styles.formGroup} select`}
+                className={styles.formGroup}
               >
                 <option value="vietnam">Việt Nam</option>
               </select>
             </div>
             <div className={styles.province}>
-              <label htmlFor="province" className={`${styles.formGroup} label`}>Tỉnh/Thành phố *</label>
+              <label htmlFor="province" className={styles.formGroup}>Tỉnh/Thành phố *</label>
               <select
                 id="province"
                 value={formData.province}
                 onChange={(e) => setFormData({ ...formData, province: e.target.value })}
-                className={`${styles.formGroup} select`}
+                className={styles.formGroup}
               >
                 <option value="">Chọn tỉnh/thành phố</option>
                 {provinces.map(province => (
@@ -494,12 +449,12 @@ const Checkout = () => {
           </div>
           <div className={`${styles.formGroup} ${styles.mergeForms}`}>
             <div className={styles.districtWard}>
-              <label htmlFor="district" className={`${styles.formGroup} label`}>Quận/Huyện *</label>
+              <label htmlFor="district" className={styles.formGroup}>Quận/Huyện *</label>
               <select
                 id="district"
                 value={formData.district}
                 onChange={(e) => setFormData({ ...formData, district: e.target.value })}
-                className={`${styles.formGroup} select`}
+                className={styles.formGroup}
                 disabled={!formData.province}
               >
                 <option value="">Chọn quận/huyện</option>
@@ -509,80 +464,73 @@ const Checkout = () => {
               </select>
             </div>
             <div className={styles.ward}>
-              <label htmlFor="ward" className={`${styles.formGroup} label`}>Xã/Phường *</label>
+              <label htmlFor="ward" className={styles.formGroup}>Xã/Phường *</label>
               <select
                 id="ward"
                 value={formData.ward}
                 onChange={(e) => setFormData({ ...formData, ward: e.target.value })}
-                className={`${styles.formGroup} select`}
+                className={styles.formGroup}
                 disabled={!formData.district}
               >
                 <option value="">Chọn xã/phường</option>
                 {wards.map(ward => (
-                  <option key={ward.code} value={ward.code}>{ward.name}</option>
+                  <option key={ward.code} value={ward.name}>{ward.name}</option>
                 ))}
               </select>
             </div>
           </div>
           <div className={styles.formGroup}>
-            <label htmlFor="address-detail" className={`${styles.formGroup} label`}>Địa chỉ *</label>
+            <label htmlFor="address-detail" className={styles.formGroup}>Địa chỉ *</label>
             <input
               type="text"
               id="address-detail"
               value={formData.addressDetail}
               onChange={(e) => setFormData({ ...formData, addressDetail: e.target.value })}
               placeholder="Ví dụ: Số 20, ngõ 90"
-              className={`${styles.formGroup} input`}
+              className={styles.formGroup}
             />
           </div>
           <div className={styles.formGroup}>
-            <label htmlFor="note" className={`${styles.formGroup} label`}>Ghi chú đặt hàng</label>
+            <label htmlFor="note" className={styles.formGroup}>Ghi chú đặt hàng</label>
             <textarea
               id="note"
               value={formData.note}
               onChange={(e) => setFormData({ ...formData, note: e.target.value })}
               placeholder="Ghi chú cho đơn hàng của bạn"
-              className={`${styles.formGroup} textarea`}
+              className={styles.formGroup}
             />
           </div>
         </div>
         <div className={styles.orderInfo}>
-          <h2 className={`${styles.orderInfo} h2`}>THÔNG TIN ĐƠN HÀNG</h2>
+          <h2 className={styles.orderInfo}>THÔNG TIN ĐƠN HÀNG</h2>
           {cartItems.length > 0 && (
             <div className={styles.productList}>
-         
-        {cartItems.map((item, index) => (
-          <div key={index} className={styles.productGroup}>
-            <p className={styles.productName}>
-              {item.name} x {item.quantity} - {formatPrice((parseFloat(item.price) || 0) * (parseInt(item.quantity) || 1))}
-            </p>
-            <p className={styles.productDetails}>
-              Size: {item.size_name || 'N/A'}
-            </p>
-          </div>
-        ))}
-
+              {cartItems.map((item, index) => (
+                <div key={index} className={styles.productGroup}>
+                  <p className={styles.productName}>
+                    {item.name} x {item.quantity} - {formatPrice((parseFloat(item.price) || 0) * (parseInt(item.quantity) || 1))}
+                  </p>
+                  <p className={styles.productDetails}>
+                    Size: {item.size_name || 'N/A'}
+                  </p>
+                </div>
+              ))}
             </div>
           )}
           <div className={styles.order}>
             <div className={`${styles.orderItem} ${styles.total}`}>
               <p>Thành tiền</p>
-              <p>{formatPrice(cartItems.reduce((sum, item) => sum + (parseFloat(item.price) || 0) * (parseInt(item.quantity) || 1), 0))}</p>
+              <p>{formatPrice(subtotal)}</p>
             </div>
             {appliedDiscount && (
               <div className={styles.orderItem}>
                 <p>Giảm giá ({appliedDiscount.discountPercentage || 0}%)</p>
-                <p>-{formatPrice((cartItems.reduce((sum, item) => sum + (parseFloat(item.price) || 0) * (parseInt(item.quantity) || 1), 0) * (appliedDiscount.discountPercentage || 0)) / 100)}</p>
+                <p>-{formatPrice(discountAmount)}</p>
               </div>
             )}
             <div className={`${styles.orderItem} ${styles.total}`}>
               <p>Tổng tiền</p>
-              <p>
-                {formatPrice(
-                  cartItems.reduce((sum, item) => sum + (parseFloat(item.price) || 0) * (parseInt(item.quantity) || 1), 0) -
-                  (appliedDiscount ? (cartItems.reduce((sum, item) => sum + (parseFloat(item.price) || 0) * (parseInt(item.quantity) || 1), 0) * (appliedDiscount.discountPercentage || 0)) / 100 : 0)
-                )}
-              </p>
+              <p>{formatPrice(grandTotal)}</p>
             </div>
             <div className={styles.orderItem}>
               <p>Giao Hàng</p>
@@ -590,18 +538,13 @@ const Checkout = () => {
             </div>
             <div className={`${styles.orderItem} ${styles.total}`}>
               <p>Tổng cộng</p>
-              <p>
-                {formatPrice(
-                  cartItems.reduce((sum, item) => sum + (parseFloat(item.price) || 0) * (parseInt(item.quantity) || 1), 0) -
-                  (appliedDiscount ? (cartItems.reduce((sum, item) => sum + (parseFloat(item.price) || 0) * (parseInt(item.quantity) || 1), 0) * (appliedDiscount.discountPercentage || 0)) / 100 : 0)
-                )}
-              </p>
+              <p>{formatPrice(grandTotal)}</p>
             </div>
           </div>
           <div className={styles.orderBtn}>
             <button
               onClick={handleOrder}
-              className={`${styles.orderBtn} button`}
+              className={styles.orderBtn}
             >
               ĐẶT HÀNG
             </button>

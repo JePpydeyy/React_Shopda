@@ -2,15 +2,16 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes, faPlus, faMinus } from '@fortawesome/free-solid-svg-icons';
+import axios from 'axios';
 import styles from './Cart.module.css';
 import ToastNotification from '../ToastNotification/ToastNotification';
 
 const API_BASE_URL = process.env.REACT_APP_API_URL;
 
+
 const Cart = () => {
   const [cartItems, setCartItems] = useState([]);
   const [couponCode, setCouponCode] = useState('');
-  const [discounts, setDiscounts] = useState([]);
   const [appliedDiscount, setAppliedDiscount] = useState(null);
   const [errorMessage, setErrorMessage] = useState('');
   const [showToast, setShowToast] = useState(false);
@@ -20,22 +21,17 @@ const Cart = () => {
   const [itemToRemove, setItemToRemove] = useState(null);
   const navigate = useNavigate();
 
-  // Fetch cart items from localStorage
   useEffect(() => {
     const cart = JSON.parse(localStorage.getItem('cart_da')) || [];
     setCartItems(cart);
 
-    setAppliedDiscount(null);
-    localStorage.removeItem('applied_discount');
+    const savedDiscount = JSON.parse(localStorage.getItem('applied_discount'));
+    if (savedDiscount) {
+      setAppliedDiscount(savedDiscount);
+    } else {
+      setAppliedDiscount(null);
+    }
     setErrorMessage('');
-  }, []);
-
-  // Fetch discount codes from API
-  useEffect(() => {
-    fetch(`${API_BASE_URL}/discount`)
-      .then(res => res.json())
-      .then(data => setDiscounts(data))
-      .catch(() => setDiscounts([]));
   }, []);
 
   const formatPrice = price => new Intl.NumberFormat('vi-VN').format(price) + ' VND';
@@ -54,6 +50,9 @@ const Cart = () => {
     }
     setCartItems(newCart);
     localStorage.setItem('cart_da', JSON.stringify(newCart));
+    setAppliedDiscount(null);
+    localStorage.removeItem('applied_discount');
+    setErrorMessage('');
   };
 
   const increaseQuantity = (index) => {
@@ -93,68 +92,46 @@ const Cart = () => {
     closePopup();
   };
 
-  const applyCoupon = () => {
+  const applyCoupon = async () => {
     if (!couponCode.trim()) {
       setErrorMessage('Vui lòng nhập mã giảm giá!');
       setAppliedDiscount(null);
+      localStorage.removeItem('applied_discount');
       setToastMessage('Vui lòng nhập mã giảm giá!');
       setToastType('error');
       setShowToast(true);
       return;
     }
 
-    const now = new Date();
-    const coupon = discounts.find(d => d.code.toUpperCase() === couponCode.toUpperCase());
+    try {
+      const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+      const response = await axios.post(`${API_BASE_URL}/discounts/preview`, {
+        code: couponCode,
+        totalAmount: subtotal
+      });
 
-    if (!coupon) {
-      setErrorMessage('Mã giảm giá không tồn tại!');
+      const { discountCode, discountPercentage, grandTotal } = response.data;
+      const discount = { code: discountCode, discountPercentage, grandTotal };
+      setAppliedDiscount(discount);
+      localStorage.setItem('applied_discount', JSON.stringify(discount));
+      setErrorMessage('');
+      setCouponCode('');
+      setToastMessage(`Mã giảm giá ${discountCode} đã áp dụng thành công!`);
+      setToastType('success');
+      setShowToast(true);
+    } catch (error) {
       setAppliedDiscount(null);
-      setToastMessage('Mã giảm giá không tồn tại!');
+      localStorage.removeItem('applied_discount');
+      setErrorMessage(error.response?.data?.message || 'Có lỗi xảy ra khi áp dụng mã giảm giá!');
+      setToastMessage(error.response?.data?.message || 'Có lỗi xảy ra khi áp dụng mã giảm giá!');
       setToastType('error');
       setShowToast(true);
-      return;
     }
-
-    if (!coupon.isActive) {
-      setErrorMessage('Mã giảm giá không hoạt động!');
-      setAppliedDiscount(null);
-      setToastMessage('Mã giảm giá không hoạt động!');
-      setToastType('error');
-      setShowToast(true);
-      return;
-    }
-
-    if (new Date(coupon.expirationDate) < now) {
-      setErrorMessage('Mã giảm giá đã hết hạn!');
-      setAppliedDiscount(null);
-      setToastMessage('Mã giảm giá đã hết hạn!');
-      setToastType('error');
-      setShowToast(true);
-      return;
-    }
-
-    if (coupon.usedCount >= coupon.usageLimit) {
-      setErrorMessage('Mã giảm giá đã hết lượt sử dụng!');
-      setAppliedDiscount(null);
-      setToastMessage('Mã giảm giá đã hết lượt sử dụng!');
-      setToastType('error');
-      setShowToast(true);
-      return;
-    }
-
-    setAppliedDiscount(coupon);
-    setErrorMessage('');
-    setCouponCode('');
-    setToastMessage(`Mã giảm giá đã áp dụng thành công!`);
-    setToastType('success');
-    setShowToast(true);
   };
 
   const checkout = () => {
     if (cartItems.length > 0) {
-      if (appliedDiscount) {
-        localStorage.setItem('applied_discount', JSON.stringify(appliedDiscount));
-      }
+      // appliedDiscount đã được lưu vào localStorage trong applyCoupon
       navigate('/checkout');
     } else {
       setToastMessage('Giỏ hàng trống!');
@@ -180,7 +157,7 @@ const Cart = () => {
   const discountAmount = appliedDiscount
     ? (subtotal * appliedDiscount.discountPercentage) / 100
     : 0;
-  const grandTotal = subtotal - discountAmount;
+  const grandTotal = appliedDiscount ? appliedDiscount.grandTotal : subtotal;
 
   return (
     <div className={styles.container}>
@@ -218,7 +195,6 @@ const Cart = () => {
                           <div className={styles.productDetails}>
                             <h3>{item.name}</h3>
                             <div className={styles.charmInfo}>Charm: {item.charm}</div>
-                            {/* <div className={styles.sizeInfo}>Size Viên Đá: {item.stoneSize}</div> */}
                             <div className={styles.sizeInfo}>Size: {item.size_name}</div>
                           </div>
                         </div>
@@ -278,7 +254,6 @@ const Cart = () => {
                       <div className={styles.mobileProductDetails}>
                         <h3>{item.name}</h3>
                         <div className={styles.charmInfo}>Charm: {item.charm}</div>
-                        {/* <div className={styles.sizeInfo}>Size Viên Đá: {item.stoneSize}</div> */}
                         <div className={styles.sizeInfo}>Size: {item.size_name}</div>
                       </div>
                     </div>
@@ -290,13 +265,11 @@ const Cart = () => {
                       <FontAwesomeIcon icon={faTimes} />
                     </button>
                   </div>
-                  
                   <div className={styles.mobileCardBody}>
                     <div className={styles.mobilePriceRow}>
                       <span>Giá:</span>
                       <span className={styles.price}>{formatPrice(item.price)}</span>
                     </div>
-                    
                     <div className={styles.mobileQuantityRow}>
                       <span>Số lượng:</span>
                       <div className={styles.mobileQuantityControls}>
@@ -324,7 +297,6 @@ const Cart = () => {
                         </button>
                       </div>
                     </div>
-                    
                     <div className={styles.mobileTotalRow}>
                       <span>Thành tiền:</span>
                       <span className={styles.total}>{formatPrice(item.price * item.quantity)}</span>
@@ -345,6 +317,7 @@ const Cart = () => {
               <button className={styles.applyBtn} onClick={applyCoupon}>
                 Áp dụng
               </button>
+              {errorMessage && <p className={styles.errorMessage}>{errorMessage}</p>}
             </div>
 
             <div className={styles.bottomActions}>
