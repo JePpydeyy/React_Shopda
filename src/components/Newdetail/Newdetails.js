@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import styles from './postdetails.module.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -10,6 +10,8 @@ const PostDetail = () => {
   const [article, setArticle] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const hasIncrementedViews = useRef(false); 
+  const abortControllerRef = useRef(null); 
 
   const API_BASE_URL = 'https://api-tuyendung-cty.onrender.com';
 
@@ -22,20 +24,47 @@ const PostDetail = () => {
 
   useEffect(() => {
     const fetchData = async () => {
+      abortControllerRef.current = new AbortController();
+      const signal = abortControllerRef.current.signal;
+
       try {
         setLoading(true);
-        const res = await fetch(`${API_BASE_URL}/api/new/${slug}`);
+        console.log('Bắt đầu tải bài viết:', slug);
+        const res = await fetch(`${API_BASE_URL}/api/new/${slug}`, { signal });
         if (!res.ok) throw new Error('Không thể tải bài viết');
         const data = await res.json();
         setArticle(data);
+
+        if (!hasIncrementedViews.current) {
+          console.log('Gửi yêu cầu tăng lượt xem:', slug);
+          await fetch(`${API_BASE_URL}/api/new/${slug}/increment-views`, {
+            method: 'POST',
+            signal,
+          });
+          hasIncrementedViews.current = true;
+          console.log('Đã tăng lượt xem:', slug);
+        }
       } catch (err) {
+        if (err.name === 'AbortError') {
+          console.log('Yêu cầu bị hủy:', slug);
+          return;
+        }
         setError(err.message);
+        console.error('Lỗi khi tải bài viết:', err.message);
       } finally {
         setLoading(false);
       }
     };
 
     if (slug) fetchData();
+
+    return () => {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+      hasIncrementedViews.current = false;
+      console.log('Cleanup useEffect:', slug);
+    };
   }, [slug]);
 
   const renderContentBlock = (block, index) => {
@@ -71,7 +100,13 @@ const PostDetail = () => {
           </div>
         );
       case 'list':
-        return null; // skip list blocks if content is empty
+        return (
+          <div
+            key={index}
+            className={styles.contentList}
+            dangerouslySetInnerHTML={{ __html: block.content }}
+          />
+        );
       default:
         return null;
     }
