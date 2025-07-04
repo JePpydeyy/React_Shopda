@@ -150,9 +150,10 @@ const ProductDetail = () => {
           onThumbnailClick={index => setCurrentImageIndex(index)}
         />
         <div className={styles.rightColumn}>
-          {product.tag === 'sale' && (
-            <span className={styles.sale}><strong>Trạng thái:</strong> SALE</span>
-          )}
+      
+           <p className={styles.priceHighlight}>
+          <strong>Giá: {selectedOption ? formatPrice(selectedOption.price) : 0} VND</strong>
+        </p>
           <p><strong>NỘI DUNG SẢN PHẨM:</strong></p>
           <p>{product.short_description || 'Không có mô tả'}</p>
      
@@ -163,31 +164,32 @@ const ProductDetail = () => {
           <b>Số lượng sản phẩm còn trong kho:</b> {selectedOption ? selectedOption.stock : 0}
         </div>
         <hr />
-        <p className={styles.priceHighlight}>
-          <strong>Giá: {selectedOption ? formatPrice(selectedOption.price) : 0} VND</strong>
-        </p>
+       
 
 
-          <div style={{ marginBottom: 12 }}>
-            <label>
-              <b>Chọn size:</b>
-              <select
-                className={styles.select}
-                value={selectedOptionId}
-                onChange={e => setSelectedOptionId(e.target.value)}
-              >
-                {product.option && product.option.length > 0 ? (
-                  product.option.map(opt => (
-                    <option key={opt._id} value={opt._id} disabled={opt.stock === 0}>
-                      {opt.size_name} {opt.stock === 0 ? '(Hết hàng)' : ''}
-                    </option>
-                  ))
-                ) : (
-                  <option value="">Không có size</option>
-                )}
-              </select>
-            </label>
-          </div>
+       <div style={{ marginBottom: 12 }}>
+  <label>
+    <b>Chọn size:</b>
+  </label>
+  <div className={styles.sizeButtons}>
+    {product.option && product.option.length > 0 ? (
+      product.option.map((opt) => (
+        <button
+          key={opt._id}
+          className={`${styles.sizeButton} ${
+            selectedOptionId === opt._id ? styles.selected : ''
+          } ${opt.stock === 0 ? styles.disabled : ''}`}
+          onClick={() => opt.stock > 0 && setSelectedOptionId(opt._id)}
+          disabled={opt.stock === 0}
+        >
+          {opt.size_name} {opt.stock === 0 ? '(Hết hàng)' : ''}
+        </button>
+      ))
+    ) : (
+      <p>Không có size</p>
+    )}
+  </div>
+</div>
           <div className={styles.quantity}>
             <button type="button" onClick={handleDecreaseQuantity}>-</button>
             <span className={styles.quantitySpan}>{quantity}</span>
