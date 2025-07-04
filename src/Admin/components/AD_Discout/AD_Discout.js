@@ -1,8 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
 import Sidebar from '../Sidebar/Sidebar';
 import ToastNotification from '../../../components/ToastNotification/ToastNotification';
 import styles from './Discount.module.css';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPenToSquare, faTrash, faPlus, faTimes, faEye, faEyeSlash, faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 
 const API_URL = `${process.env.REACT_APP_API_URL}/discount`;
 
@@ -31,9 +33,14 @@ const AD_Discount = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [detailsModalOpen, setDetailsModalOpen] = useState(false);
   const [orderDetails, setOrderDetails] = useState([]);
+  const [showConfirmPopup, setShowConfirmPopup] = useState(false);
+  const [pendingDeleteId, setPendingDeleteId] = useState(null);
   const discountsPerPage = 10;
+  const modalRef = useRef(null);
+  const detailsModalRef = useRef(null);
+  const confirmPopupRef = useRef(null);
 
-  // Generate short order code from MongoDB _id (first 8 characters)
+  // Generate short order code from MongoDB _id
   const generateShortOrderCode = (_id) => {
     return _id ? _id.substring(0, 8) : 'N/A';
   };
@@ -74,6 +81,34 @@ const AD_Discount = () => {
     setCurrentPage(1);
   }, [searchTerm, statusFilter, discounts]);
 
+  // Handle Esc key press and click outside to close modals and popup
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.key === 'Escape' && (modalOpen || detailsModalOpen || showConfirmPopup)) {
+        closeModal();
+      }
+    };
+
+    const handleClickOutside = (event) => {
+      if (modalOpen && modalRef.current && !modalRef.current.contains(event.target)) {
+        closeModal();
+      }
+      if (detailsModalOpen && detailsModalRef.current && !detailsModalRef.current.contains(event.target)) {
+        closeModal();
+      }
+      if (showConfirmPopup && confirmPopupRef.current && !confirmPopupRef.current.contains(event.target)) {
+        closeModal();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [modalOpen, detailsModalOpen, showConfirmPopup]);
+
   // Pagination
   const indexOfLastDiscount = currentPage * discountsPerPage;
   const indexOfFirstDiscount = indexOfLastDiscount - discountsPerPage;
@@ -100,6 +135,19 @@ const AD_Discount = () => {
       setEditId(null);
     }
     setModalOpen(true);
+  };
+
+  // Close modal and popup
+  const closeModal = () => {
+    setModalOpen(false);
+    setDetailsModalOpen(false);
+    setShowConfirmPopup(false);
+    setPendingDeleteId(null);
+    setForm(defaultForm);
+    setEditId(null);
+    setError('');
+    setSuccessMessage(null);
+    setErrorMessage(null);
   };
 
   // Handle form change
@@ -154,21 +202,36 @@ const AD_Discount = () => {
     }
   };
 
-  // Delete discount
-  const handleDelete = async (id) => {
-    if (!window.confirm('Bạn có chắc muốn xóa mã này?')) return;
+  // Delete discount with confirmation popup
+  const handleDelete = (id) => {
     setSuccessMessage(null);
     setErrorMessage(null);
+    setPendingDeleteId(id);
+    setShowConfirmPopup(true);
+  };
+
+  // Confirm delete
+  const handleConfirmDelete = async () => {
     try {
       const token = localStorage.getItem('adminToken');
-      await axios.delete(`${API_URL}/${id}`, {
+      await axios.delete(`${API_URL}/${pendingDeleteId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setDiscounts((prev) => prev.filter((d) => d._id !== id));
+      setDiscounts((prev) => prev.filter((d) => d._id !== pendingDeleteId));
       setSuccessMessage('Xóa mã giảm giá thành công');
+      setShowConfirmPopup(false);
+      setPendingDeleteId(null);
     } catch {
       setErrorMessage('Không thể xóa mã giảm giá');
+      setShowConfirmPopup(false);
+      setPendingDeleteId(null);
     }
+  };
+
+  // Cancel delete
+  const handleCancelDelete = () => {
+    setShowConfirmPopup(false);
+    setPendingDeleteId(null);
   };
 
   // Toggle active
@@ -251,8 +314,12 @@ const AD_Discount = () => {
             <option value="active">Kích hoạt</option>
             <option value="inactive">Vô hiệu</option>
           </select>
-          <button className={styles.addButton} onClick={() => openModal('add')}>
-            Thêm mã giảm giá
+          <button
+            className={styles.addButton}
+            onClick={() => openModal('add')}
+            title="Thêm mã giảm giá"
+          >
+            <FontAwesomeIcon icon={faPlus} /> Thêm mã giảm giá
           </button>
         </div>
         {loading ? (
@@ -277,45 +344,56 @@ const AD_Discount = () => {
                 </thead>
                 <tbody>
                   {currentDiscounts.map((d, idx) => (
-                    <React.Fragment key={d._id}>
-                      <tr className={styles.tableRow} onClick={() => fetchOrderDetails(d._id)}>
-                        <td>{indexOfFirstDiscount + idx + 1}</td>
-                        <td>{d.code}</td>
-                        <td>{d.discountPercentage}</td>
-                        <td>{new Date(d.expirationDate).toLocaleDateString('vi-VN')}</td>
-                        <td>{d.usedCount}</td>
-                        <td>{d.usageLimit}</td>
-                        <td>
-                          <span
-                            className={
-                              d.isActive ? styles.statusActive : styles.statusInactive
-                            }
-                          >
-                            {d.isActive ? 'Kích hoạt' : 'Vô hiệu'}
-                          </span>
-                        </td>
-                        <td>
-                          <button
-                            className={styles.actionButton}
-                            onClick={() => openModal('edit', d)}
-                          >
-                            Sửa
-                          </button>
-                          <button
-                            className={`${styles.actionButton} ${styles.deleteButton}`}
-                            onClick={() => handleDelete(d._id)}
-                          >
-                            Xóa
-                          </button>
-                          <button
-                            className={`${styles.actionButton} ${styles.toggleButton}`}
-                            onClick={() => handleToggleActive(d)}
-                          >
-                            {d.isActive ? 'Vô hiệu' : 'Kích hoạt'}
-                          </button>
-                        </td>
-                      </tr>
-                    </React.Fragment>
+                    <tr
+                      key={d._id}
+                      className={styles.tableRow}
+                    >
+                      <td>{indexOfFirstDiscount + idx + 1}</td>
+                      <td>{d.code}</td>
+                      <td>{d.discountPercentage}</td>
+                      <td>{new Date(d.expirationDate).toLocaleDateString('vi-VN')}</td>
+                      <td>{d.usedCount}</td>
+                      <td>{d.usageLimit}</td>
+                      <td>
+                        <span
+                          className={
+                            d.isActive ? styles.statusActive : styles.statusInactive
+                          }
+                        >
+                          {d.isActive ? 'Kích hoạt' : 'Vô hiệu'}
+                        </span>
+                      </td>
+                      <td onClick={(e) => e.stopPropagation()}>
+                        <button
+                          className={styles.iconButton}
+                          onClick={() => openModal('edit', d)}
+                          title="Chỉnh sửa"
+                        >
+                          <FontAwesomeIcon icon={faPenToSquare} />
+                        </button>
+                        <button
+                          className={styles.iconButton}
+                          onClick={() => handleDelete(d._id)}
+                          title="Xóa mã giảm giá"
+                        >
+                          <FontAwesomeIcon icon={faTrash} />
+                        </button>
+                        <button
+                          className={styles.iconButton}
+                          onClick={() => handleToggleActive(d)}
+                          title={d.isActive ? 'Vô hiệu mã' : 'Kích hoạt mã'}
+                        >
+                          <FontAwesomeIcon icon={d.isActive ? faEyeSlash : faEye} />
+                        </button>
+                        <button
+                          className={styles.iconButton}
+                          onClick={() => fetchOrderDetails(d._id)}
+                          title="Xem chi tiết"
+                        >
+                          <FontAwesomeIcon icon={faInfoCircle} />
+                        </button>
+                      </td>
+                    </tr>
                   ))}
                 </tbody>
               </table>
@@ -339,7 +417,7 @@ const AD_Discount = () => {
         {/* Modal for add/edit discount */}
         {modalOpen && (
           <div className={styles.modalOverlay}>
-            <div className={styles.modal}>
+            <div className={styles.modal} ref={modalRef}>
               <h2>
                 {modalMode === 'add' ? 'Thêm mã giảm giá' : 'Sửa mã giảm giá'}
               </h2>
@@ -409,15 +487,17 @@ const AD_Discount = () => {
                     type="submit"
                     className={styles.submitButton}
                     disabled={submitLoading}
+                    title={modalMode === 'add' ? 'Thêm mã giảm giá' : 'Cập nhật mã giảm giá'}
                   >
-                    {submitLoading ? 'Đang lưu...' : 'Lưu'}
+                    <FontAwesomeIcon icon={faPlus} /> {submitLoading ? 'Đang lưu...' : 'Lưu'}
                   </button>
                   <button
                     type="button"
                     className={styles.cancelButton}
-                    onClick={() => setModalOpen(false)}
+                    onClick={closeModal}
+                    title="Hủy"
                   >
-                    Hủy
+                    <FontAwesomeIcon icon={faTimes} /> Hủy
                   </button>
                 </div>
               </form>
@@ -428,7 +508,7 @@ const AD_Discount = () => {
         {/* Modal for order details */}
         {detailsModalOpen && (
           <div className={styles.modalOverlay}>
-            <div className={`${styles.modal} ${styles.detailsModal}`}>
+            <div className={`${styles.modal} ${styles.detailsModal}`} ref={detailsModalRef}>
               <h2>Thông tin đơn hàng sử dụng mã</h2>
               {error && <div className={styles.error}>{error}</div>}
               <div className={styles.orderDetailsContainer}>
@@ -464,10 +544,75 @@ const AD_Discount = () => {
               </div>
               <div className={styles.formActions}>
                 <button
-                  className={styles.closeButton}
-                  onClick={() => setDetailsModalOpen(false)}
+                  className={styles.cancelButton}
+                  onClick={closeModal}
+                  title="Đóng"
                 >
-                  Đóng
+                  <FontAwesomeIcon icon={faTimes} /> Đóng
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Confirm Delete Popup */}
+        {showConfirmPopup && (
+          <div className={styles.errorPopupOverlay} onClick={handleCancelDelete}>
+            <div className={styles.confirmPopup} ref={confirmPopupRef} onClick={(e) => e.stopPropagation()}>
+              <h3>Xác nhận xóa mã giảm giá</h3>
+              <p>Bạn có chắc muốn xóa mã giảm giá này?</p>
+              <div className={styles.tableContainer}>
+                <table className={styles.table}>
+                  <thead className={styles.tableHeader}>
+                    <tr>
+                      <th>Mã</th>
+                      <th>Phần trăm (%)</th>
+                      <th>Ngày hết hạn</th>
+                      <th>Đã dùng</th>
+                      <th>Số lượt dùng</th>
+                      <th>Trạng thái</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {(() => {
+                      const discount = discounts.find((d) => d._id === pendingDeleteId);
+                      if (!discount) return null;
+                      return (
+                        <tr className={styles.tableRow}>
+                          <td>{discount.code}</td>
+                          <td>{discount.discountPercentage}</td>
+                          <td>{new Date(discount.expirationDate).toLocaleDateString('vi-VN')}</td>
+                          <td>{discount.usedCount}</td>
+                          <td>{discount.usageLimit}</td>
+                          <td>
+                            <span
+                              className={
+                                discount.isActive ? styles.statusActive : styles.statusInactive
+                              }
+                            >
+                              {discount.isActive ? 'Kích hoạt' : 'Vô hiệu'}
+                            </span>
+                          </td>
+                        </tr>
+                      );
+                    })()}
+                  </tbody>
+                </table>
+              </div>
+              <div className={styles.formActions}>
+                <button
+                  onClick={handleConfirmDelete}
+                  className={styles.submitButton}
+                  title="Xác nhận xóa"
+                >
+                  <FontAwesomeIcon icon={faTrash} /> Xác nhận
+                </button>
+                <button
+                  onClick={handleCancelDelete}
+                  className={styles.cancelButton}
+                  title="Hủy"
+                >
+                  <FontAwesomeIcon icon={faTimes} /> Hủy
                 </button>
               </div>
             </div>

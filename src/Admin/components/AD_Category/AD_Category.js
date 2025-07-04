@@ -3,6 +3,8 @@ import axios from 'axios';
 import Sidebar from '../Sidebar/Sidebar';
 import ToastNotification from '../../../components/ToastNotification/ToastNotification';
 import styles from './Category.module.css';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPlus, faPenToSquare, faTrash, faEye, faEyeSlash, faTimes } from '@fortawesome/free-solid-svg-icons';
 
 const CategoryManagement = () => {
   const [categories, setCategories] = useState([]);
@@ -18,11 +20,22 @@ const CategoryManagement = () => {
   const [modalLoading, setModalLoading] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState({ open: false, id: null });
 
-  // Base API URL (use proxy in development)
   const API_URL = process.env.REACT_APP_API_URL;
 
-  // Check if user is authenticated
   const isAuthenticated = () => !!localStorage.getItem('adminToken');
+
+  // Close modals on Esc key press
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.key === 'Escape' && (isModalOpen || deleteConfirm.open)) {
+        setIsModalOpen(false);
+        setDeleteConfirm({ open: false, id: null });
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isModalOpen, deleteConfirm.open]);
 
   // Fetch categories from API
   useEffect(() => {
@@ -49,7 +62,6 @@ const CategoryManagement = () => {
     fetchCategories();
   }, []);
 
-  // Open modal for adding
   const openAddModal = () => {
     setSuccessMessage(null);
     setErrorMessage(null);
@@ -64,7 +76,6 @@ const CategoryManagement = () => {
     setIsModalOpen(true);
   };
 
-  // Open modal for editing
   const openEditModal = async (id) => {
     setSuccessMessage(null);
     setErrorMessage(null);
@@ -94,7 +105,6 @@ const CategoryManagement = () => {
     }
   };
 
-  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSuccessMessage(null);
@@ -152,7 +162,6 @@ const CategoryManagement = () => {
     }
   };
 
-  // Handle delete
   const handleDelete = async (id) => {
     setSuccessMessage(null);
     setErrorMessage(null);
@@ -169,18 +178,19 @@ const CategoryManagement = () => {
       });
       setCategories(categories.filter(category => category.id !== id));
       setSuccessMessage('Xóa danh mục thành công');
+      setDeleteConfirm({ open: false, id: null });
     } catch (err) {
+      setDeleteConfirm({ open: false, id: null });
       if (err.response?.status === 401) {
         setErrorMessage('Phiên đăng nhập hết hạn hoặc không có quyền admin.');
         setTimeout(() => window.location.href = '/admin/login', 2000);
       } else {
-        setErrorMessage('Không thể xóa danh mục. Vui lòng thử lại.');
+        setErrorMessage(err.response?.data?.message || 'Không thể xóa danh mục.');
+        console.error('Error deleting category:', err);
       }
-      console.error('Error deleting category:', err);
     }
   };
 
-  // Handle toggle status
   const handleToggleStatus = async (id) => {
     setSuccessMessage(null);
     setErrorMessage(null);
@@ -214,18 +224,16 @@ const CategoryManagement = () => {
         setTimeout(() => window.location.href = '/admin/login', 2000);
       } else {
         setErrorMessage('Không thể thay đổi trạng thái danh mục. Vui lòng thử lại.');
+        console.error('Error toggling status:', err);
       }
-      console.error('Error toggling status:', err);
     }
   };
 
-  // Handle close toast
   const handleCloseToast = () => {
     setSuccessMessage(null);
     setErrorMessage(null);
   };
 
-  // Filter categories based on search term
   const filteredCategories = categories.filter(category =>
     category.name_categories.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -236,7 +244,6 @@ const CategoryManagement = () => {
       <div className={styles.content}>
         <h1 className={styles.title}>Quản Lý Danh Mục</h1>
         
-        {/* Search and Add Button */}
         <div className={styles.searchFilter}>
           <input
             type="text"
@@ -245,16 +252,14 @@ const CategoryManagement = () => {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
-          <button onClick={openAddModal} className={styles.addButton}>
-            Thêm Danh Mục
+          <button onClick={openAddModal} className={styles.addButton} title="Thêm danh mục">
+            <FontAwesomeIcon icon={faPlus} /> Thêm Danh Mục
           </button>
         </div>
 
-        {/* Error and Loading States */}
         {error && <div className={styles.error}>{error}</div>}
         {isLoading && <div className={styles.loading}>Đang tải...</div>}
 
-        {/* Category Table */}
         {!isLoading && (
           <div className={styles.tableContainer}>
             <table className={styles.table}>
@@ -276,20 +281,23 @@ const CategoryManagement = () => {
                       <button
                         onClick={() => openEditModal(category.id)}
                         className={styles.actionButton}
+                        title="Sửa danh mục"
                       >
-                        Sửa
+                        <FontAwesomeIcon icon={faPenToSquare} />
                       </button>
                       <button
                         onClick={() => setDeleteConfirm({ open: true, id: category.id })}
                         className={`${styles.actionButton} ${styles.deleteButton}`}
+                        title="Xóa danh mục"
                       >
-                        Xóa
+                        <FontAwesomeIcon icon={faTrash} />
                       </button>
                       <button
                         onClick={() => handleToggleStatus(category.id)}
                         className={styles.actionButton}
+                        title={category.status === 'show' ? 'Ẩn danh mục' : 'Hiển thị danh mục'}
                       >
-                        {category.status === 'show' ? 'Ẩn' : 'Hiển thị'}
+                        <FontAwesomeIcon icon={category.status === 'show' ? faEyeSlash : faEye} />
                       </button>
                     </td>
                   </tr>
@@ -299,10 +307,9 @@ const CategoryManagement = () => {
           </div>
         )}
 
-        {/* Modal for Add/Edit */}
         {isModalOpen && (
-          <div className={styles.modalOverlay}>
-            <div className={styles.modal}>
+          <div className={styles.modalOverlay} onClick={() => setIsModalOpen(false)}>
+            <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
               <h2>{modalMode === 'edit' ? 'Sửa Danh Mục' : 'Thêm Danh Mục'}</h2>
               {modalError && <div className={styles.error}>{modalError}</div>}
               {modalLoading && <div className={styles.loading}>Đang xử lý...</div>}
@@ -336,15 +343,16 @@ const CategoryManagement = () => {
                     </select>
                   </div>
                   <div className={styles.formActions}>
-                    <button type="submit" className={styles.submitButton}>
-                      {modalMode === 'edit' ? 'Cập nhật' : 'Thêm'}
+                    <button type="submit" className={styles.submitButton} title={modalMode === 'edit' ? 'Cập nhật danh mục' : 'Thêm danh mục'}>
+                      <FontAwesomeIcon icon={faPlus} /> {modalMode === 'edit' ? 'Cập nhật' : 'Thêm'}
                     </button>
                     <button
                       type="button"
                       onClick={() => setIsModalOpen(false)}
                       className={styles.cancelButton}
+                      title="Hủy"
                     >
-                      Hủy
+                      <FontAwesomeIcon icon={faTimes} /> Hủy
                     </button>
                   </div>
                 </form>
@@ -353,10 +361,9 @@ const CategoryManagement = () => {
           </div>
         )}
 
-        {/* Delete Confirmation Modal */}
         {deleteConfirm.open && (
-          <div className={styles.modalOverlay}>
-            <div className={styles.modal} style={{ maxWidth: 400, textAlign: 'center' }}>
+          <div className={styles.modalOverlay} onClick={() => setDeleteConfirm({ open: false, id: null })}>
+            <div className={styles.modal} style={{ maxWidth: 400, textAlign: 'center' }} onClick={(e) => e.stopPropagation()}>
               <div style={{ marginBottom: 16 }}>
                 <svg width="48" height="48" fill="none" viewBox="0 0 24 24">
                   <circle cx="12" cy="12" r="12" fill="#fdecea"/>
@@ -375,21 +382,22 @@ const CategoryManagement = () => {
                     await handleDelete(deleteConfirm.id);
                     setDeleteConfirm({ open: false, id: null });
                   }}
+                  title="Xóa danh mục"
                 >
-                  Xóa
+                  <FontAwesomeIcon icon={faTrash} /> Xóa
                 </button>
                 <button
                   className={styles.cancelButton}
                   onClick={() => setDeleteConfirm({ open: false, id: null })}
+                  title="Hủy"
                 >
-                  Hủy
+                  <FontAwesomeIcon icon={faTimes} /> Hủy
                 </button>
               </div>
             </div>
           </div>
         )}
 
-        {/* Toast Notifications */}
         {successMessage && (
           <ToastNotification
             message={successMessage}
