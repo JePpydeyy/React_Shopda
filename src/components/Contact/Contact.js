@@ -89,23 +89,7 @@ function Contact() {
           <div className={styles.showroomList}>
             <div className={styles.showroomItem}>
               <i className={`fas fa-map-marker-alt ${styles.locationIcon}`} aria-hidden="true"></i>
-              <span>Showroom 1: 280 E10 Lương Định Của, P. An Phú, Q.2, TP HCM (có chỗ đậu ô tô)</span>
-            </div>
-            <div className={styles.showroomItem}>
-              <i className={`fas fa-map-marker-alt ${styles.locationIcon}`} aria-hidden="true"></i>
-              <span>Showroom 2: 61C Phan Đình Phùng, P. 17, Q.Phú Nhuận, TP HCM (có chỗ đậu ô tô theo khung giờ 9 am - 2pm và sau 8 pm)</span>
-            </div>
-            <div className={styles.showroomItem}>
-              <i className={`fas fa-map-marker-alt ${styles.locationIcon}`} aria-hidden="true"></i>
-              <span>Showroom 3: Tầng 2, chung cư 42 Nguyễn Huệ, P. Bến Nghé, Q.1, TP HCM (có chỗ đậu ô tô trên đường Mạc ThịISBN Bưởi)</span>
-            </div>
-            <div className={styles.showroomItem}>
-              <i className={`fas fa-map-marker-alt ${styles.locationIcon}`} aria-hidden="true"></i>
-              <span>Showroom 4: 91 Xuân Thủy, P. Thảo Điền, Q. 2, TP HCM (khuôn viên cà phê Cộng - có chỗ đậu ô tô)</span>
-            </div>
-            <div className={styles.showroomItem}>
-              <i className={`fas fa-map-marker-alt ${styles.locationIcon}`} aria-hidden="true"></i>
-              <span>Showroom 5: 47 Hải Bà Trưng, P. Mỹ Long, Tp. Long Xuyên, Tỉnh An Giang</span>
+              <span>Showroom: 280 E10 Lương Định Của, P. An Phú, Q.2, TP HCM (có chỗ đậu ô tô)</span>
             </div>
           </div>
 

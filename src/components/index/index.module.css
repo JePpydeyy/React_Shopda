@@ -17,6 +17,7 @@
 
 .newsTitle {
   text-align: center;
+  color:#3457a0;
 }
 
 /* Collections Section */
@@ -62,15 +63,18 @@
 }
 
 .necklaces .cardBackground {
-  background-image: url('/public/images/vongdaphongthuy.png');
+  background-image: url('/public/images/Vongcopt.jpg');
 }
 
 .rings .cardBackground {
-  background-image: url('/public/images/vongtaythoitrang.jpg');
+  background-image: url('/public/images/vongco2pt.jpg');
 }
 
 .bracelets .cardBackground {
-  background-image: url('/public/images/newproduct.png');
+  background-image: url('/public/images/vongpt.jpg');
+}
+.stones .cardBackground {
+  background-image: url('/public/images/Dapt.jpg');
 }
 
 .cardBackground {
@@ -190,7 +194,7 @@
 }
 
 .newProductDescription p {
-  margin-bottom: 0.75rem;
+  margin-bottom: 1rem;
 }
 
 .viewAllBtn {
