@@ -5,7 +5,7 @@ import styles from './add_news.module.css';
 
 const AddNews = () => {
   const navigate = useNavigate();
-  const { slug } = useParams(); // Lấy slug từ URL để xác định chế độ chỉnh sửa
+  const { slug } = useParams();
   const [formData, setFormData] = useState({
     title: '',
     thumbnail: null,
@@ -15,16 +15,20 @@ const AddNews = () => {
     status: 'show',
     views: 0,
     categoryNew: '',
+    createdAt: new Date('2025-07-07T13:54:00+07:00').toISOString(), // Cập nhật theo thời gian hiện tại
+    updatedAt: new Date('2025-07-07T13:54:00+07:00').toISOString(),
+    __v: 0,
+    publishedAt: new Date('2025-07-07T13:54:00+07:00').toISOString(),
   });
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [isEditMode, setIsEditMode] = useState(!!slug); // Xác định chế độ chỉnh sửa
+  const [isEditMode, setIsEditMode] = useState(!!slug);
 
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const res = await fetch(`${process.env.REACT_APP_API_BASE}/api/new-category`, {
+        const res = await fetch(`${process.env.REACT_APP_API_URL}/new-category`, {
           headers: {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${localStorage.getItem('adminToken') || ''}`,
@@ -33,7 +37,7 @@ const AddNews = () => {
         const result = await res.json();
         setCategories((result.data || result || []).filter((cat) => cat.status === 'show'));
       } catch (err) {
-        setError(err.message);
+        setError(`Lỗi tải danh mục: ${err.message}`);
       }
     };
 
@@ -41,7 +45,7 @@ const AddNews = () => {
       if (!slug) return;
       try {
         setLoading(true);
-        const res = await fetch(`${process.env.REACT_APP_API_BASE}/api/new/${slug}`, {
+        const res = await fetch(`${process.env.REACT_APP_API_URL}/new/${slug}`, {
           headers: {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${localStorage.getItem('adminToken') || ''}`,
@@ -51,14 +55,14 @@ const AddNews = () => {
         const data = await res.json();
         setFormData({
           title: data.title || '',
-          thumbnail: null, // Không tải lại file, giữ nguyên URL
+          thumbnail: null,
           thumbnailPreview: data.thumbnailUrl || null,
           thumbnailCaption: data.thumbnailCaption || '',
           contentBlocks: data.contentBlocks.map((block) => ({
-            _id: block._id || `temp_${Date.now()}`,
+            _id: block._id || `temp_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
             type: block.type,
-            content: block.type === 'list' 
-              ? block.content
+            content: block.type === 'list'
+              ? (block.content || '')
                   .replace(/<\/?ul>/g, '')
                   .replace(/<\/?li>/g, '')
                   .split('\n')
@@ -72,9 +76,13 @@ const AddNews = () => {
           status: data.status || 'show',
           views: data.views || 0,
           categoryNew: data.newCategory?._id || '',
+          createdAt: data.createdAt || new Date('2025-07-07T13:54:00+07:00').toISOString(),
+          updatedAt: data.updatedAt || new Date('2025-07-07T13:54:00+07:00').toISOString(),
+          __v: data.__v || 0,
+          publishedAt: data.publishedAt || new Date('2025-07-07T13:54:00+07:00').toISOString(),
         });
       } catch (err) {
-        setError(err.message);
+        setError(`Lỗi tải bài viết: ${err.message}`);
       } finally {
         setLoading(false);
       }
@@ -97,7 +105,7 @@ const AddNews = () => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     if (name === 'title' && value.length > 120) return;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value, updatedAt: new Date().toISOString() }));
   };
 
   const handleImageChange = (e) => {
@@ -111,6 +119,7 @@ const AddNews = () => {
       ...prev,
       thumbnail: file,
       thumbnailPreview: previewUrl,
+      updatedAt: new Date().toISOString(),
     }));
   };
 
@@ -128,17 +137,11 @@ const AddNews = () => {
     } else if (field === 'url' && !value) {
       blocks[index] = { ...blocks[index], url: undefined, preview: null, content: '' };
     } else if (field === 'content' && blocks[index].type === 'list') {
-      const listItems = value
-        .split('\n')
-        .filter((line) => line.trim())
-        .map((line) => `<li>${line.trim()}</li>`)
-        .join('');
-      const listHtml = `<ul>${listItems}</ul>`;
-      blocks[index] = { ...blocks[index], [field]: listHtml };
+      blocks[index] = { ...blocks[index], [field]: value };
     } else {
       blocks[index] = { ...blocks[index], [field]: value };
     }
-    setFormData((prev) => ({ ...prev, contentBlocks: blocks }));
+    setFormData((prev) => ({ ...prev, contentBlocks: blocks, updatedAt: new Date().toISOString() }));
   };
 
   const handleAddBlock = () => {
@@ -147,7 +150,7 @@ const AddNews = () => {
       contentBlocks: [
         ...prev.contentBlocks,
         {
-          _id: `temp_${Date.now()}`,
+          _id: `temp_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
           type: 'text',
           content: '',
           url: undefined,
@@ -155,6 +158,7 @@ const AddNews = () => {
           preview: null,
         },
       ],
+      updatedAt: new Date().toISOString(),
     }));
   };
 
@@ -162,6 +166,7 @@ const AddNews = () => {
     setFormData((prev) => ({
       ...prev,
       contentBlocks: prev.contentBlocks.filter((_, i) => i !== index),
+      updatedAt: new Date().toISOString(),
     }));
   };
 
@@ -169,26 +174,50 @@ const AddNews = () => {
     setLoading(true);
     setError('');
 
-    if (!formData.title.trim()) return setError('Vui lòng nhập tiêu đề.') || setLoading(false);
-    if (!formData.thumbnail && !formData.thumbnailPreview) return setError('Vui lòng chọn hình ảnh chủ đạo.') || setLoading(false);
-    if (!formData.contentBlocks.length) return setError('Vui lòng thêm ít nhất một khối nội dung.') || setLoading(false);
-    if (!formData.categoryNew) return setError('Vui lòng chọn danh mục.') || setLoading(false);
+    // Kiểm tra các trường bắt buộc
+    if (!formData.title.trim()) {
+      setError('Tiêu đề là bắt buộc.');
+      setLoading(false);
+      return;
+    }
+    if (!formData.categoryNew) {
+      setError('Danh mục là bắt buộc.');
+      setLoading(false);
+      return;
+    }
+    if (!formData.thumbnail) {
+      setError('Hình ảnh thumbnail là bắt buộc.');
+      setLoading(false);
+      return;
+    }
+    if (!formData.contentBlocks.length) {
+      setError('Vui lòng thêm ít nhất một khối nội dung.');
+      setLoading(false);
+      return;
+    }
 
     const token = localStorage.getItem('adminToken');
-    if (!token) return setError('Vui lòng đăng nhập lại.') || setLoading(false);
+    if (!token) {
+      setError('Vui lòng đăng nhập lại.');
+      setLoading(false);
+      return;
+    }
 
     try {
-      const processedBlocks = formData.contentBlocks.map((block, index) => {
-        if (block.type === 'image' && !block.url && !block.preview) {
-          throw new Error(`Khối hình ảnh thứ ${index + 1} thiếu ảnh.`);
-        }
-        if (block.type !== 'image' && (!block.content || typeof block.content !== 'string')) {
-          throw new Error(`Khối ${block.type} thứ ${index + 1} có nội dung không hợp lệ.`);
+      const processedBlocks = formData.contentBlocks.map((block) => {
+        let contentToSave = block.content || '';
+        if (block.type === 'list') {
+          const listItems = contentToSave
+            .split('\n')
+            .filter((line) => line.trim())
+            .map((line) => `<li>${line.trim()}</li>`)
+            .join('');
+          contentToSave = `<ul>${listItems}</ul>`;
         }
         return {
           _id: block._id,
           type: block.type,
-          content: block.content || '',
+          content: contentToSave,
           caption: block.caption || '',
           url: block.url instanceof File ? '' : block.url || '',
         };
@@ -204,29 +233,25 @@ const AddNews = () => {
         formDataToSend.append('thumbnail', formData.thumbnail);
       }
       formDataToSend.append('thumbnailCaption', formData.thumbnailCaption);
-      formDataToSend.append('status', formData.status);
-      formDataToSend.append('publishedAt', new Date().toISOString());
+      formDataToSend.append('publishedAt', formData.publishedAt);
       formDataToSend.append('views', formData.views.toString());
-      formDataToSend.append('category-new', JSON.stringify({
-        _id: selectedCategory._id,
-        category: selectedCategory.category,
-        status: selectedCategory.status,
-        slug: selectedCategory.slug,
-        createdAt: selectedCategory.createdAt,
-        updatedAt: selectedCategory.updatedAt,
-        __v: selectedCategory.__v,
-      }));
+      formDataToSend.append('status', formData.status);
+      formDataToSend.append('category-new[oid]', selectedCategory._id); // Điều chỉnh để khớp với Postman
       formDataToSend.append('contentBlocks', JSON.stringify(processedBlocks));
 
+      // Gửi file cho contentImages
       formData.contentBlocks.forEach((block) => {
         if (block.type === 'image' && block.url instanceof File) {
           formDataToSend.append('contentImages', block.url);
         }
       });
 
+      // Debug: Kiểm tra nội dung của formDataToSend
+      console.log('FormData entries:', [...formDataToSend.entries()]);
+
       const url = isEditMode
-        ? `${process.env.REACT_APP_API_BASE}/api/new/${slug}`
-        : `${process.env.REACT_APP_API_BASE}/api/new/`;
+        ? `${process.env.REACT_APP_API_URL}/new/${slug}`
+        : `${process.env.REACT_APP_API_URL}/new/`;
       const method = isEditMode ? 'PUT' : 'POST';
 
       const res = await fetch(url, {
@@ -264,11 +289,6 @@ const AddNews = () => {
               onChange={handleChange}
               placeholder="Nhập tiêu đề"
             />
-            {formData.title && (
-              <div className={styles.slugPreview}>
-                Slug dự kiến: <strong>{generateSlug(formData.title)}</strong>
-              </div>
-            )}
           </div>
 
           <div className={styles.formGroup}>
@@ -339,8 +359,6 @@ const AddNews = () => {
                     <option value="text">Text</option>
                     <option value="image">Image</option>
                     <option value="list">List</option>
-                    <option value="heading">Heading</option>
-                    <option value="sub_heading">Sub Heading</option>
                   </select>
 
                   {block.type === 'image' ? (
@@ -368,16 +386,7 @@ const AddNews = () => {
                     <>
                       <textarea
                         className={styles.blockInput}
-                        value={
-                          block.type === 'list'
-                            ? block.content
-                                .replace(/<\/?ul>/g, '')
-                                .replace(/<\/?li>/g, '')
-                                .split('\n')
-                                .filter((line) => line.trim())
-                                .join('\n')
-                            : block.content
-                        }
+                        value={block.content || ''}
                         onChange={(e) => handleBlockChange(index, 'content', e.target.value)}
                         placeholder={block.type === 'list' ? 'Mỗi dòng là một mục danh sách' : 'Nhập nội dung'}
                         rows={block.type === 'list' ? 4 : 3}
@@ -385,7 +394,7 @@ const AddNews = () => {
                       {block.type === 'list' && (
                         <div
                           className={styles.listPreview}
-                          dangerouslySetInnerHTML={{ __html: block.content || '<ul><li>Chưa có nội dung</li></ul>' }}
+                          dangerouslySetInnerHTML={{ __html: block.content ? `<ul><li>${block.content.split('\n').filter(line => line.trim()).join('</li><li>')}</li></ul>` : '<ul><li>Chưa có nội dung</li></ul>' }}
                         />
                       )}
                     </>

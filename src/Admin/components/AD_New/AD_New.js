@@ -55,8 +55,8 @@ const NewsManagement = () => {
           ? item.thumbnailUrl
           : `${API_BASE_URL}/${item.thumbnailUrl?.replace(/^\/+/, '')}`;
 
-        const categoryOid = item['category-new']?.oid || '';
-        const category = categories.find(c => c._id === categoryOid)?.category || 'Chưa phân loại';
+        const categoryId = item.newCategory?._id || ''; // Sử dụng newCategory._id
+        const categoryName = categories.find(c => c._id === categoryId)?.category || 'Chưa phân loại';
 
         return {
           id: item._id,
@@ -65,8 +65,8 @@ const NewsManagement = () => {
           publishedAt: item.publishedAt || item.createdAt,
           views: item.views || 0,
           status: item.status === 'show' ? 'Hiển thị' : 'Ẩn',
-          category: categoryOid,
-          categoryName: category,
+          category: categoryId,
+          categoryName: categoryName,
           image: imageUrl || PLACEHOLDER_IMAGE,
         };
       });
@@ -80,7 +80,9 @@ const NewsManagement = () => {
   };
 
   useEffect(() => {
-    if (categories.length > 0) fetchNews();
+    if (categories.length > 0) {
+      fetchNews();
+    }
   }, [categories]);
 
   const filteredNews = news.filter(article =>
@@ -174,9 +176,18 @@ const NewsManagement = () => {
       if (res.ok) {
         const contentData = result.data || result;
         const contentBlocks = contentData.contentBlocks || [];
+        const processedContentBlocks = contentBlocks.map(block => {
+          if (block.type === 'list' && block.content) {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(block.content, 'text/html');
+            const items = Array.from(doc.querySelectorAll('li')).map(li => li.textContent.trim());
+            return { ...block, items };
+          }
+          return block;
+        });
         setSelectedArticle({
           ...article,
-          contentBlocks,
+          contentBlocks: processedContentBlocks,
         });
       } else {
         alert('Không lấy được nội dung bài viết');

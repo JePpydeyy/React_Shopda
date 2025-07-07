@@ -2,27 +2,24 @@ import React, { useEffect, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCalendarDays } from '@fortawesome/free-solid-svg-icons';
 import styles from './index.module.css';
-import { Link } from 'react-router-dom'; 
+import { Link } from 'react-router-dom';
 
 const Index = () => {
   const [products, setProducts] = useState([]);
   const [news, setNews] = useState([]);
+  const [categories, setCategories] = useState([]); // Thêm trạng thái categories
   const [loading, setLoading] = useState(true);
   const [toast, setToast] = useState(null);
 
-  // API URLs
   const API_BASE = process.env.REACT_APP_API_BASE;
   const API_URL = process.env.REACT_APP_API_URL;
 
-  // Toast notification
   const showToast = (message, type) => {
     setToast({ message, type });
     setTimeout(() => setToast(null), 3000);
   };
 
-  // Add to cart function
   const handleAddToCart = (product) => {
-    // Lấy option đầu tiên còn hàng (nếu có)
     let selectedOption = null;
     if (Array.isArray(product.option) && product.option.length > 0) {
       selectedOption = product.option.find(opt => opt.stock > 0) || product.option[0];
@@ -37,7 +34,7 @@ const Index = () => {
       stoneSize: product.weight || '10,5 Li',
       size_name: selectedOption ? selectedOption.size_name : '',
       image: getImageUrl(product.images),
-      stock: selectedOption ? selectedOption.stock : 99 // Nếu không có option thì giả sử còn hàng
+      stock: selectedOption ? selectedOption.stock : 99
     };
 
     const existIndex = cart.findIndex(item => item._id === cartItem._id && item.size_name === cartItem.size_name);
@@ -52,32 +49,32 @@ const Index = () => {
     showToast('Đã thêm vào giỏ hàng!', 'success');
   };
 
-  // Fetch data from API
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        
-        // Fetch products
+
         const productsResponse = await fetch(`${API_URL}/product/show`);
         const productsData = await productsResponse.json();
-        
-        // Fetch news
+
         const newsResponse = await fetch(`${API_URL}/new`);
         const newsData = await newsResponse.json();
-        
-        // Get latest 4 products (sort by createdAt desc)
+
+        const categoriesResponse = await fetch('https://api-tuyendung-cty.onrender.com/api/category');
+        const categoriesData = await categoriesResponse.json();
+
         const latestProducts = productsData
           .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
           .slice(0, 4);
-        // Get latest 3 news
-        const latestNews = newsData.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 3);
-        
-        // Format news data to include slug
+
+        const latestNews = newsData
+          .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+          .slice(0, 3);
+
         const formattedNews = latestNews.map(item => ({
           _id: item._id,
           id: item._id,
-          slug: item.slug, // Đảm bảo có slug
+          slug: item.slug,
           title: item.title,
           createdAt: item.createdAt,
           publishedAt: item.publishedAt,
@@ -87,10 +84,10 @@ const Index = () => {
 
         setProducts(latestProducts);
         setNews(formattedNews);
+        setCategories(categoriesData);
 
       } catch (error) {
         console.error('Error fetching data:', error);
-        // Fallback to dummy data if API fails
         setProducts([
           { id: 1, name: 'Sản phẩm 1', image: '/images/product1.jpg', price: '500000' },
           { id: 2, name: 'Sản phẩm 2', image: '/images/product2.jpg', price: '600000' },
@@ -102,6 +99,11 @@ const Index = () => {
           { _id: 2, id: 2, slug: 'tin-tuc-2', title: 'Tin tức 2', content: 'Nội dung tin tức 2', createdAt: '2025-05-22', thumbnailUrl: '/images/news2.jpg' },
           { _id: 3, id: 3, slug: 'tin-tuc-3', title: 'Tin tức 3', content: 'Nội dung tin tức 3', createdAt: '2025-05-21', thumbnailUrl: '/images/news3.jpg' }
         ]);
+        setCategories([
+          { _id: '1', category: 'Vòng tay phong thủy', status: 'show' },
+          { _id: '2', category: 'Vòng đá thời trang', status: 'show' },
+          { _id: '3', category: 'Sản phẩm hot', status: 'show' }
+        ]);
       } finally {
         setLoading(false);
       }
@@ -110,14 +112,12 @@ const Index = () => {
     fetchData();
   }, [API_URL]);
 
-  // Format date
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     const options = { year: 'numeric', month: 'long', day: 'numeric' };
     return date.toLocaleDateString('vi-VN', options);
   };
 
-  // Format price (giá nhỏ nhất trong option nếu có)
   const formatPrice = (product) => {
     let price = product.price;
     if (Array.isArray(product.option) && product.option.length > 0) {
@@ -129,7 +129,6 @@ const Index = () => {
     }).format(price);
   };
 
-  // Get full image URL
   const getImageUrl = (images) => {
     if (!images) return '/images/placeholder.jpg';
     let imagePath = Array.isArray(images) ? images[0] : images;
@@ -148,19 +147,16 @@ const Index = () => {
 
   return (
     <div className={styles.indexContainer}>
-      {/* Toast notification */}
       {toast && (
         <div className={`${styles.toast} ${styles[toast.type]}`}>
           {toast.message}
         </div>
       )}
 
-      {/* Banner Section */}
       <div className={styles.banner}>
         <img src="images/Banner-Web-KimLongPhatLoc.png" alt="Banner" className={styles.bannerImage} />
       </div>
 
-      {/* New Product Section */}
       <div className={styles.newProductSection}>
         <div className={styles.newProductContainer}>
           <div className={styles.newProductRight}>
@@ -168,8 +164,8 @@ const Index = () => {
               {products.map((product, index) => (
                 <div key={product.id || product._id} className={styles.productCard}>
                   <div className={styles.productImageWrapper}>
-                    <img 
-                      src={getImageUrl(product.images)} 
+                    <img
+                      src={getImageUrl(product.images)}
                       alt={product.name}
                       className={styles.productCardImage}
                       onError={(e) => {
@@ -177,8 +173,8 @@ const Index = () => {
                       }}
                     />
                     <div className={styles.productOverlay}>
-                      <Link 
-                        to={`/detail/${product.slug}`} 
+                      <Link
+                        to={`/detail/${product.slug}`}
                         className={styles.quickViewBtn}
                       >
                         Xem Nhanh
@@ -198,12 +194,12 @@ const Index = () => {
               <h2 className={styles.newProductTitle}>Sản Phẩm Mới</h2>
               <div className={styles.newProductDescription}>
                 <p>
-                  Khám phá bộ sưu tập sản phẩm mới nhất từ Tinh Lâm Jewelry. 
+                  Khám phá bộ sưu tập sản phẩm mới nhất từ Tinh Lâm Jewelry.
                   Những thiết kế độc đáo, tinh tế được chế tác từ những viên đá có trong tự nhiên, với những màu sắc khác nhau và được chế tác vô cùng kỹ công.
                 </p>
                 <p>
-                  Mỗi sản phẩm được lựa chọn kỹ lưỡng theo ngũ hành phong thủy, 
-                  phù hợp với từng mệnh, giúp gia tăng năng lượng tích cực và 
+                  Mỗi sản phẩm được lựa chọn kỹ lưỡng theo ngũ hành phong thủy,
+                  phù hợp với từng mệnh, giúp gia tăng năng lượng tích cực và
                   thu hút tài lộc trong cuộc sống.
                 </p>
                 <Link to="/product" className={styles.viewAllBtn}>
@@ -214,53 +210,48 @@ const Index = () => {
           </div>
         </div>
       </div>
-      
+
       <div className={styles.collectionsSection}>
         <h2 className={styles.collectionsTitle}>Danh Mục Sản Phẩm</h2>
         <div className={styles.collectionsGrid}>
-          <div className={`${styles.collectionCard} ${styles.necklaces}`}>
-            <div className={styles.cardBackground}></div>
-            <div className={styles.cardOverlay}></div>
-            <div className={styles.cardContent}>
-              <h3 className={styles.collectionTitle}>Vòng tay phong thủy</h3>
-              <Link 
-                to="/product?category=Phong thủy" 
-                className={styles.shopNowBtn}
-              >
-                Mua ngay
-              </Link>
-            </div>
-          </div>
-          <div className={`${styles.collectionCard} ${styles.rings}`}>
-            <div className={styles.cardBackground}></div>
-            <div className={styles.cardOverlay}></div>
-            <div className={styles.cardContent}>
-              <h3 className={styles.collectionTitle}>Vòng đá thời trang</h3>
-              <Link 
-                to="/product?category=Thời trang" 
-                className={styles.shopNowBtn}
-              >
-                Mua ngay
-              </Link>
-            </div>
-          </div>
-          <div className={`${styles.collectionCard} ${styles.bracelets}`}>
-            <div className={styles.cardBackground}></div>
-            <div className={styles.cardOverlay}></div>
-            <div className={styles.cardContent}>
-              <h3 className={styles.collectionTitle}>Sản phẩm hot</h3>
-              <Link 
-                to="/product" 
-                className={styles.shopNowBtn}
-              >
-                Mua ngay
-              </Link>
-            </div>
-          </div>
+          {categories
+            .filter(category => category.status === 'show')
+            .map((category, index) => {
+              const categoryStyles = {
+                'Vòng tay phong thủy': styles.bracelets,
+                'Vòng cổ mặt đá': styles.necklaces,
+                'Vòng cổ phong thủy': styles.rings,
+                'Đá phong thủy': styles.stones
+              };
+              const categoryParams = {
+                'Vòng tay phong thủy': 'Phong thủy',
+                'Vòng cổ mặt đá': 'Mặt đá',
+                'Vòng cổ phong thủy': 'Phong thủy',
+                'Đá phong thủy': 'Đá phong thủy'
+              };
+
+              return (
+                <div
+                  key={category._id}
+                  className={`${styles.collectionCard} ${categoryStyles[category.category.trim()] || styles.defaultCard}`}
+                >
+                  <div className={styles.cardBackground}></div>
+                  <div className={styles.cardOverlay}></div>
+                  <div className={styles.cardContent}>
+                    <h3 className={styles.collectionTitle}>{category.category}</h3>
+                    <Link
+                      to={`/product?category=${encodeURIComponent(categoryParams[category.category.trim()] || category.category)}`}
+                      className={styles.shopNowBtn}
+                    >
+                      Mua ngay
+                    </Link>
+                  </div>
+                </div>
+              );
+            })}
         </div>
       </div>
 
-      {/* Ngũ Hành Section */}
       <div className={styles.nguHanhSection}>
         <div className={styles.nguHanhGrid}>
           <div className={`${styles.elementCard} ${styles.mongTho}`}>

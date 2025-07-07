@@ -8,7 +8,6 @@ const EditNew = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     title: '',
-    newSlug: '',
     thumbnail: null,
     thumbnailPreview: null,
     thumbnailCaption: '',
@@ -17,6 +16,9 @@ const EditNew = () => {
     publishedAt: '',
     views: 0,
     'category-new': '',
+    createdAt: new Date('2025-07-07T14:57:00+07:00').toISOString(), // Cập nhật theo thời gian hiện tại
+    updatedAt: new Date('2025-07-07T14:57:00+07:00').toISOString(),
+    __v: 0,
   });
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -25,7 +27,7 @@ const EditNew = () => {
 
   const fetchCategories = async () => {
     try {
-      const res = await fetch('https://api-tuyendung-cty.onrender.com/api/new-category', {
+      const res = await fetch(`${process.env.REACT_APP_API_URL}/new-category`, {
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${localStorage.getItem('adminToken') || ''}`,
@@ -37,8 +39,10 @@ const EditNew = () => {
       }
       const result = await res.json();
       const data = result.data || result || [];
-      setCategories(data.filter(category => category.status === 'show'));
-      return data.filter(category => category.status === 'show');
+      const filteredCategories = data.filter(category => category.status === 'show');
+      console.log('Fetched categories:', filteredCategories); // Debug
+      setCategories(filteredCategories);
+      return filteredCategories;
     } catch (err) {
       setError(`Lỗi tải danh mục: ${err.message}`);
       return [];
@@ -48,7 +52,7 @@ const EditNew = () => {
   const fetchArticle = async () => {
     try {
       setLoading(true);
-      const res = await fetch(`https://api-tuyendung-cty.onrender.com/api/new/${slug}`, {
+      const res = await fetch(`${process.env.REACT_APP_API_URL}/new/${slug}`, {
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${localStorage.getItem('adminToken') || ''}`,
@@ -60,31 +64,51 @@ const EditNew = () => {
       }
 
       const data = await res.json();
-      const categoryOid = data['category-new']?.oid || '';
+      const categoryId = data.newCategory?._id || '';
+      console.log('Fetched article data:', data); // Debug
 
       setFormData({
         title: data.title || '',
-        newSlug: data.slug || '',
         thumbnail: null,
         thumbnailPreview: data.thumbnailUrl
           ? data.thumbnailUrl.startsWith('http') || data.thumbnailUrl.startsWith('data:')
             ? data.thumbnailUrl
-            : `https://api-tuyendung-cty.onrender.com/${data.thumbnailUrl.replace(/^\/+/, '')}`
+            : `${process.env.REACT_APP_API_BASE}/${data.thumbnailUrl.replace(/^\/+/, '')}`
           : null,
         thumbnailCaption: data.thumbnailCaption || '',
-        contentBlocks: (data.contentBlocks || []).map(block => ({
-          ...block,
-          type: ['heading', 'sub_heading', 'subheading'].includes(block.type) ? 'text' : block.type,
-          preview: block.type === 'image' && block.url
-            ? block.url.startsWith('http') || block.url.startsWith('data:')
-              ? block.url
-              : `https://api-tuyendung-cty.onrender.com/${block.url.replace(/^\/+/, '')}`
-            : null,
-        })),
+        contentBlocks: (data.contentBlocks || []).map(block => {
+          if (block.type === 'list' && block.content) {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(block.content, 'text/html');
+            const items = Array.from(doc.querySelectorAll('li')).map(li => `- ${li.textContent.trim()}`);
+            return {
+              ...block,
+              type: ['heading', 'sub_heading', 'subheading'].includes(block.type) ? 'text' : block.type,
+              content: items.join('\n'), // Chuyển HTML thành các dòng bullet points
+              preview: block.type === 'image' && block.url
+                ? block.url.startsWith('http') || block.url.startsWith('data:')
+                  ? block.url
+                  : `${process.env.REACT_APP_API_BASE}/${block.url.replace(/^\/+/, '')}`
+                : null,
+            };
+          }
+          return {
+            ...block,
+            type: ['heading', 'sub_heading', 'subheading'].includes(block.type) ? 'text' : block.type,
+            preview: block.type === 'image' && block.url
+              ? block.url.startsWith('http') || block.url.startsWith('data:')
+                ? block.url
+                : `${process.env.REACT_APP_API_BASE}/${block.url.replace(/^\/+/, '')}`
+              : null,
+          };
+        }),
         status: data.status || 'show',
-        publishedAt: data.publishedAt ? new Date(data.publishedAt).toISOString().slice(0, 16) : '',
+        publishedAt: data.publishedAt ? new Date(data.publishedAt).toISOString().slice(0, 16) : new Date('2025-07-07T14:57:00+07:00').toISOString().slice(0, 16),
         views: data.views || 0,
-        'category-new': categoryOid,
+        'category-new': categoryId,
+        createdAt: data.createdAt || new Date('2025-07-07T14:57:00+07:00').toISOString(),
+        updatedAt: data.updatedAt || new Date('2025-07-07T14:57:00+07:00').toISOString(),
+        __v: data.__v || 0,
       });
     } catch (err) {
       console.error('Fetch article error:', err);
@@ -115,7 +139,11 @@ const EditNew = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData(prev => ({
+      ...prev,
+      [name]: value,
+      updatedAt: new Date().toISOString(),
+    }));
   };
 
   const handleImageChange = (e) => {
@@ -136,6 +164,7 @@ const EditNew = () => {
         ...prev,
         thumbnail: file,
         thumbnailPreview: URL.createObjectURL(file),
+        updatedAt: new Date().toISOString(),
       }));
     }
   };
@@ -174,7 +203,11 @@ const EditNew = () => {
     } else {
       newBlocks[index] = { ...newBlocks[index], [field]: value };
     }
-    setFormData(prev => ({ ...prev, contentBlocks: newBlocks }));
+    setFormData(prev => ({
+      ...prev,
+      contentBlocks: newBlocks,
+      updatedAt: new Date().toISOString(),
+    }));
   };
 
   const handleAddBlock = () => {
@@ -183,7 +216,6 @@ const EditNew = () => {
       contentBlocks: [
         ...prev.contentBlocks,
         {
-          _id: `temp_${Date.now()}`,
           type: 'text',
           content: '',
           url: undefined,
@@ -191,6 +223,7 @@ const EditNew = () => {
           preview: null,
         },
       ],
+      updatedAt: new Date().toISOString(),
     }));
   };
 
@@ -202,6 +235,7 @@ const EditNew = () => {
     setFormData(prev => ({
       ...prev,
       contentBlocks: prev.contentBlocks.filter((_, i) => i !== index),
+      updatedAt: new Date().toISOString(),
     }));
   };
 
@@ -242,25 +276,47 @@ const EditNew = () => {
     }
 
     try {
-      const processedBlocks = formData.contentBlocks.map((block, index) => {
+      const processedBlocks = formData.contentBlocks.map((block) => {
         if (block.type === 'image' && !block.url && !block.preview) {
-          throw new Error(`Khối hình ảnh tại vị trí ${index + 1} thiếu tệp hoặc URL.`);
+          throw new Error(`Khối hình ảnh thiếu tệp hoặc URL.`);
         }
         if (block.type !== 'image' && (!block.content || typeof block.content !== 'string')) {
-          throw new Error(`Khối ${block.type} tại vị trí ${index + 1} có nội dung không hợp lệ.`);
+          throw new Error(`Khối ${block.type} có nội dung không hợp lệ.`);
+        }
+        if (block.type === 'list') {
+          const items = (block.content || '').split('\n').filter(item => item.trim()).map(item => `<li>${item.replace(/^-\s*/, '').trim()}</li>`);
+          return {
+            type: block.type,
+            content: `<ul>${items.join('')}</ul>`,
+            caption: block.caption || '',
+            url: block.url instanceof File ? '' : block.url || '',
+          };
         }
         return {
           type: block.type,
           content: block.content || '',
           caption: block.caption || '',
           url: block.url instanceof File ? '' : block.url || '',
-          preview: undefined,
         };
       });
 
+      console.log('Data to send:', {
+        title: formData.title,
+        thumbnail: formData.thumbnail,
+        thumbnailUrl: formData.thumbnailPreview,
+        thumbnailCaption: formData.thumbnailCaption,
+        status: formData.status,
+        publishedAt: formData.publishedAt,
+        views: formData.views,
+        contentBlocks: processedBlocks,
+        'category-new': formData['category-new'],
+        createdAt: formData.createdAt,
+        updatedAt: formData.updatedAt,
+        __v: formData.__v,
+      }); // Debug dữ liệu gửi đi
+
       const formDataToSend = new FormData();
       formDataToSend.append('title', formData.title);
-      formDataToSend.append('slug', formData.newSlug || slug);
       if (formData.thumbnail) {
         formDataToSend.append('thumbnail', formData.thumbnail);
       }
@@ -271,15 +327,18 @@ const EditNew = () => {
       formDataToSend.append('views', formData.views.toString());
       formDataToSend.append('contentBlocks', JSON.stringify(processedBlocks));
       formDataToSend.append('category-new', JSON.stringify({ oid: formData['category-new'] }));
-      console.log('Category-new sent:', JSON.stringify({ oid: formData['category-new'] })); // Debug
+      formDataToSend.append('createdAt', formData.createdAt);
+      formDataToSend.append('updatedAt', formData.updatedAt);
+      formDataToSend.append('__v', formData.__v.toString());
 
+      // Thêm hình ảnh khối nội dung dưới dạng mảng đơn giản
       formData.contentBlocks.forEach((block) => {
         if (block.type === 'image' && block.url instanceof File) {
-          formDataToSend.append('contentImages', block.url);
+          formDataToSend.append('contentImages', block.url); // Sử dụng key 'contentImages' đơn giản
         }
       });
 
-      const res = await fetch(`https://api-tuyendung-cty.onrender.com/api/new/${slug}`, {
+      const res = await fetch(`${process.env.REACT_APP_API_URL}/new/${slug}`, {
         method: 'PUT',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -319,17 +378,6 @@ const EditNew = () => {
               value={formData.title}
               onChange={handleChange}
               placeholder="Nhập tiêu đề bài viết"
-            />
-          </div>
-
-          <div className={styles.formGroup}>
-            <label>Slug</label>
-            <input
-              className={styles.inputField}
-              name="newSlug"
-              value={formData.newSlug}
-              onChange={handleChange}
-              placeholder="Nhập slug (URL thân thiện)"
             />
           </div>
 
@@ -425,14 +473,10 @@ const EditNew = () => {
                           className={styles.blockInput}
                           value={block.content || ''}
                           onChange={(e) => handleBlockChange(index, 'content', e.target.value)}
-                          placeholder="Mỗi dòng là một mục danh sách"
+                          placeholder="Nhập danh sách (mỗi dòng bắt đầu bằng -)"
                           rows={4}
                         />
-                        <ul className={styles.listPreview}>
-                          {(block.content || '').split('\n').filter(item => item.trim()).map((item, i) => (
-                            <li key={i}>{item}</li>
-                          ))}
-                        </ul>
+                        <div className={styles.listPreview} dangerouslySetInnerHTML={{ __html: block.content ? `<ul>${block.content.split('\n').filter(item => item.trim()).map(item => `<li>${item.replace(/^-\s*/, '').trim()}</li>`).join('')}</ul>` : '' }} />
                       </>
                     ) : (
                       <textarea
@@ -469,7 +513,7 @@ const EditNew = () => {
                                 ? block.preview
                                 : block.url?.startsWith('http') || block.url?.startsWith('data:')
                                 ? block.url
-                                : `https://api-tuyendung-cty.onrender.com/${block.url?.replace(/^\/+/, '')}`
+                                : `${process.env.REACT_APP_API_BASE}/${block.url?.replace(/^\/+/, '')}`
                             }
                             alt={`Block ${index + 1}`}
                             className={styles.previewImage}

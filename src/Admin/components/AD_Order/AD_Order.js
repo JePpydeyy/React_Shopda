@@ -4,6 +4,8 @@ import Sidebar from '../Sidebar/Sidebar';
 import ToastNotification from '../../../components/ToastNotification/ToastNotification';
 import styles from './Order.module.css';
 import axios from 'axios';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 
 const ORDERS_PER_PAGE = 10;
 const API_URL = process.env.REACT_APP_API_URL;
@@ -275,26 +277,37 @@ const OrderManagement = () => {
                     <td>{order.fullName}</td>
                     <td>{order.grandTotal?.toLocaleString() || order.totalAmount?.toLocaleString()} VNĐ</td>
                     <td>{order.status}</td>
-                    <td>{new Date(order.createdAt).toLocaleDateString('vi-VN')}</td>
+                    <td>{
+
+new Date(order.createdAt).toLocaleDateString('vi-VN')}</td>
                     <td onClick={(e) => e.stopPropagation()}>
-                      <select
-                        className={styles.statusSelect}
-                        value={order.status}
-                        onChange={(e) => {
-                          handleUpdateStatus(order._id, e.target.value);
-                        }}
-                      >
-                        {getStatusOptions(order.status).map((option) => (
-                          <option
-                            key={option.value}
-                            value={option.value}
-                            disabled={option.disabled}
-                            style={option.disabled ? { color: '#999', backgroundColor: '#f0f0f0' } : {}}
-                          >
-                            {option.value}
-                          </option>
-                        ))}
-                      </select>
+                      <div className={styles.actionContainer}>
+                        <select
+                          className={styles.statusSelect}
+                          value={order.status}
+                          onChange={(e) => {
+                            handleUpdateStatus(order._id, e.target.value);
+                          }}
+                        >
+                          {getStatusOptions(order.status).map((option) => (
+                            <option
+                              key={option.value}
+                              value={option.value}
+                              disabled={option.disabled}
+                              style={option.disabled ? { color: '#999', backgroundColor: '#f0f0f0' } : {}}
+                            >
+                              {option.value}
+                            </option>
+                          ))}
+                        </select>
+                        <button
+                          onClick={() => handleView(order._id)}
+                          className={styles.iconButton}
+                          title="Xem chi tiết"
+                        >
+                          <FontAwesomeIcon icon={faInfoCircle} />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}

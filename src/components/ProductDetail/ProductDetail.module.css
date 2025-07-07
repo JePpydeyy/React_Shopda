@@ -37,6 +37,10 @@
   margin: 10px 0;
 }
 
+.rightColumn .priceHighlight {
+ font-size:20px;
+ color: #3457a0;
+}
 .sale {
   color: #3457a0;
 }
@@ -289,6 +293,49 @@
 
 .thumbnail:hover {
   transform: scale(1.1);
+}
+/* Thêm vào cuối file ProductDetail.module.css */
+.sizeButtons {
+  width:90%;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px; /* Khoảng cách giữa các nút */
+  margin-top: 10px;
+}
+
+.sizeButton {
+  padding: 6px 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: #fff;
+  color: #333;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap; /* Ngăn text xuống dòng */
+}
+
+.sizeButton:hover {
+  border-color: #3457a0;
+  color: #3457a0;
+}
+
+.selected {
+  background-color: #3457a0;
+  color: #fff;
+  border-color: #3457a0;
+}
+
+.disabled {
+  background-color: #f0f0f0;
+  color: #999;
+  border-color: #ccc;
+  cursor: not-allowed;
+}
+
+.disabled:hover {
+  border-color: #ccc;
+  color: #999;
 }
 
 

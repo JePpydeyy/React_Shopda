@@ -19,7 +19,7 @@ const fieldGuides = {
   images: "Chọn tối đa 4 ảnh chất lượng cao (JPEG, PNG, GIF)",
   status: "Hiển thị: Hiện trên website | Ẩn: Không hiện | Sale: Đang giảm giá",
 };
-
+  
 const TooltipButton = ({ field, children, activeTooltip, setActiveTooltip }) => (
   <div className={styles.fieldWithTooltip}>
     <div className={styles.labelContainer}>
@@ -56,7 +56,6 @@ const AddProduct = () => {
     tag: 'new',
     short_description: '',
     description: '',
-    weight: '1', // <-- mặc định là 1
     status: 'show',
     images: [],
   });

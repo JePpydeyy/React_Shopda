@@ -187,7 +187,7 @@ const Cart = () => {
                       <td>
                         <div className={styles.productInfo}>
                           <div className={styles.productImage}>
-                            <img src={item.image} alt={item.name} style={{ width: 60, borderRadius: 8 }} />
+                            <img src={item.image} alt={item.name} style={{ width: 80, borderRadius: 8 }} />
                           </div>
                           <div className={styles.productDetails}>
                             <h3>{item.name}</h3>
