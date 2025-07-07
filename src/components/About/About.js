@@ -8,7 +8,7 @@ function About() {
       {/* Hero Section */}
       <div className={styles.mainContainer}>
         <div className={styles.heroImage}>
-          <img src="images/about-us-1.jpg" alt="About Us" />
+          <img src="images/Bannerabout.jpg" alt="About Us" />
         </div>
 
         {/* About Us Section */}
@@ -16,9 +16,9 @@ function About() {
           <div className={styles.column}>
             <h2 className={styles.columnTitle}>Về chúng tôi?</h2>
             <p>
-              Tịnh Lâm là đứa con tinh thần mà Huỳnh Lập tâm huyết nhất. Sở dĩ đặt tên thương hiệu là Tịnh Lâm bởi đây là một nhân vật rất quen thuộc với những ai là fan của Huỳnh Lập trong các tác phẩm như "Pháp Sư Mù", "Ai Chết Giơ Tay". Nhiều người khi theo dõi các series này quan tâm đến những phụ kiện độc đáo của nhân vật Tịnh Lâm, và vì thế Tịnh Lâm - Trang Sức Phong Thủy ra đời.
+            Đá Phong Thủy không chỉ là một cửa hàng, mà còn là đứa con tinh thần mà chúng tôi - những người dành trọn tâm huyết cho vẻ đẹp và năng lượng của đá tự nhiên - vun đắp. Chúng tôi tin rằng mỗi viên đá đều mang trong mình một câu chuyện, một nguồn năng lượng độc đáo có thể kết nối và hỗ trợ hành trình cuộc sống của mỗi người.
             </p>
-          </div>
+          </div>  
 
           <div className={styles.divider}></div>
 
@@ -47,10 +47,10 @@ function About() {
             "Một thương hiệu thành công được xây dựng bởi lòng tin và sự hài lòng của khách hàng. Tịnh Lâm được ra đời bởi điều đó: sự chân thành, lòng tin và hơn hết nữa chúng tôi dành rất nhiều thời gian, tìm hiểu để mang đến những sản phẩm chất lượng nhất đến người tiêu dùng."
           </div>
           <div className={styles.authorSection}>
-            <div className={styles.authorAvatar}>HL</div>
+            <div className={styles.authorAvatar}>HP</div>
             <div className={styles.authorInfo}>
-              <h4>Huỳnh Lập</h4>
-              <p>TinhLam JW</p>
+              <h4>Huy Phan</h4>
+              <p>Nichetsu</p>
             </div>
           </div>
         </div>
@@ -64,10 +64,10 @@ function About() {
 
       {/* Intro Section */}
       <div className={styles.newWrapper}>
-        <div className={styles.title}>TINH LÂM</div>
+        <div className={styles.title}>Đá Phong Thủy</div>
         <div className={styles.subtitle}>Về Chúng Tôi</div>
         <div className={styles.content}>
-          Tịnh Lâm là đứa con tinh thần mà Huỳnh Lập tâm huyết nhất. Sở dĩ đặt tên thương hiệu là Tịnh Lâm bởi đây là một nhân vật rất quen thuộc với những ai là fan của Huỳnh Lập trong các tác phẩm như “Pháp Sư Mù”, “Ai Chết Giơ Tay”. Nhiều người khi theo dõi các series này quan tâm đến những phụ kiện đi kèm của nhân vật Tịnh Lâm, và vì thế Tịnh Lâm – Trang Sức Phong Thủy ra đời.
+         Chúng tôi không chỉ bán đá, chúng tôi mang đến sự bình an, may mắn và tài lộc. Hãy để Đá Phong Thủy đồng hành cùng bạn trên con đường tìm kiếm sự cân bằng, hài hòa và thịnh vượng trong cuộc sống.
         </div>
       </div>
     </div>

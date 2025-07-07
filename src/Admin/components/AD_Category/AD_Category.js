@@ -19,25 +19,28 @@ const CategoryManagement = () => {
   const [modalError, setModalError] = useState(null);
   const [modalLoading, setModalLoading] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState({ open: false, id: null });
+  // Thêm state mới cho xác nhận toggle trạng thái
+  const [toggleConfirm, setToggleConfirm] = useState({ open: false, id: null, currentStatus: '' });
 
   const API_URL = process.env.REACT_APP_API_URL;
 
   const isAuthenticated = () => !!localStorage.getItem('adminToken');
 
-  // Close modals on Esc key press
+  // Đóng các modal khi nhấn phím Esc
   useEffect(() => {
     const handleKeyDown = (event) => {
-      if (event.key === 'Escape' && (isModalOpen || deleteConfirm.open)) {
+      if (event.key === 'Escape' && (isModalOpen || deleteConfirm.open || toggleConfirm.open)) {
         setIsModalOpen(false);
         setDeleteConfirm({ open: false, id: null });
+        setToggleConfirm({ open: false, id: null, currentStatus: '' });
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isModalOpen, deleteConfirm.open]);
+  }, [isModalOpen, deleteConfirm.open, toggleConfirm.open]);
 
-  // Fetch categories from API
+  // Fetch danh mục từ API (giữ nguyên)
   useEffect(() => {
     const fetchCategories = async () => {
       setIsLoading(true);
@@ -191,7 +194,7 @@ const CategoryManagement = () => {
     }
   };
 
-  const handleToggleStatus = async (id) => {
+  const handleToggleStatus = async (id, currentStatus) => {
     setSuccessMessage(null);
     setErrorMessage(null);
     if (!isAuthenticated()) {
@@ -199,6 +202,12 @@ const CategoryManagement = () => {
       setTimeout(() => window.location.href = '/admin/login', 2000);
       return;
     }
+    // Nếu đang chuyển từ 'show' sang 'hidden', hiển thị popup xác nhận
+    if (currentStatus === 'show') {
+      setToggleConfirm({ open: true, id, currentStatus });
+      return;
+    }
+    // Nếu chuyển từ 'hidden' sang 'show', thực hiện ngay không cần xác nhận
     try {
       const response = await axios.put(
         `${API_URL}/category/${id}/toggle-status`,
@@ -229,6 +238,39 @@ const CategoryManagement = () => {
     }
   };
 
+  const confirmToggleStatus = async () => {
+    try {
+      const response = await axios.put(
+        `${API_URL}/category/${toggleConfirm.id}/toggle-status`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('adminToken')}`,
+          },
+        }
+      );
+      const updatedCategory = {
+        id: response.data._id,
+        name_categories: response.data.category,
+        status: response.data.status,
+      };
+      setCategories(categories.map(category =>
+        category.id === toggleConfirm.id ? updatedCategory : category
+      ));
+      setSuccessMessage(`Đã thay đổi trạng thái danh mục thành ${response.data.status === 'show' ? 'Hiển thị' : 'Ẩn'}`);
+      setToggleConfirm({ open: false, id: null, currentStatus: '' });
+    } catch (err) {
+      setToggleConfirm({ open: false, id: null, currentStatus: '' });
+      if (err.response?.status === 401) {
+        setErrorMessage('Phiên đăng nhập hết hạn hoặc không có quyền admin.');
+        setTimeout(() => window.location.href = '/admin/login', 2000);
+      } else {
+        setErrorMessage('Không thể thay đổi trạng thái danh mục. Vui lòng thử lại.');
+        console.error('Error toggling status:', err);
+      }
+    }
+  };
+
   const handleCloseToast = () => {
     setSuccessMessage(null);
     setErrorMessage(null);
@@ -243,7 +285,6 @@ const CategoryManagement = () => {
       <Sidebar />
       <div className={styles.content}>
         <h1 className={styles.title}>Quản Lý Danh Mục</h1>
-        
         <div className={styles.searchFilter}>
           <input
             type="text"
@@ -293,7 +334,7 @@ const CategoryManagement = () => {
                         <FontAwesomeIcon icon={faTrash} />
                       </button>
                       <button
-                        onClick={() => handleToggleStatus(category.id)}
+                        onClick={() => handleToggleStatus(category.id, category.status)}
                         className={styles.actionButton}
                         title={category.status === 'show' ? 'Ẩn danh mục' : 'Hiển thị danh mục'}
                       >
@@ -389,6 +430,40 @@ const CategoryManagement = () => {
                 <button
                   className={styles.cancelButton}
                   onClick={() => setDeleteConfirm({ open: false, id: null })}
+                  title="Hủy"
+                >
+                  <FontAwesomeIcon icon={faTimes} /> Hủy
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {toggleConfirm.open && (
+          <div className={styles.modalOverlay} onClick={() => setToggleConfirm({ open: false, id: null, currentStatus: '' })}>
+            <div className={styles.modal} style={{ maxWidth: 400, textAlign: 'center' }} onClick={(e) => e.stopPropagation()}>
+              <div style={{ marginBottom: 16 }}>
+                <svg width="48" height="48" fill="none" viewBox="0 0 24 24">
+                  <circle cx="12" cy="12" r="12" fill="#fdecea"/>
+                  <path d="M15 9l-6 6M9 9l6 6" stroke="#e74c3c" strokeWidth="2" strokeLinecap="round"/>
+                </svg>
+              </div>
+              <h3 style={{ color: '#e74c3c', marginBottom: 12, fontWeight: 600 }}>Xác nhận ẩn danh mục</h3>
+              <p style={{ marginBottom: 24, color: '#333' }}>
+                <strong>Tất cả sản phẩm trong danh mục này sẽ bị ẩn đi.</strong><br />
+              </p>
+              <div className={styles.formActions}>
+                <button
+                  className={styles.submitButton}
+                  style={{ background: '#e74c3c' }}
+                  onClick={confirmToggleStatus}
+                  title="Ẩn danh mục"
+                >
+                  <FontAwesomeIcon icon={faEyeSlash} /> Ẩn
+                </button>
+                <button
+                  className={styles.cancelButton}
+                  onClick={() => setToggleConfirm({ open: false, id: null, currentStatus: '' })}
                   title="Hủy"
                 >
                   <FontAwesomeIcon icon={faTimes} /> Hủy
