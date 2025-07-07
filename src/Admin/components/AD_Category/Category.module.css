@@ -35,7 +35,6 @@
   font-weight: 600;
   margin-bottom: var(--spacing-lg);
   color: var(--secondary-color);
-  letter-spacing: -0.02em;
 }
 
 .searchFilter {
@@ -43,10 +42,6 @@
   gap: var(--spacing-md);
   margin-bottom: var(--spacing-lg);
   flex-wrap: wrap;
-  background: white;
-  padding: var(--spacing-md);
-  border-radius: var(--border-radius);
-  box-shadow: var(--shadow-sm);
 }
 
 .searchInput {
@@ -59,6 +54,7 @@
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
   flex: 1;
   min-width: 200px;
+  max-width: 500px;
 }
 
 .searchInput:focus {

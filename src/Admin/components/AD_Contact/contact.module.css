@@ -1,65 +1,245 @@
+/* ===== Layout chính ===== */
 .container {
-      padding: 20px;
-    width: 70%;
-    margin-left: 20%;
+  display: flex;
+  background-color: #f9fafb;
+  min-height: 100vh;
+  font-family: 'Inter', sans-serif;
+  padding-top: 24px;
+}
+
+.content {
+  flex-grow: 1;
+  padding: 24px;
+  margin-left: 250px;
+  transition: margin-left 0.3s ease-in-out;
+  position: relative;
+  z-index: 1;
 }
 
 .title {
-  font-size: 24px;
-  font-weight: bold;
-  margin-bottom: 20px;
-  text-align: center;
+    font-size: 1.75rem;
+    font-weight: bold;
+    margin-bottom: 24px;
+    color: #1a1a3d;
+    letter-spacing: -0.02em;
+    text-align: center;
 }
 
-.tableContainer {
-  overflow-x: auto;
+/* ===== Filter ===== */
+.searchFilter {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.searchInput {
+  width: 500px;
+  padding: 10px 16px 10px 40px;
+  border: 1px solid #e5e7eb;
   border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  font-size: 0.95rem;
+  color: #64748b;
+  background: white;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748b' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M21 21l-4.35-4.35m0 0A7.5 7.5 0 1110.5 3a7.5 7.5 0 016.15 13.65z' /%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: 12px center;
+  background-size: 18px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.select,
+.selectAction {
+  width: 150px;
+  padding: 10px 16px;
+  padding-right: 36px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #374151;
+  background-color: white;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 16px 16px;
+  appearance: none;
+  cursor: pointer;
+}
+
+.selectAction:disabled {
+  background-color: #f9fafb;
+  color: #9ca3af;
+  cursor: not-allowed;
+}
+
+.select:focus,
+.selectAction:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+}
+
+/* ===== Table ===== */
+.tableContainer {
+  background-color: #fff;
+  border-radius: 6px;
+  overflow-x: auto;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 14px;
-  background-color: white;
 }
 
 .tableHeader {
-  background-color: #edf1f7;
-  color: #1f2d3d;
-  font-weight: bold;
-  text-transform: uppercase;
+  background-color: #e5e7eb;
 }
 
-.tableHeader th {
+.table th,
+.table td {
   padding: 12px;
-  text-align: left;
-  font-size: 13px;
+  text-align: center;
+  border-bottom: 1px solid #e5e7eb;
+  font-size: 14px;
 }
 
-.tableRow td {
-  padding: 14px 12px;
-  border-bottom: 1px solid #f0f0f0;
-  cursor: pointer;
+.table th {
+  text-transform: uppercase;
+  font-weight: 600;
+  color: #374151;
 }
 
 .tableRow:hover {
-  background-color: #f9f9f9;
+  background-color: #f3f4f6;
+  cursor: pointer;
 }
 
-.messageRow td {
-  padding: 12px;
-  background-color: #f7fafe;
-  border-bottom: 1px solid #e0e0e0;
+/* ===== Trạng thái ===== */
+.statusProcessed {
+  color: #16a34a;
 }
 
-.messageContent {
-  font-size: 14px;
-  color: #333;
-  line-height: 1.6;
+.statusNotProcessed {
+  color: #dc2626;
 }
 
+/* ===== Loading / Error ===== */
+.loading,
 .error {
-  color: red;
-  margin-top: 10px;
+  text-align: center;
+  padding: 16px;
+  font-style: italic;
+}
+
+/* ===== Modal ===== */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.modalContent {
+  background-color: white;
+  padding: 24px;
+  border-radius: 12px;
+  max-width: 500px;
+  width: 90%;
+  text-align: center;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.modalTitle {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: #1a1a3d;
+}
+
+.modalText {
+  font-size: 14px;
+  color: #374151;
+  margin-bottom: 20px;
+  text-align: left;
+  white-space: pre-line;
+}
+
+.closeButton {
+  padding: 10px 20px;
+  font-size: 14px;
+  color: white;
+  background-color: #3b82f6;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.closeButton:hover {
+  background-color: #2563eb;
+}
+
+/* ===== Pagination ===== */
+.pagination {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+  gap: 8px;
+}
+
+.pageButton {
+  padding: 8px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  background-color: white;
+  color: #374151;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.pageButton:hover {
+  background-color: #e5e7eb;
+}
+
+.pageButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.activePage {
+  background-color: #3b82f6;
+  color: white;
+  font-weight: bold;
+  border-color: #3b82f6;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 768px) {
+  .content {
+    margin-left: 0;
+    padding: 16px;
+  }
+
+  .searchFilter {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .searchInput,
+  .select,
+  .selectAction {
+    width: 100%;
+  }
+
+  .table th,
+  .table td {
+    padding: 8px;
+  }
 }

@@ -24,10 +24,12 @@
 }
 
 .filterSelect {
-  padding: 8px 12px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-  font-size: 14px;
+   display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  padding: 16px;
+  border-radius: 8px;
 }
 
 .createButton {

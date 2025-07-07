@@ -300,10 +300,10 @@ const AD_Discount = () => {
         <div className={styles.searchFilter}>
           <input
             type="text"
-            placeholder="Tìm kiếm mã giảm giá..."
+            placeholder="Tìm kiếm danh mục..."
+            className={styles.searchInput}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className={styles.searchInput}
           />
           <select
             value={statusFilter}

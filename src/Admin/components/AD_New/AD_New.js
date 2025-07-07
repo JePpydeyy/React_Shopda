@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Sidebar from '../Sidebar/Sidebar';
-import styles from './new.module.css';
+import styles from './ad_new.module.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPenToSquare, faEye, faEyeSlash, faTrash } from '@fortawesome/free-solid-svg-icons';
 
@@ -233,7 +233,11 @@ const NewsManagement = () => {
             <tbody>
               {paginatedNews.length > 0 ? paginatedNews.map(article => (
                 <tr key={article.slug} className={styles.tableRow} onClick={() => handleShowDetail(article)}>
-                  <td>{article.title.length > 60 ? article.title.slice(0, 57) + '...' : article.title}</td>
+                  <td>
+                    {article.title.split(' ').length > 11
+                      ? article.title.split(' ').slice(0, 11).join(' ') + '...'
+                      : article.title}
+                  </td>
                   <td>{article.categoryName}</td>
                   <td>{new Date(article.publishedAt).toLocaleDateString('vi-VN')}</td>
                   <td>{article.views}</td>
