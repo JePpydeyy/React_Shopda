@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import styles from './New.module.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCalendarAlt } from '@fortawesome/free-solid-svg-icons';
+import { faCalendarDays, faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
 
 const New = () => {
   const [newsItems, setNewsItems] = useState([]);
@@ -11,6 +11,8 @@ const New = () => {
   const [loadingCategories, setLoadingCategories] = useState(true);
   const [error, setError] = useState(null);
   const [selectedCategoryId, setSelectedCategoryId] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 9;
 
   const API_BASE_URL = process.env.REACT_APP_API_BASE;
 
@@ -20,6 +22,18 @@ const New = () => {
       return words.slice(0, 10).join(' ') + '...';
     }
     return title;
+  };
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    const options = { year: 'numeric', month: 'long', day: 'numeric' };
+    return date.toLocaleDateString('vi-VN', options);
+  };
+
+  const getImageUrl = (image) => {
+    if (!image) return '/images/placeholder.jpg';
+    if (image.startsWith('http')) return image;
+    return `${API_BASE_URL}/${image}`;
   };
 
   useEffect(() => {
@@ -64,16 +78,15 @@ const New = () => {
         }
 
         const mapped = items.map((item) => ({
-          id: item._id,
+          _id: item._id,
           slug: item.slug,
           title: item.title || 'Không có tiêu đề',
-          date: new Date(item.publishedAt).toLocaleDateString('vi-VN', {
-            year: 'numeric', month: 'long', day: 'numeric',
-          }),
-          image: item.thumbnailUrl || '/placeholder-image.jpg',
+          createdAt: item.publishedAt,
+          thumbnailUrl: item.thumbnailUrl || '/images/kim.jpg',
         }));
 
         setNewsItems(mapped);
+        setCurrentPage(1); // Reset to first page when data changes
       } catch (err) {
         setError(err.message);
       } finally {
@@ -85,6 +98,18 @@ const New = () => {
 
   const handleCategorySelect = (id) => {
     setSelectedCategoryId(id === selectedCategoryId ? null : id);
+  };
+
+  // Pagination logic
+  const totalPages = Math.ceil(newsItems.length / itemsPerPage);
+  const paginatedItems = newsItems
+    .filter((article) => article.slug)
+    .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+
+  const handlePageChange = (page) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+    }
   };
 
   return (
@@ -117,29 +142,35 @@ const New = () => {
         </nav>
 
         <div className={styles.newsSection}>
+          <h2 className={styles.newsTitle}>Tin Tức Mới Nhất</h2>
           <div className={styles.newsGrid}>
             {loadingNews ? (
               <div className={styles.loading}>Đang tải bài viết...</div>
             ) : error ? (
               <div className={styles.error}>Lỗi: {error}</div>
-            ) : newsItems.length > 0 ? (
-              newsItems.map((item) => (
-                <div key={item.id} className={styles.newsPost}>
+            ) : paginatedItems.length > 0 ? (
+              paginatedItems.map((article) => (
+                <div key={article._id} className={styles.newsPost}>
                   <div className={styles.postImage}>
                     <img
-                      src={item.image.startsWith('http') ? item.image : `${API_BASE_URL}/${item.image}`}
-                      alt={item.title}
-                      onError={(e) => (e.target.src = '/placeholder-image.jpg')}
+                      src={getImageUrl(article.thumbnailUrl)}
+                      alt={article.title}
+                      className={styles.postImageImg}
+                      onError={(e) => {
+                        e.target.src = '/images/kim.jpg';
+                      }}
                     />
                   </div>
                   <div className={styles.postContent}>
-                    <p>
-                      <FontAwesomeIcon icon={faCalendarAlt} style={{ marginRight: 5 }} />
-                      {item.date}
+                    <p className={styles.postDate}>
+                      <FontAwesomeIcon icon={faCalendarDays} className={styles.postDateIcon} />
+                      {formatDate(article.createdAt)}
                     </p>
-                    <h3>{truncateTitle(item.title)}</h3>
+                    <h3 className={styles.postTitle}>{truncateTitle(article.title)}</h3>
                     <div className={styles.postLink}>
-                      <Link to={`/newdetail/${item.slug}`}>XEM THÊM</Link>
+                      <Link to={`/newdetail/${article.slug}`} className={styles.postLinkA}>
+                        XEM THÊM
+                      </Link>
                     </div>
                   </div>
                 </div>
@@ -148,6 +179,33 @@ const New = () => {
               <div className={styles.noItems}>Không có bài viết nào.</div>
             )}
           </div>
+          {totalPages > 1 && (
+            <div className={styles.pagination}>
+              <button
+                className={`${styles.paginationItem} ${currentPage === 1 ? styles.disabled : ''}`}
+                onClick={() => handlePageChange(currentPage - 1)}
+                disabled={currentPage === 1}
+              >
+                <FontAwesomeIcon icon={faChevronLeft} />
+              </button>
+              {Array.from({ length: totalPages }, (_, index) => (
+                <button
+                  key={index + 1}
+                  className={`${styles.paginationItem} ${currentPage === index + 1 ? styles.active : ''}`}
+                  onClick={() => handlePageChange(index + 1)}
+                >
+                  {index + 1}
+                </button>
+              ))}
+              <button
+                className={`${styles.paginationItem} ${currentPage === totalPages ? styles.disabled : ''}`}
+                onClick={() => handlePageChange(currentPage + 1)}
+                disabled={currentPage === totalPages}
+              >
+                <FontAwesomeIcon icon={faChevronRight} />
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </main>
