@@ -13,19 +13,18 @@
 }
 
 .title {
-  font-size: 1.75rem;
-  font-weight: bold;
-  margin-bottom: 24px;
-  color: #1a1a3d;
-  letter-spacing: -0.02em;
-  text-align: center;
+   font-size: 1.75rem;
+    font-weight: bold;
+    margin-bottom: 24px;
+    color: #1a1a3d;
+    letter-spacing: -0.02em;
 }
 
 /* Bộ lọc và tìm kiếm */
 .searchFilter {
   display: flex;
   gap: 16px;
-  margin-bottom: 24px;
+  /* margin-bottom: 24px; */
   flex-wrap: wrap;
   /* background: white; */
   padding: 16px;
