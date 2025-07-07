@@ -76,6 +76,7 @@
 /* Filter Select */
 .filterSelect {
   padding: var(--spacing-sm) var(--spacing-md);
+  padding-right: 2rem; /* Tạo khoảng trống cho mũi tên */
   border: 1px solid var(--border-color);
   border-radius: var(--border-radius);
   font-size: 0.95rem;
@@ -83,6 +84,15 @@
   background: #ffffff;
   transition: border-color 0.2s ease;
   min-width: 150px;
+
+  /* Tùy chỉnh mũi tên */
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml;utf8,<svg fill='black' height='20' viewBox='0 0 24 24' width='20' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 1rem;
 }
 
 .filterSelect:focus {
