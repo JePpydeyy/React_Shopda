@@ -5,6 +5,8 @@ import 'quill/dist/quill.snow.css';
 import Sidebar from '../Sidebar/Sidebar';
 import ToastNotification from '../../../components/ToastNotification/ToastNotification';
 import styles from './Product.module.css';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPenToSquare, faEye, faEyeSlash, faTrash, faPlus, faTimes, faAngleLeft, faAngleRight, faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 
 // Reusable TooltipButton component
 const TooltipButton = React.memo(({ field, children, activeTooltip, setActiveTooltip, guide }) => (
@@ -33,8 +35,8 @@ const TooltipButton = React.memo(({ field, children, activeTooltip, setActiveToo
 
 // Reusable ErrorPopup component
 const ErrorPopup = ({ errors, onClose }) => (
-  <div className={styles.errorPopupOverlay}>
-    <div className={styles.errorPopup}>
+  <div className={styles.errorPopupOverlay} onClick={onClose}>
+    <div className={styles.errorPopup} onClick={(e) => e.stopPropagation()}>
       <h3>Lỗi nhập liệu</h3>
       <ul>
         {Object.entries(errors).map(([key, message]) => (
@@ -42,7 +44,7 @@ const ErrorPopup = ({ errors, onClose }) => (
         ))}
       </ul>
       <button onClick={onClose} className={styles.errorPopupCloseButton}>
-        Đóng
+        <FontAwesomeIcon icon={faTimes} /> Đóng
       </button>
     </div>
   </div>
@@ -50,16 +52,16 @@ const ErrorPopup = ({ errors, onClose }) => (
 
 // Reusable ConfirmPopup component
 const ConfirmPopup = ({ message, onConfirm, onCancel }) => (
-  <div className={styles.errorPopupOverlay}>
-    <div className={styles.confirmPopup}>
+  <div className={styles.errorPopupOverlay} onClick={onCancel}>
+    <div className={styles.confirmPopup} onClick={(e) => e.stopPropagation()}>
       <h3>Xác nhận xóa</h3>
       <p>{message}</p>
       <div className={styles.confirmPopupActions}>
         <button onClick={onConfirm} className={styles.confirmButton}>
-          Xác nhận
+          <FontAwesomeIcon icon={faTrash} /> Xác nhận
         </button>
         <button onClick={onCancel} className={styles.cancelButton}>
-          Hủy
+          <FontAwesomeIcon icon={faTimes} /> Hủy
         </button>
       </div>
     </div>
@@ -142,6 +144,20 @@ const ProductManagement = () => {
     );
   }, [filteredProducts, currentPage]);
 
+  // Close modal on Esc key press
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.key === 'Escape' && (showDetailProduct || editProduct || addProduct || showErrorPopup || showConfirmPopup)) {
+        closeModal();
+        if (showErrorPopup) closeErrorPopup();
+        if (showConfirmPopup) handleCancelDelete();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [showDetailProduct, editProduct, addProduct, showErrorPopup, showConfirmPopup]);
+
   // Initialize Quill editor
   useEffect(() => {
     if (editorRef.current && !quillRef.current && (editProduct || addProduct)) {
@@ -161,13 +177,11 @@ const ProductManagement = () => {
           placeholder: 'Nhập mô tả chi tiết...',
         });
 
-        // Set initial content
         if (formData.description) {
           console.log('Setting initial description:', formData.description);
           quill.root.innerHTML = formData.description;
         }
 
-        // Sync Quill content with formData
         quill.on('text-change', () => {
           const content = quill.root.innerHTML;
           console.log('Quill text changed:', content);
@@ -185,7 +199,6 @@ const ProductManagement = () => {
       }
     }
 
-    // Cleanup Quill instance
     return () => {
       console.log('Cleaning up Quill instance');
       if (quillRef.current) {
@@ -538,10 +551,9 @@ const ProductManagement = () => {
     return buttons;
   }, [currentPage, totalPages, handlePageChange]);
 
-  const handleShowDetails = useCallback((product, e) => {
+  const handleShowDetails = useCallback((product) => {
     setSuccessMessage(null);
     setErrorMessage(null);
-    if (e.target.tagName === 'BUTTON') return;
     setShowDetailProduct(product);
     setSuccessMessage('Đã tải chi tiết sản phẩm thành công');
   }, []);
@@ -664,8 +676,8 @@ const ProductManagement = () => {
             <option value="show">Hiển thị</option>
             <option value="hidden">Ẩn</option>
           </select>
-          <button onClick={handleAddProduct} className={styles.addButton}>
-            Thêm Sản Phẩm
+          <button onClick={handleAddProduct} className={styles.addButton} title="Thêm sản phẩm">
+            <FontAwesomeIcon icon={faPlus} /> Thêm Sản Phẩm
           </button>
         </div>
         <div className={styles.tableContainer}>
@@ -685,7 +697,6 @@ const ProductManagement = () => {
                 <tr
                   key={product._id}
                   className={styles.tableRow}
-                  onClick={(e) => handleShowDetails(product, e)}
                   style={{ cursor: 'pointer' }}
                 >
                   <td>
@@ -705,22 +716,32 @@ const ProductManagement = () => {
                   <td>{product.status === 'show' ? 'Hiển thị' : 'Ẩn'}</td>
                   <td onClick={(e) => e.stopPropagation()}>
                     <button
-                      onClick={() => handleEdit(product)}
-                      className={styles.actionButton}
+                      onClick={() => handleShowDetails(product)}
+                      className={styles.iconButton}
+                      title="Xem chi tiết"
                     >
-                      Sửa
+                      <FontAwesomeIcon icon={faInfoCircle} />
+                    </button>
+                    <button
+                      onClick={() => handleEdit(product)}
+                      className={styles.iconButton}
+                      title="Chỉnh sửa"
+                    >
+                      <FontAwesomeIcon icon={faPenToSquare} />
                     </button>
                     <button
                       onClick={() => toggleStatus(product)}
-                      className={`${styles.actionButton} ${styles.toggleButton}`}
+                      className={styles.iconButton}
+                      title={product.status === 'show' ? 'Ẩn sản phẩm' : 'Hiển thị sản phẩm'}
                     >
-                      {product.status === 'show' ? 'Ẩn' : 'Hiện'}
+                      <FontAwesomeIcon icon={product.status === 'show' ? faEyeSlash : faEye} />
                     </button>
                     <button
                       onClick={() => handleDelete(product.slug)}
-                      className={`${styles.actionButton} ${styles.deleteButton}`}
+                      className={styles.iconButton}
+                      title="Xóa sản phẩm"
                     >
-                      Xóa
+                      <FontAwesomeIcon icon={faTrash} />
                     </button>
                   </td>
                 </tr>
@@ -733,21 +754,30 @@ const ProductManagement = () => {
             onClick={() => handlePageChange(currentPage - 1)}
             disabled={currentPage === 1}
             className={styles.pageButton}
+            title="Trang trước"
           >
-            Trước
+            <FontAwesomeIcon icon={faAngleLeft} />
           </button>
           {getPaginationButtons()}
           <button
             onClick={() => handlePageChange(currentPage + 1)}
             disabled={currentPage === totalPages}
             className={styles.pageButton}
+            title="Trang sau"
           >
-            Sau
+            <FontAwesomeIcon icon={faAngleRight} />
           </button>
         </div>
         {(editProduct || addProduct) && (
-          <div className={styles.modalOverlay}>
-            <div className={styles.modal} ref={modalRef}>
+          <div
+            className={styles.modalOverlay}
+            onClick={closeModal}
+          >
+            <div
+              className={styles.modal}
+              ref={modalRef}
+              onClick={(e) => e.stopPropagation()}
+            >
               <h2>{addProduct ? 'Thêm Sản Phẩm' : `Sửa Sản Phẩm: ${editProduct?.name}`}</h2>
               <form onSubmit={handleFormSubmit} className={styles.form}>
                 <div className={styles.formGroup}>
@@ -773,8 +803,9 @@ const ProductManagement = () => {
                               type="button"
                               onClick={() => deleteExistingImage(index)}
                               className={styles.deleteExistingImageButton}
+                              title="Xóa ảnh"
                             >
-                              Xóa
+                              <FontAwesomeIcon icon={faTrash} />
                             </button>
                           </div>
                         ))
@@ -827,8 +858,9 @@ const ProductManagement = () => {
                             type="button"
                             onClick={() => removeImage(index)}
                             className={styles.removeImageButton}
+                            title="Xóa ảnh"
                           >
-                            Xóa
+                            <FontAwesomeIcon icon={faTrash} />
                           </button>
                         </div>
                       ))
@@ -928,14 +960,15 @@ const ProductManagement = () => {
                           type="button"
                           onClick={() => removeOption(index)}
                           className={styles.removeButton}
+                          title="Xóa tùy chọn"
                         >
-                          Xóa
+                          <FontAwesomeIcon icon={faTrash} />
                         </button>
                       )}
                     </div>
                   ))}
-                  <button type="button" onClick={addOption} className={styles.addSizeButton}>
-                    Thêm tùy chọn
+                  <button type="button" onClick={addOption} className={styles.addSizeButton} title="Thêm tùy chọn">
+                    <FontAwesomeIcon icon={faPlus} /> Thêm tùy chọn
                   </button>
                 </div>
                 <div className={styles.formGroup}>
@@ -1060,15 +1093,16 @@ const ProductManagement = () => {
                   />
                 </div>
                 <div className={styles.formActions}>
-                  <button type="submit" className={styles.submitButton}>
-                    {addProduct ? 'Thêm' : 'Cập nhật'}
+                  <button type="submit" className={styles.submitButton} title={addProduct ? 'Thêm sản phẩm' : 'Cập nhật sản phẩm'}>
+                    <FontAwesomeIcon icon={faPlus} /> {addProduct ? 'Thêm' : 'Cập nhật'}
                   </button>
                   <button
                     type="button"
                     onClick={closeModal}
                     className={styles.cancelButton}
+                    title="Hủy"
                   >
-                    Hủy
+                    <FontAwesomeIcon icon={faTimes} /> Hủy
                   </button>
                 </div>
               </form>
@@ -1076,8 +1110,14 @@ const ProductManagement = () => {
           </div>
         )}
         {showDetailProduct && (
-          <div className={styles.modalOverlay}>
-            <div className={styles.modal}>
+          <div
+            className={styles.modalOverlay}
+            onClick={closeModal}
+          >
+            <div
+              className={styles.modal}
+              onClick={(e) => e.stopPropagation()}
+            >
               <h3>Chi tiết sản phẩm: {showDetailProduct.name}</h3>
               <div className={styles.detailContainer}>
                 <p><strong>Cấp độ:</strong> {showDetailProduct.level || 'Chưa xác định'}</p>
@@ -1113,8 +1153,9 @@ const ProductManagement = () => {
                   type="button"
                   onClick={closeModal}
                   className={styles.cancelButton}
+                  title="Đóng"
                 >
-                  Đóng
+                  <FontAwesomeIcon icon={faTimes} /> Đóng
                 </button>
               </div>
             </div>
