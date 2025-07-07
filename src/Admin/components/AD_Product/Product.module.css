@@ -56,15 +56,18 @@
 
 /* Search Input */
 .searchInput {
-  padding: var(--spacing-sm) var(--spacing-md);
-  border: 1px solid var(--border-color);
-  border-radius: var(--border-radius);
+width: 500px;
+  padding: 10px 16px 10px 40px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
   font-size: 0.95rem;
-  color: var(--text-color);
-  background: #ffffff;
+  color: #64748b;
+  background: white;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748b' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M21 21l-4.35-4.35m0 0A7.5 7.5 0 1110.5 3a7.5 7.5 0 016.15 13.65z' /%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: 12px center;
+  background-size: 18px;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
-  flex: 1;
-  min-width: 200px;
 }
 
 .searchInput:focus {
@@ -75,15 +78,23 @@
 
 /* Filter Select */
 .filterSelect {
-  padding: var(--spacing-sm) var(--spacing-md);
-  border: 1px solid var(--border-color);
-  border-radius: var(--border-radius);
+  width: 250px;
+  padding: 10px 16px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
   font-size: 0.95rem;
-  color: var(--text-color);
-  background: #ffffff;
-  transition: border-color 0.2s ease;
-  min-width: 150px;
+  color: #64748b;
+  background: white;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  background-size: 1rem;
+  padding-right: 2.5rem;
+  line-height: 1.5;
 }
+
 
 .filterSelect:focus {
   outline: none;
@@ -96,11 +107,15 @@
   color: var(--text-hover-color);
   padding: var(--spacing-sm) var(--spacing-md);
   border-radius: var(--border-radius);
-  text-decoration: none;
+  border: none;
   font-size: 0.95rem;
   font-weight: 500;
-  transition: background-color 0.2s ease;
+  cursor: pointer;
   text-align: center;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: background-color 0.2s ease;
 }
 
 .addButton:hover {

@@ -52,7 +52,7 @@ const Sidebar = () => {
     { path: '/admin/category', icon: 'fa-list', label: 'Danh mục' },
     { path: '/admin/product', icon: 'fa-gem', label: 'Sản phẩm' },
     { path: '/admin/order', icon: 'fa-shopping-cart', label: 'Đơn hàng' },
-    { path: '/admin/categorynew', icon: 'fa-envelope', label: 'danh mục tin tức' },
+    { path: '/admin/categorynew', icon: 'fa-envelope', label: 'Danh mục tin tức' },
     { path: '/admin/new', icon: 'fa-newspaper', label: 'Tin tức' },
     { path: '/admin/contact', icon: 'fa-envelope', label: 'Liên hệ' },
     { path: '/admin/discout', icon: 'fa-envelope', label: 'Mã giảm giá' }
