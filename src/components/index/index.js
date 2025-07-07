@@ -154,7 +154,7 @@ const Index = () => {
       )}
 
       <div className={styles.banner}>
-        <img src="images/Banner-Web-KimLongPhatLoc.png" alt="Banner" className={styles.bannerImage} />
+        <img src="images/Bannehome.png" alt="Banner" className={styles.bannerImage} />
       </div>
 
       <div className={styles.newProductSection}>
