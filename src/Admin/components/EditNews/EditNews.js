@@ -16,8 +16,8 @@ const EditNew = () => {
     publishedAt: '',
     views: 0,
     'category-new': '',
-    createdAt: new Date('2025-07-07T14:57:00+07:00').toISOString(), // Cập nhật theo thời gian hiện tại
-    updatedAt: new Date('2025-07-07T14:57:00+07:00').toISOString(),
+    createdAt: new Date('2025-07-07T18:09:00+07:00').toISOString(), // Cập nhật theo thời gian hiện tại
+    updatedAt: new Date('2025-07-07T18:09:00+07:00').toISOString(),
     __v: 0,
   });
   const [categories, setCategories] = useState([]);
@@ -40,7 +40,7 @@ const EditNew = () => {
       const result = await res.json();
       const data = result.data || result || [];
       const filteredCategories = data.filter(category => category.status === 'show');
-      console.log('Fetched categories:', filteredCategories); // Debug
+      console.log('Fetched categories:', filteredCategories); // Debug danh sách danh mục
       setCategories(filteredCategories);
       return filteredCategories;
     } catch (err) {
@@ -65,7 +65,7 @@ const EditNew = () => {
 
       const data = await res.json();
       const categoryId = data.newCategory?._id || '';
-      console.log('Fetched article data:', data); // Debug
+      console.log('Fetched article data:', data); // Debug dữ liệu bài viết
 
       setFormData({
         title: data.title || '',
@@ -103,11 +103,11 @@ const EditNew = () => {
           };
         }),
         status: data.status || 'show',
-        publishedAt: data.publishedAt ? new Date(data.publishedAt).toISOString().slice(0, 16) : new Date('2025-07-07T14:57:00+07:00').toISOString().slice(0, 16),
+        publishedAt: data.publishedAt ? new Date(data.publishedAt).toISOString().slice(0, 16) : new Date('2025-07-07T18:09:00+07:00').toISOString().slice(0, 16),
         views: data.views || 0,
         'category-new': categoryId,
-        createdAt: data.createdAt || new Date('2025-07-07T14:57:00+07:00').toISOString(),
-        updatedAt: data.updatedAt || new Date('2025-07-07T14:57:00+07:00').toISOString(),
+        createdAt: data.createdAt || new Date('2025-07-07T18:09:00+07:00').toISOString(),
+        updatedAt: data.updatedAt || new Date('2025-07-07T18:09:00+07:00').toISOString(),
         __v: data.__v || 0,
       });
     } catch (err) {
@@ -139,6 +139,7 @@ const EditNew = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    console.log(`Changing ${name} to: ${value}`); // Debug giá trị thay đổi
     setFormData(prev => ({
       ...prev,
       [name]: value,
@@ -300,6 +301,7 @@ const EditNew = () => {
         };
       });
 
+      console.log('Data to send - category-new:', formData['category-new']); // Debug giá trị category-new
       console.log('Data to send:', {
         title: formData.title,
         thumbnail: formData.thumbnail,
@@ -326,7 +328,7 @@ const EditNew = () => {
       formDataToSend.append('publishedAt', formData.publishedAt || new Date().toISOString());
       formDataToSend.append('views', formData.views.toString());
       formDataToSend.append('contentBlocks', JSON.stringify(processedBlocks));
-      formDataToSend.append('category-new', JSON.stringify({ oid: formData['category-new'] }));
+      formDataToSend.append('category-new', formData['category-new']); // Gửi trực tiếp categoryId
       formDataToSend.append('createdAt', formData.createdAt);
       formDataToSend.append('updatedAt', formData.updatedAt);
       formDataToSend.append('__v', formData.__v.toString());
@@ -337,6 +339,11 @@ const EditNew = () => {
           formDataToSend.append('contentImages', block.url); // Sử dụng key 'contentImages' đơn giản
         }
       });
+
+      // Debug FormData (khó log trực tiếp, dùng cách thủ công)
+      for (let pair of formDataToSend.entries()) {
+        console.log('FormData entry:', pair[0], pair[1]);
+      }
 
       const res = await fetch(`${process.env.REACT_APP_API_URL}/new/${slug}`, {
         method: 'PUT',
