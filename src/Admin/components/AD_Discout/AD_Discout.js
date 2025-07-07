@@ -364,6 +364,14 @@ const AD_Discount = () => {
                         </span>
                       </td>
                       <td onClick={(e) => e.stopPropagation()}>
+
+                        <button
+                          className={styles.iconButton}
+                          onClick={() => fetchOrderDetails(d._id)}
+                          title="Xem chi tiết"
+                        >
+                          <FontAwesomeIcon icon={faInfoCircle} />
+                        </button>
                         <button
                           className={styles.iconButton}
                           onClick={() => openModal('edit', d)}
@@ -385,13 +393,7 @@ const AD_Discount = () => {
                         >
                           <FontAwesomeIcon icon={d.isActive ? faEyeSlash : faEye} />
                         </button>
-                        <button
-                          className={styles.iconButton}
-                          onClick={() => fetchOrderDetails(d._id)}
-                          title="Xem chi tiết"
-                        >
-                          <FontAwesomeIcon icon={faInfoCircle} />
-                        </button>
+                        
                       </td>
                     </tr>
                   ))}
@@ -513,31 +515,34 @@ const AD_Discount = () => {
               {error && <div className={styles.error}>{error}</div>}
               <div className={styles.orderDetailsContainer}>
                 {orderDetails.length > 0 ? (
-                  orderDetails.map((order, i) => (
-                    <div key={i} className={styles.orderDetail}>
-                      <h3>Đơn hàng #{i + 1}</h3>
-                      <p><strong>Mã đơn hàng:</strong> {generateShortOrderCode(order._id)}</p>
-                      <p><strong>Tên người dùng:</strong> {order.fullName}</p>
-                      <p><strong>Số điện thoại:</strong> {order.phoneNumber}</p>
-                      <p><strong>Email:</strong> {order.email}</p>
-                      <p><strong>Tổng tiền:</strong> {order.totalAmount.toLocaleString('vi-VN')} VNĐ</p>
-                      <p><strong>Tiền sau giảm giá:</strong> {order.grandTotal.toLocaleString('vi-VN')} VNĐ</p>
-                      <p><strong>Trạng thái:</strong> {order.status}</p>
-                      <p><strong>Ngày tạo:</strong> {new Date(order.createdAt).toLocaleString('vi-VN')}</p>
-                      <p><strong>Sản phẩm:</strong></p>
-                      <ul className={styles.productList}>
-                        {order.products && order.products.length > 0 ? (
-                          order.products.map((product, j) => (
-                            <li key={j}>
-                              {product.productName} (Kích thước: {product.size_name}, Số lượng: {product.quantity}, Giá: {product.price.toLocaleString('vi-VN')} VNĐ)
-                            </li>
-                          ))
-                        ) : (
-                          <li>Không có thông tin sản phẩm.</li>
-                        )}
-                      </ul>
-                    </div>
-                  ))
+                  <table className={styles.table}>
+                    <thead className={styles.tableHeader}>
+                      <tr>
+                        <th>STT</th>
+                        <th>Mã đơn hàng</th>
+                        <th>Tên người dùng</th>
+                        <th>Số điện thoại</th>
+                        <th>Email</th>
+                        <th>Tổng tiền</th>
+                        <th>Trạng thái</th>
+                        <th>Ngày tạo</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {orderDetails.map((order, i) => (
+                        <tr key={i} className={styles.tableRow}>
+                          <td>{i + 1}</td>
+                          <td>{generateShortOrderCode(order._id)}</td>
+                          <td>{order.fullName}</td>
+                          <td>{order.phoneNumber}</td>
+                          <td>{order.email}</td>
+                          <td>{order.grandTotal.toLocaleString('vi-VN')} VNĐ</td>
+                          <td>{order.status}</td>
+                          <td>{new Date(order.createdAt).toLocaleString('vi-VN')}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 ) : (
                   <p>Không có đơn hàng nào sử dụng mã này.</p>
                 )}

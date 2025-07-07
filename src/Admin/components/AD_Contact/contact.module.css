@@ -28,10 +28,13 @@
 /* ===== Filter ===== */
 .searchFilter {
   display: flex;
-  align-items: center;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
   flex-wrap: wrap;
-  gap: 12px;
-  margin-bottom: 16px;
+  background: white;
+  padding: var(--spacing-md);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-sm);
 }
 
 .searchInput {

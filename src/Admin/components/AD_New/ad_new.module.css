@@ -23,14 +23,13 @@
 /* Bộ lọc và tìm kiếm */
 .searchFilter {
   display: flex;
-  gap: 16px;
-  /* margin-bottom: 24px; */
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
   flex-wrap: wrap;
-  /* background: white; */
-  padding: 16px;
-  border-radius: 8px;
-  /* box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); */
-  max-width: 100%;
+  background: white;
+  padding: var(--spacing-md);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-sm);
 
 }
 
