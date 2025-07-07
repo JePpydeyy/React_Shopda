@@ -31,11 +31,10 @@
     "react-scripts": "5.0.1",
     "react-toastify": "^11.0.5",
     "sanitize-html": "^2.17.0",
-    "web-vitals": "^2.1.4",
-    "serve": "^14.2.0"
+    "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "serve -s build",
+    "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
@@ -58,4 +57,4 @@
       "last 1 safari version"
     ]
   }
-}
+} 
