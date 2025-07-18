@@ -58,7 +58,7 @@
 
 /* Search Input */
 .searchInput {
-  width: 500px;
+  width: 250px;
   padding: 10px 16px;
   border: 1px solid var(--border-color);
   border-radius: var(--border-radius);
@@ -259,11 +259,6 @@
   border-color: var(--primary-color);
 }
 
-.inputField[readonly] {
-  background-color: #f1f5f9;
-  cursor: not-allowed;
-}
-
 /* Popup Buttons */
 .popupButtons {
   display: flex;
@@ -316,7 +311,7 @@
   color: var(--error-color);
 }
 
-/* Toast Notification (giả định tương tự NewsManagement.jsx) */
+/* Toast Notification */
 :global(.toast) {
   position: fixed;
   bottom: 20px;

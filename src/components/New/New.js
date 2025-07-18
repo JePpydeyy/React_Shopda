@@ -14,9 +14,10 @@ const New = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 9;
 
-  const API_BASE_URL = process.env.REACT_APP_API_BASE;
+  const API_BASE_URL = process.env.REACT_APP_API_BASE || 'https://api-tuyendung-cty.onrender.com';
 
   const truncateTitle = (title) => {
+    if (!title) return 'Không có tiêu đề';
     const words = title.split(' ');
     if (words.length > 10) {
       return words.slice(0, 10).join(' ') + '...';
@@ -25,7 +26,9 @@ const New = () => {
   };
 
   const formatDate = (dateString) => {
+    if (!dateString) return 'Không có ngày';
     const date = new Date(dateString);
+    if (isNaN(date.getTime())) return 'Ngày không hợp lệ';
     const options = { year: 'numeric', month: 'long', day: 'numeric' };
     return date.toLocaleDateString('vi-VN', options);
   };
@@ -40,13 +43,17 @@ const New = () => {
     const fetchCategories = async () => {
       setLoadingCategories(true);
       try {
-        const response = await fetch(`${API_BASE_URL}/api/new-category`);
+        const response = await fetch(`${API_BASE_URL}/api/new-category`, {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
         if (!response.ok) throw new Error(`Lỗi tải danh mục: ${response.statusText}`);
         const data = await response.json();
 
         const categoryData = Array.isArray(data) ? data : data.data || [];
         const filtered = categoryData
-          .filter((cat) => cat?.status === 'show')
+          .filter((cat) => cat?.status === 'show' && cat?.category && cat?._id)
           .map((cat) => ({
             _id: cat._id,
             name: cat.category,
@@ -66,23 +73,30 @@ const New = () => {
     const fetchNews = async () => {
       setLoadingNews(true);
       try {
-        const response = await fetch(`${API_BASE_URL}/api/new`);
+        const response = await fetch(`${API_BASE_URL}/api/new`, {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
         if (!response.ok) throw new Error(`Lỗi tải bài viết: ${response.statusText}`);
         const data = await response.json();
 
-        let items = Array.isArray(data) ? data : data.data || [];
-        items = items.filter((item) => item?.status === 'show');
+        let items = Array.isArray(data) ? data : data.data || data.news || [];
+        items = items.filter((item) => item?.status === 'show' && item?.slug && item?.title);
 
         if (selectedCategoryId) {
-          items = items.filter((item) => item.category_new === selectedCategoryId);
+          items = items.filter((item) => {
+            const categoryId = item.newCategory?._id || item.newCategory;
+            return categoryId === selectedCategoryId;
+          });
         }
 
         const mapped = items.map((item) => ({
-          _id: item._id,
+          _id: item._id || 'unknown',
           slug: item.slug,
           title: item.title || 'Không có tiêu đề',
-          createdAt: item.publishedAt,
-          thumbnailUrl: item.thumbnailUrl || '/images/kim.jpg',
+          createdAt: item.publishedAt || new Date().toISOString(),
+          thumbnailUrl: item.thumbnailUrl || '/images/placeholder.jpg',
         }));
 
         setNewsItems(mapped);
@@ -122,6 +136,8 @@ const New = () => {
               <li>Đang tải danh mục...</li>
             ) : error ? (
               <li>Lỗi: {error}</li>
+            ) : categories.length === 0 ? (
+              <li>Không có danh mục nào.</li>
             ) : (
               [{ _id: null, name: 'Tất cả' }, ...categories].map((cat) => (
                 <li key={cat._id || 'all'}>
@@ -157,7 +173,7 @@ const New = () => {
                       alt={article.title}
                       className={styles.postImageImg}
                       onError={(e) => {
-                        e.target.src = '/images/kim.jpg';
+                        e.target.src = '/images/placeholder.jpg';
                       }}
                     />
                   </div>

@@ -197,7 +197,7 @@ const CategoryNewsManagement = () => {
   };
 
   const handleEdit = (category) => {
-    setEditCategory({ ...category, status: category.status === 'Hiển thị' ? 'show' : 'hide' });
+    setEditCategory({ ...category });
   };
 
   const handleSaveEdit = async () => {
@@ -227,7 +227,8 @@ const CategoryNewsManagement = () => {
       const payload = {
         category: trimmedName,
         slug: editCategory.id ? editCategory.slug : slug,
-        status: editCategory.status,
+        // Không gửi status khi chỉnh sửa, chỉ gửi khi tạo mới với mặc định 'show'
+        ...(editCategory.id ? {} : { status: 'show' }),
       };
 
       const url = editCategory.id
@@ -249,6 +250,7 @@ const CategoryNewsManagement = () => {
         throw new Error(`Lỗi ${editCategory.id ? 'cập nhật' : 'tạo'} danh mục: ${errorData.message || res.statusText}`);
       }
 
+      // Cập nhật danh sách danh mục sau khi lưu
       await fetchCategories();
       setEditCategory(null);
       setToast({ message: `${editCategory.id ? 'Cập nhật' : 'Tạo'} danh mục thành công!`, type: 'success', show: true });
@@ -308,7 +310,7 @@ const CategoryNewsManagement = () => {
             <option value="most">Số bài viết: Nhiều nhất</option>
             <option value="least">Số bài viết: Ít nhất</option>
           </select>
-          <button className={styles.createButton} onClick={() => setEditCategory({ id: '', name: '', status: 'show' })}>
+          <button className={styles.createButton} onClick={() => setEditCategory({ id: '', name: '' })}>
             <FontAwesomeIcon icon={faPlus} /> Tạo Thêm Danh Mục
           </button>
         </div>
@@ -367,14 +369,6 @@ const CategoryNewsManagement = () => {
                 placeholder="Tên danh mục"
                 className={styles.inputField}
               />
-              <select
-                value={editCategory.status}
-                onChange={(e) => setEditCategory({ ...editCategory, status: e.target.value })}
-                className={styles.inputField}
-              >
-                <option value="show">Hiển thị</option>
-                <option value="hide">Ẩn</option>
-              </select>
               <div className={styles.popupButtons}>
                 <button onClick={handleSaveEdit} className={styles.saveButton}>Lưu</button>
                 <button onClick={() => setEditCategory(null)} className={styles.cancelButton}>Hủy</button>
