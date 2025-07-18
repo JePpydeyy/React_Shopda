@@ -4,6 +4,7 @@ import Sidebar from '../Sidebar/Sidebar';
 import styles from './ad_new.module.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPenToSquare, faEye, faEyeSlash, faTrash } from '@fortawesome/free-solid-svg-icons';
+import ToastNotification from '../../../components/ToastNotification/ToastNotification';
 
 const NewsManagement = () => {
   const [news, setNews] = useState([]);
@@ -15,28 +16,28 @@ const NewsManagement = () => {
   const [error, setError] = useState(null);
   const [selectedArticle, setSelectedArticle] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [toast, setToast] = useState({ message: '', type: '', show: false });
 
   const navigate = useNavigate();
   const API_BASE_URL = process.env.REACT_APP_API_BASE || 'https://api-tuyendung-cty.onrender.com';
   const PLACEHOLDER_IMAGE = 'https://via.placeholder.com/150';
   const PAGE_SIZE = 12;
 
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const res = await fetch(`${API_BASE_URL}/api/new-category`, {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('adminToken') || ''}`,
-          },
-        });
-        const result = await res.json();
-        setCategories(Array.isArray(result) ? result : result.data || []);
-      } catch {
-        setCategories([]);
-      }
-    };
-    fetchCategories();
-  }, []);
+  const fetchCategories = async () => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/new-category`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('adminToken') || ''}`,
+        },
+      });
+      if (!res.ok) throw new Error('Không thể lấy danh sách danh mục');
+      const result = await res.json();
+      setCategories(Array.isArray(result) ? result : result.data || []);
+    } catch (err) {
+      console.error('Lỗi khi lấy danh mục:', err);
+      setCategories([]);
+    }
+  };
 
   const fetchNews = async () => {
     try {
@@ -46,16 +47,16 @@ const NewsManagement = () => {
           Authorization: `Bearer ${localStorage.getItem('adminToken') || ''}`,
         },
       });
-
+      if (!res.ok) throw new Error('Không thể lấy danh sách tin tức');
       const result = await res.json();
-      const data = result.data || result.news || result || [];
+      const data = Array.isArray(result) ? result : result.data || result.news || [];
 
       const transformed = data.map(item => {
         const imageUrl = item.thumbnailUrl?.startsWith('http')
           ? item.thumbnailUrl
           : `${API_BASE_URL}/${item.thumbnailUrl?.replace(/^\/+/, '')}`;
 
-        const categoryId = item.newCategory?._id || ''; // Sử dụng newCategory._id
+        const categoryId = item.newCategory?._id || (typeof item.newCategory === 'string' ? item.newCategory : '');
         const categoryName = categories.find(c => c._id === categoryId)?.category || 'Chưa phân loại';
 
         return {
@@ -80,9 +81,11 @@ const NewsManagement = () => {
   };
 
   useEffect(() => {
-    if (categories.length > 0) {
-      fetchNews();
-    }
+    fetchCategories();
+  }, []);
+
+  useEffect(() => {
+    fetchNews();
   }, [categories]);
 
   const filteredNews = news.filter(article =>
@@ -107,19 +110,25 @@ const NewsManagement = () => {
     try {
       setLoading(true);
       const token = localStorage.getItem('adminToken');
+      if (!token) {
+        navigate('/admin/login');
+        throw new Error('Vui lòng đăng nhập để thực hiện hành động này');
+      }
+
       const article = news.find(item => item.slug === slug);
       if (!article) throw new Error('Không tìm thấy bài viết.');
 
+      const categoryId = article.category || '';
+      if (categoryId && !/^[0-9a-fA-F]{24}$/.test(categoryId)) {
+        throw new Error('ID danh mục không hợp lệ, vui lòng kiểm tra lại dữ liệu bài viết.');
+      }
+
       const formDataToSend = new FormData();
-      formDataToSend.append('title', article.title);
-      formDataToSend.append('slug', article.slug);
-      formDataToSend.append('thumbnailUrl', article.image !== PLACEHOLDER_IMAGE ? article.image : '');
-      formDataToSend.append('thumbnailCaption', '');
       formDataToSend.append('status', newStatus);
+      formDataToSend.append('category-new', categoryId);
+      formDataToSend.append('title', article.title);
       formDataToSend.append('publishedAt', article.publishedAt || new Date().toISOString());
       formDataToSend.append('views', article.views.toString());
-      formDataToSend.append('contentBlocks', JSON.stringify([]));
-      formDataToSend.append('category-new', JSON.stringify({ oid: article.category }));
 
       const res = await fetch(`${API_BASE_URL}/api/new/${slug}`, {
         method: 'PUT',
@@ -130,16 +139,18 @@ const NewsManagement = () => {
       });
 
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Lỗi không xác định');
+      if (!res.ok) {
+        throw new Error(data.error || data.message || 'Lỗi không xác định từ server');
+      }
 
       await fetchNews();
       if (selectedArticle?.slug === slug) {
         setSelectedArticle(prev => ({ ...prev, status: statusLabel }));
       }
 
-      alert(`Đã cập nhật trạng thái: ${statusLabel}`);
+      setToast({ message: `Đã cập nhật trạng thái: ${statusLabel}`, type: 'success', show: true });
     } catch (err) {
-      alert(`Lỗi cập nhật trạng thái: ${err.message}`);
+      setToast({ message: `Lỗi cập nhật trạng thái: ${err.message}`, type: 'error', show: true });
     } finally {
       setLoading(false);
     }
@@ -158,14 +169,14 @@ const NewsManagement = () => {
 
       const result = await res.json();
       if (res.ok) {
-        alert('Đã xóa bài viết thành công.');
+        setToast({ message: 'Đã xóa bài viết thành công.', type: 'success', show: true });
         fetchNews();
         if (selectedArticle?.slug === slug) setSelectedArticle(null);
       } else {
-        alert(`Xóa thất bại: ${result.message || 'Lỗi không xác định'}`);
+        throw new Error(result.message || 'Lỗi không xác định');
       }
     } catch (err) {
-      alert(`Lỗi khi xóa bài viết: ${err.message}`);
+      setToast({ message: `Lỗi khi xóa bài viết: ${err.message}`, type: 'error', show: true });
     }
   };
 
@@ -189,12 +200,17 @@ const NewsManagement = () => {
           ...article,
           contentBlocks: processedContentBlocks,
         });
+        setToast({ message: 'Đã tải nội dung chi tiết thành công.', type: 'success', show: true });
       } else {
-        alert('Không lấy được nội dung bài viết');
+        throw new Error('Không lấy được nội dung bài viết');
       }
     } catch (err) {
-      alert('Lỗi khi lấy nội dung chi tiết: ' + err.message);
+      setToast({ message: `Lỗi khi lấy nội dung chi tiết: ${err.message}`, type: 'error', show: true });
     }
+  };
+
+  const closeToast = () => {
+    setToast({ ...toast, show: false });
   };
 
   if (loading) return <div className={styles.container}>Đang tải...</div>;
@@ -311,12 +327,10 @@ const NewsManagement = () => {
             <div className={styles.articleContent}>
               {selectedArticle.contentBlocks?.length > 0 ? selectedArticle.contentBlocks.map((block, index) => {
                 switch (block.type) {
-                  case 'heading': return <h2 key={index}>{block.content}</h2>;
-                  case 'sub_heading': return <h3 key={index}>{block.content}</h3>;
                   case 'text': return <p key={index}>{block.content}</p>;
                   case 'image': return (
                     <div key={index} className={styles.articleImage}>
-                      <img src={block.url?.startsWith('http') ? block.url : `${API_BASE_URL}/${block.url}`} alt="block-img" />
+                      <img src={block.url?.startsWith('http') ? block.url : `${API_BASE_URL}/${block.url?.replace(/^\/+/, '')}`} alt="block-img" />
                       {block.caption && <p style={{ fontStyle: 'italic', textAlign: 'center' }}>{block.caption}</p>}
                     </div>
                   );
@@ -332,6 +346,14 @@ const NewsManagement = () => {
             <button className={styles.closeButton} onClick={() => setSelectedArticle(null)}>Đóng</button>
           </div>
         </div>
+      )}
+
+      {toast.show && (
+        <ToastNotification
+          message={toast.message}
+          type={toast.type}
+          onClose={closeToast}
+        />
       )}
     </div>
   );
